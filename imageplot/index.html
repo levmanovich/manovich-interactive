@@ -1,1 +1,2518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ImagePlot 2 — Visualize image collections</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body, #root { width: 100%; height: 100%; overflow: hidden; }
+  input[type="range"] { -webkit-appearance: none; appearance: none; height: 3px; background: #444; border-radius: 2px; outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #a0a0a0; cursor: pointer; }
+  input[type="range"]::-moz-range-track { height: 3px; background: #444; border-radius: 2px; }
+  input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #a0a0a0; cursor: pointer; border: none; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo
+} = React;
 
+// ── PCA helpers ──
+function mean(arr) {
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+function std(arr) {
+  const m = mean(arr);
+  return Math.sqrt(arr.reduce((a, b) => a + (b - m) ** 2, 0) / arr.length) || 1;
+}
+function computePCA(matrix) {
+  const n = matrix.length;
+  const p = matrix[0].length;
+  const means = Array.from({
+    length: p
+  }, (_, j) => mean(matrix.map(r => r[j])));
+  const stds = Array.from({
+    length: p
+  }, (_, j) => std(matrix.map(r => r[j])));
+  const Z = matrix.map(row => row.map((v, j) => (v - means[j]) / stds[j]));
+  const cov = Array.from({
+    length: p
+  }, (_, i) => Array.from({
+    length: p
+  }, (_, j) => Z.reduce((s, row) => s + row[i] * row[j], 0) / (n - 1)));
+  const eigenvectors = [];
+  let A = cov.map(r => [...r]);
+  for (let ev = 0; ev < 2; ev++) {
+    let v = Array.from({
+      length: p
+    }, () => Math.random());
+    for (let iter = 0; iter < 200; iter++) {
+      const Av = v.map((_, i) => A[i].reduce((s, a, j) => s + a * v[j], 0));
+      const norm = Math.sqrt(Av.reduce((s, x) => s + x * x, 0)) || 1;
+      v = Av.map(x => x / norm);
+    }
+    eigenvectors.push(v);
+    const lambda = v.reduce((s, vi, i) => s + vi * A[i].reduce((ss, a, j) => ss + a * v[j], 0), 0);
+    A = A.map((row, i) => row.map((val, j) => val - lambda * v[i] * v[j]));
+  }
+  return Z.map(row => eigenvectors.map(ev => ev.reduce((s, e, j) => s + e * row[j], 0)));
+}
+
+// ── t-SNE (Barnes-Hut simplified) ──
+function computeTSNE(matrix, {
+  perplexity = 30,
+  iterations = 500,
+  learningRate = 100
+} = {}) {
+  const n = matrix.length;
+  const p = matrix[0].length;
+  const means = Array.from({
+    length: p
+  }, (_, j) => mean(matrix.map(r => r[j])));
+  const stds = Array.from({
+    length: p
+  }, (_, j) => std(matrix.map(r => r[j])));
+  const X = matrix.map(row => row.map((v, j) => (v - means[j]) / stds[j]));
+  const dist2 = (a, b) => a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0);
+
+  // Compute pairwise affinities
+  const P = Array.from({
+    length: n
+  }, () => new Float64Array(n));
+  for (let i = 0; i < n; i++) {
+    const dists = X.map((xj, j) => i === j ? Infinity : dist2(X[i], xj));
+    let lo = 0.01,
+      hi = 100,
+      sigma = 1;
+    for (let iter = 0; iter < 50; iter++) {
+      sigma = (lo + hi) / 2;
+      const pVals = dists.map(d => d === Infinity ? 0 : Math.exp(-d / (2 * sigma * sigma)));
+      const sumP = pVals.reduce((a, b) => a + b, 0) || 1;
+      const H = -pVals.reduce((s, p, j) => s + (p > 0 ? p / sumP * Math.log2(p / sumP) : 0), 0);
+      if (Math.abs(H - Math.log2(perplexity)) < 0.01) break;
+      if (H > Math.log2(perplexity)) hi = sigma;else lo = sigma;
+    }
+    const pVals = dists.map(d => d === Infinity ? 0 : Math.exp(-d / (2 * sigma * sigma)));
+    const sumP = pVals.reduce((a, b) => a + b, 0) || 1;
+    for (let j = 0; j < n; j++) P[i][j] = pVals[j] / sumP;
+  }
+  // Symmetrize
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    const v = (P[i][j] + P[j][i]) / (2 * n);
+    P[i][j] = v;
+    P[j][i] = v;
+  }
+
+  // Initialize Y randomly
+  const Y = Array.from({
+    length: n
+  }, () => [Math.random() * 0.01 - 0.005, Math.random() * 0.01 - 0.005]);
+  const gains = Array.from({
+    length: n
+  }, () => [1, 1]);
+  const Ym1 = Y.map(y => [...y]);
+  for (let t = 0; t < iterations; t++) {
+    const exag = t < 100 ? 4 : 1;
+    // Compute Q
+    const num = Array.from({
+      length: n
+    }, () => new Float64Array(n));
+    let sumQ = 0;
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+      const d = 1 / (1 + (Y[i][0] - Y[j][0]) ** 2 + (Y[i][1] - Y[j][1]) ** 2);
+      num[i][j] = d;
+      num[j][i] = d;
+      sumQ += 2 * d;
+    }
+    sumQ = sumQ || 1;
+    const grad = Array.from({
+      length: n
+    }, () => [0, 0]);
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const mult = 4 * (exag * P[i][j] - num[i][j] / sumQ) * num[i][j];
+      grad[i][0] += mult * (Y[i][0] - Y[j][0]);
+      grad[i][1] += mult * (Y[i][1] - Y[j][1]);
+    }
+    const momentum = t < 250 ? 0.5 : 0.8;
+    for (let i = 0; i < n; i++) for (let d = 0; d < 2; d++) {
+      const signMatch = grad[i][d] > 0 === Y[i][d] - Ym1[i][d] > 0;
+      gains[i][d] = signMatch ? gains[i][d] * 0.8 : gains[i][d] + 0.2;
+      gains[i][d] = Math.max(gains[i][d], 0.01);
+      const prev = Y[i][d];
+      Y[i][d] = Y[i][d] + momentum * (Y[i][d] - Ym1[i][d]) - learningRate * gains[i][d] * grad[i][d];
+      Ym1[i][d] = prev;
+    }
+    // Center
+    const my0 = mean(Y.map(y => y[0])),
+      my1 = mean(Y.map(y => y[1]));
+    for (let i = 0; i < n; i++) {
+      Y[i][0] -= my0;
+      Y[i][1] -= my1;
+    }
+  }
+  return Y;
+}
+
+// ── Color utilities ──
+function yearToColor(t) {
+  // t: 0..1, blue → teal → orange → yellow → red
+  if (t <= 0.25) {
+    const s = t / 0.25;
+    const r = Math.round(20 + s * 0);
+    const g = Math.round(50 + s * 160);
+    const b = Math.round(190 - s * 30);
+    return `rgb(${r},${g},${b})`;
+  } else if (t <= 0.5) {
+    const s = (t - 0.25) / 0.25;
+    const r = Math.round(20 + s * 215);
+    const g = Math.round(210 - s * 60);
+    const b = Math.round(160 - s * 130);
+    return `rgb(${r},${g},${b})`;
+  } else if (t <= 0.75) {
+    const s = (t - 0.5) / 0.25;
+    const r = Math.round(235 + s * 20);
+    const g = Math.round(150 + s * 90);
+    const b = Math.round(30 - s * 20);
+    return `rgb(${r},${g},${b})`;
+  } else {
+    const s = (t - 0.75) / 0.25;
+    const r = Math.round(255 - s * 55);
+    const g = Math.round(240 - s * 180);
+    const b = Math.round(10 + s * 40);
+    return `rgb(${r},${g},${b})`;
+  }
+}
+const DARK_BG = "#111111";
+const CANVAS_BG = "#646464";
+const PANEL_BG = "#161616";
+const BORDER = "#2e2e2e";
+const ACCENT = "#e8e8e8";
+const TEXT = "#f2f2f2";
+const TEXT_DIM = "#b3b3b3";
+const TEXT_BRIGHT = "#f0f0f0";
+const CLUSTER_COLORS = ["#ff6b6b", "#4ecdc4", "#ffe66d", "#a29bfe", "#fd79a8"];
+
+// ── Feature extraction helpers ──
+function rgbToHsl(r, g, b) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h;
+  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;else if (max === g) h = ((b - r) / d + 2) / 6;else h = ((r - g) / d + 4) / 6;
+  return [h * 360, s, l];
+}
+function medianSorted(arr) {
+  const n = arr.length;
+  if (n === 0) return 0;
+  const mid = Math.floor(n / 2);
+  return n % 2 ? arr[mid] : (arr[mid - 1] + arr[mid]) / 2;
+}
+function stdDev(arr, meanVal) {
+  if (arr.length === 0) return 0;
+  const sumSq = arr.reduce((s, v) => s + (v - meanVal) ** 2, 0);
+  return Math.sqrt(sumSq / arr.length);
+}
+function circularMean(angles) {
+  let sinSum = 0,
+    cosSum = 0;
+  for (const a of angles) {
+    const rad = a * Math.PI / 180;
+    sinSum += Math.sin(rad);
+    cosSum += Math.cos(rad);
+  }
+  let m = Math.atan2(sinSum / angles.length, cosSum / angles.length) * 180 / Math.PI;
+  if (m < 0) m += 360;
+  return m;
+}
+function circularStd(angles, meanAngle) {
+  let cosSum = 0;
+  for (const a of angles) {
+    cosSum += Math.cos((a - meanAngle) * Math.PI / 180);
+  }
+  const R = cosSum / angles.length;
+  return Math.sqrt(-2 * Math.log(Math.max(R, 1e-10))) * (180 / Math.PI);
+}
+function shannonEntropy(values, numBins, minVal, maxVal) {
+  const range = maxVal - minVal || 1;
+  const bins = new Uint32Array(numBins);
+  for (const v of values) {
+    const idx = Math.min(numBins - 1, Math.max(0, Math.floor((v - minVal) / range * numBins)));
+    bins[idx]++;
+  }
+  const n = values.length;
+  let entropy = 0;
+  for (let i = 0; i < numBins; i++) {
+    if (bins[i] > 0) {
+      const p = bins[i] / n;
+      entropy -= p * Math.log2(p);
+    }
+  }
+  return entropy;
+}
+
+// Prepare pixel data from an image — shared by basic and all extraction
+function preparePixelData(img) {
+  const maxDim = 256;
+  let cw, ch;
+  if (img.naturalWidth <= maxDim && img.naturalHeight <= maxDim) {
+    cw = img.naturalWidth;
+    ch = img.naturalHeight;
+  } else {
+    const scale = Math.min(maxDim / img.naturalWidth, maxDim / img.naturalHeight);
+    cw = Math.round(img.naturalWidth * scale);
+    ch = Math.round(img.naturalHeight * scale);
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = cw;
+  canvas.height = ch;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0, cw, ch);
+  const imageData = ctx.getImageData(0, 0, cw, ch);
+  const px = imageData.data;
+  const n = cw * ch;
+  const brightness = new Float32Array(n);
+  const saturation = new Float32Array(n);
+  const hue = new Float32Array(n);
+  const red = new Uint8Array(n);
+  const green = new Uint8Array(n);
+  const blue = new Uint8Array(n);
+  for (let i = 0; i < n; i++) {
+    const off = i * 4;
+    red[i] = px[off];
+    green[i] = px[off + 1];
+    blue[i] = px[off + 2];
+    const [h, s, l] = rgbToHsl(px[off], px[off + 1], px[off + 2]);
+    brightness[i] = l;
+    saturation[i] = s;
+    hue[i] = h;
+  }
+  return {
+    cw,
+    ch,
+    n,
+    brightness,
+    saturation,
+    hue,
+    red,
+    green,
+    blue
+  };
+}
+function extractBasicFeatures(pd) {
+  const {
+    brightness,
+    saturation,
+    hue,
+    n
+  } = pd;
+  const bSorted = Float32Array.from(brightness).sort((a, b) => a - b);
+  const sSorted = Float32Array.from(saturation).sort((a, b) => a - b);
+  const bMedian = medianSorted(bSorted);
+  const sMedian = medianSorted(sSorted);
+  const bMean = brightness.reduce((a, b) => a + b, 0) / n;
+  const sMean = saturation.reduce((a, b) => a + b, 0) / n;
+  const hMean = circularMean(hue);
+  return {
+    brightness_median: bMedian,
+    brightness_stdev: stdDev(brightness, bMean),
+    saturation_median: sMedian,
+    saturation_stdev: stdDev(saturation, sMean),
+    hue_median: hMean,
+    hue_stdev: circularStd(hue, hMean)
+  };
+}
+function extractAllFeatures(pd) {
+  const {
+    cw,
+    ch,
+    n,
+    brightness,
+    saturation,
+    hue,
+    red,
+    green,
+    blue
+  } = pd;
+  const basic = extractBasicFeatures(pd);
+  const features = {
+    ...basic
+  };
+
+  // ── Spatial grid 3×3 (27 features) ──
+  const cellW = Math.floor(cw / 3);
+  const cellH = Math.floor(ch / 3);
+  const gridLabels = ["TL", "TC", "TR", "ML", "MC", "MR", "BL", "BC", "BR"];
+  for (let gr = 0; gr < 3; gr++) {
+    for (let gc = 0; gc < 3; gc++) {
+      const label = gridLabels[gr * 3 + gc];
+      let bSum = 0,
+        sSum = 0,
+        hSin = 0,
+        hCos = 0,
+        count = 0;
+      const y0 = gr * cellH,
+        y1 = gr === 2 ? ch : (gr + 1) * cellH;
+      const x0 = gc * cellW,
+        x1 = gc === 2 ? cw : (gc + 1) * cellW;
+      for (let y = y0; y < y1; y++) {
+        for (let x = x0; x < x1; x++) {
+          const idx = y * cw + x;
+          bSum += brightness[idx];
+          sSum += saturation[idx];
+          const rad = hue[idx] * Math.PI / 180;
+          hSin += Math.sin(rad);
+          hCos += Math.cos(rad);
+          count++;
+        }
+      }
+      features[`grid_${label}_brightness`] = count > 0 ? bSum / count : 0;
+      features[`grid_${label}_saturation`] = count > 0 ? sSum / count : 0;
+      let hm = Math.atan2(hSin / count, hCos / count) * 180 / Math.PI;
+      if (hm < 0) hm += 360;
+      features[`grid_${label}_hue`] = count > 0 ? hm : 0;
+    }
+  }
+
+  // ── Complexity / entropy (3 features) ──
+  features.brightness_entropy = shannonEntropy(brightness, 32, 0, 1);
+  features.hue_entropy = shannonEntropy(hue, 36, 0, 360);
+
+  // Edge density via Sobel gradient magnitude
+  const gray = brightness; // already 0..1
+  let edgePixels = 0;
+  const gradMag = new Float32Array(n);
+  const gradX = new Float32Array(n);
+  const gradY = new Float32Array(n);
+  for (let y = 1; y < ch - 1; y++) {
+    for (let x = 1; x < cw - 1; x++) {
+      const idx = y * cw + x;
+      const gx = -gray[(y - 1) * cw + (x - 1)] - 2 * gray[y * cw + (x - 1)] - gray[(y + 1) * cw + (x - 1)] + gray[(y - 1) * cw + (x + 1)] + 2 * gray[y * cw + (x + 1)] + gray[(y + 1) * cw + (x + 1)];
+      const gy = -gray[(y - 1) * cw + (x - 1)] - 2 * gray[(y - 1) * cw + x] - gray[(y - 1) * cw + (x + 1)] + gray[(y + 1) * cw + (x - 1)] + 2 * gray[(y + 1) * cw + x] + gray[(y + 1) * cw + (x + 1)];
+      const mag = Math.sqrt(gx * gx + gy * gy);
+      gradMag[idx] = mag;
+      gradX[idx] = gx;
+      gradY[idx] = gy;
+      if (mag > 0.15) edgePixels++;
+    }
+  }
+  const interiorPixels = Math.max(1, (cw - 2) * (ch - 2));
+  features.edge_density = edgePixels / interiorPixels;
+
+  // ── Line orientation (4 features) ──
+  let horizCount = 0,
+    vertCount = 0,
+    diagCount = 0,
+    totalEdge = 0;
+  const angleBins = new Float32Array(180);
+  for (let y = 1; y < ch - 1; y++) {
+    for (let x = 1; x < cw - 1; x++) {
+      const idx = y * cw + x;
+      if (gradMag[idx] <= 0.15) continue;
+      totalEdge++;
+      const gx = gradX[idx];
+      const gy = gradY[idx];
+      const angle = Math.atan2(Math.abs(gy), Math.abs(gx)) * 180 / Math.PI; // 0..90
+      let fullAngle = Math.atan2(gy, gx) * 180 / Math.PI;
+      if (fullAngle < 0) fullAngle += 180;
+      const bin = Math.min(179, Math.floor(fullAngle));
+      angleBins[bin]++;
+      if (angle < 20) horizCount++;else if (angle > 70) vertCount++;else diagCount++;
+    }
+  }
+  const te = Math.max(1, totalEdge);
+  features.pct_horizontal = horizCount / te;
+  features.pct_vertical = vertCount / te;
+  features.pct_diagonal = diagCount / te;
+  let maxBin = 0,
+    maxBinIdx = 0;
+  for (let i = 0; i < 180; i++) {
+    if (angleBins[i] > maxBin) {
+      maxBin = angleBins[i];
+      maxBinIdx = i;
+    }
+  }
+  features.dominant_angle = maxBinIdx;
+
+  // ── 16-bin grayscale histogram (16 features) ──
+  const grayHist = new Uint32Array(16);
+  for (let i = 0; i < n; i++) grayHist[Math.min(15, Math.floor(brightness[i] * 16))]++;
+  for (let b = 0; b < 16; b++) features[`gray_hist_${String(b).padStart(2, "0")}`] = grayHist[b] / n;
+
+  // ── 16-bin saturation histogram (16 features) ──
+  const satHist = new Uint32Array(16);
+  for (let i = 0; i < n; i++) satHist[Math.min(15, Math.floor(saturation[i] * 16))]++;
+  for (let b = 0; b < 16; b++) features[`sat_hist_${String(b).padStart(2, "0")}`] = satHist[b] / n;
+
+  // ── Local contrast (1 feature) — mean absolute difference between adjacent pixels ──
+  let lcSum = 0;
+  for (let y = 0; y < ch - 1; y++) {
+    for (let x = 0; x < cw - 1; x++) {
+      const idx = y * cw + x;
+      lcSum += Math.abs(brightness[idx] - brightness[idx + 1]);
+      lcSum += Math.abs(brightness[idx] - brightness[idx + cw]);
+    }
+  }
+  features.local_contrast = lcSum / (2 * (cw - 1) * (ch - 1));
+
+  // ── Aspect ratio (1 feature) ──
+  features.aspect_ratio = cw / Math.max(1, ch);
+
+  // ── RGB channel means (3 features) ──
+  let rChanSum = 0, gChanSum = 0, bChanSum = 0;
+  for (let i = 0; i < n; i++) { rChanSum += red[i]; gChanSum += green[i]; bChanSum += blue[i]; }
+  features.red_mean = rChanSum / n / 255;
+  features.green_mean = gChanSum / n / 255;
+  features.blue_mean = bChanSum / n / 255;
+
+  return features;
+}
+const BASIC_FEATURE_NAMES = ["brightness_median", "brightness_stdev", "saturation_median", "saturation_stdev", "hue_median", "hue_stdev"];
+const ALL_FEATURE_NAMES = [...BASIC_FEATURE_NAMES, "grid_TL_brightness", "grid_TL_saturation", "grid_TL_hue", "grid_TC_brightness", "grid_TC_saturation", "grid_TC_hue", "grid_TR_brightness", "grid_TR_saturation", "grid_TR_hue", "grid_ML_brightness", "grid_ML_saturation", "grid_ML_hue", "grid_MC_brightness", "grid_MC_saturation", "grid_MC_hue", "grid_MR_brightness", "grid_MR_saturation", "grid_MR_hue", "grid_BL_brightness", "grid_BL_saturation", "grid_BL_hue", "grid_BC_brightness", "grid_BC_saturation", "grid_BC_hue", "grid_BR_brightness", "grid_BR_saturation", "grid_BR_hue", "brightness_entropy", "hue_entropy", "edge_density", "pct_horizontal", "pct_vertical", "pct_diagonal", "dominant_angle", "gray_hist_00", "gray_hist_01", "gray_hist_02", "gray_hist_03", "gray_hist_04", "gray_hist_05", "gray_hist_06", "gray_hist_07", "gray_hist_08", "gray_hist_09", "gray_hist_10", "gray_hist_11", "gray_hist_12", "gray_hist_13", "gray_hist_14", "gray_hist_15", "sat_hist_00", "sat_hist_01", "sat_hist_02", "sat_hist_03", "sat_hist_04", "sat_hist_05", "sat_hist_06", "sat_hist_07", "sat_hist_08", "sat_hist_09", "sat_hist_10", "sat_hist_11", "sat_hist_12", "sat_hist_13", "sat_hist_14", "sat_hist_15", "local_contrast", "aspect_ratio", "red_mean", "green_mean", "blue_mean"];
+
+// ── Pair analysis: silhouette score + correlation ──
+function pearsonCorrelation(xs, ys) {
+  const n = xs.length;
+  let sx = 0,
+    sy = 0,
+    sxx = 0,
+    syy = 0,
+    sxy = 0;
+  for (let i = 0; i < n; i++) {
+    sx += xs[i];
+    sy += ys[i];
+    sxx += xs[i] * xs[i];
+    syy += ys[i] * ys[i];
+    sxy += xs[i] * ys[i];
+  }
+  const denom = Math.sqrt((n * sxx - sx * sx) * (n * syy - sy * sy));
+  return denom === 0 ? 0 : (n * sxy - sx * sy) / denom;
+}
+function kmeansCluster(points, k, maxIter = 15) {
+  const n = points.length;
+  // Initialize centroids by picking evenly spaced points from sorted order
+  const centroids = [];
+  for (let i = 0; i < k; i++) {
+    const idx = Math.floor(i * n / k);
+    centroids.push([points[idx][0], points[idx][1]]);
+  }
+  const assignments = new Uint8Array(n);
+  for (let iter = 0; iter < maxIter; iter++) {
+    // Assign
+    for (let i = 0; i < n; i++) {
+      let bestDist = Infinity,
+        bestK = 0;
+      for (let ki = 0; ki < k; ki++) {
+        const dx = points[i][0] - centroids[ki][0];
+        const dy = points[i][1] - centroids[ki][1];
+        const d = dx * dx + dy * dy;
+        if (d < bestDist) {
+          bestDist = d;
+          bestK = ki;
+        }
+      }
+      assignments[i] = bestK;
+    }
+    // Update
+    const sums = Array.from({
+      length: k
+    }, () => [0, 0, 0]);
+    for (let i = 0; i < n; i++) {
+      sums[assignments[i]][0] += points[i][0];
+      sums[assignments[i]][1] += points[i][1];
+      sums[assignments[i]][2]++;
+    }
+    for (let ki = 0; ki < k; ki++) {
+      if (sums[ki][2] > 0) {
+        centroids[ki][0] = sums[ki][0] / sums[ki][2];
+        centroids[ki][1] = sums[ki][1] / sums[ki][2];
+      }
+    }
+  }
+  return assignments;
+}
+function silhouetteScore(points, assignments, k) {
+  const n = points.length;
+  if (n < 2 || k < 2) return -1;
+
+  // Group points by cluster
+  const clusters = Array.from({
+    length: k
+  }, () => []);
+  for (let i = 0; i < n; i++) clusters[assignments[i]].push(i);
+
+  // Skip if any cluster is empty or all in one cluster
+  const nonEmpty = clusters.filter(c => c.length > 0);
+  if (nonEmpty.length < 2) return -1;
+  let totalScore = 0;
+  const dist = (i, j) => {
+    const dx = points[i][0] - points[j][0];
+    const dy = points[i][1] - points[j][1];
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+  for (let i = 0; i < n; i++) {
+    const myCluster = assignments[i];
+    const myGroup = clusters[myCluster];
+
+    // a(i) = average distance to points in same cluster
+    let ai = 0;
+    if (myGroup.length > 1) {
+      for (const j of myGroup) {
+        if (j !== i) ai += dist(i, j);
+      }
+      ai /= myGroup.length - 1;
+    }
+
+    // b(i) = minimum average distance to points in any other cluster
+    let bi = Infinity;
+    for (let ki = 0; ki < k; ki++) {
+      if (ki === myCluster || clusters[ki].length === 0) continue;
+      let avg = 0;
+      for (const j of clusters[ki]) avg += dist(i, j);
+      avg /= clusters[ki].length;
+      if (avg < bi) bi = avg;
+    }
+    const si = bi === Infinity ? 0 : (bi - ai) / Math.max(ai, bi);
+    totalScore += si;
+  }
+  return totalScore / n;
+}
+function computeClusterEllipses(points, assignments, k) {
+  const clusters = Array.from({ length: k }, () => []);
+  for (let i = 0; i < points.length; i++) clusters[assignments[i]].push(points[i]);
+  return clusters.map(pts => {
+    if (pts.length < 2) return null;
+    const mx = pts.reduce((s, p) => s + p[0], 0) / pts.length;
+    const my = pts.reduce((s, p) => s + p[1], 0) / pts.length;
+    let sxx = 0, sxy = 0, syy = 0;
+    for (const p of pts) {
+      const dx = p[0] - mx, dy = p[1] - my;
+      sxx += dx * dx; sxy += dx * dy; syy += dy * dy;
+    }
+    sxx /= pts.length; sxy /= pts.length; syy /= pts.length;
+    const trace = sxx + syy;
+    const det = sxx * syy - sxy * sxy;
+    const disc = Math.sqrt(Math.max(0, (trace / 2) ** 2 - det));
+    const lam1 = trace / 2 + disc;
+    const lam2 = trace / 2 - disc;
+    const angle = Math.abs(sxy) > 1e-10 ? Math.atan2(lam1 - sxx, sxy) : (sxx >= syy ? 0 : Math.PI / 2);
+    return { cx: mx, cy: my, a: 2 * Math.sqrt(Math.max(lam1, 0)), b: 2 * Math.sqrt(Math.max(lam2, 0)), angle };
+  });
+}
+function findInterestingPairs(data, numericCols) {
+  const n = data.length;
+  if (n < 6 || numericCols.length < 2) return [];
+
+  // Parse all columns into arrays, normalize to 0..1
+  const colData = {};
+  for (const col of numericCols) {
+    const vals = data.map(r => parseFloat(r[col]));
+    const min = Math.min(...vals),
+      max = Math.max(...vals);
+    const range = max - min || 1;
+    colData[col] = vals.map(v => (v - min) / range);
+  }
+  const results = [];
+  for (let a = 0; a < numericCols.length; a++) {
+    for (let b = a + 1; b < numericCols.length; b++) {
+      const colA = numericCols[a],
+        colB = numericCols[b];
+      const xs = colData[colA],
+        ys = colData[colB];
+
+      // Correlation
+      const corr = Math.abs(pearsonCorrelation(xs, ys));
+
+      // Build 2D points
+      const points = xs.map((x, i) => [x, ys[i]]);
+
+      // Try k = 2, 3, 4, 5 and take best silhouette
+      let bestScore = -1;
+      for (let k = 2; k <= 5; k++) {
+        if (n < k * 2) continue; // need enough points
+        const assignments = kmeansCluster(points, k);
+        const score = silhouetteScore(points, assignments, k);
+        if (score > bestScore) bestScore = score;
+      }
+      results.push({
+        colA,
+        colB,
+        score: bestScore,
+        correlated: corr > 0.9,
+        correlation: corr
+      });
+    }
+  }
+
+  // Sort by score descending
+  results.sort((a, b) => b.score - a.score);
+  return results.slice(0, 20); // top 20
+}
+// ── drawPlotOnCanvas ─────────────────────────────────────────────────────────
+// Standalone drawing function used by both the left (or single) and right canvases.
+function drawPlotOnCanvas(canvas, {
+  W, H, data, images, coords, zoom, pan, mode, colorCol,
+  xAxisLabel, yAxisLabel, thumbSize, circleSize, showGrid, showLabels,
+  labelCol, labelSize, labelColor, canvasRGB, animFrame, animCol,
+  hovered, sharedBounds, fileCol, panelLabel, showClusters, clusterData
+}) {
+  const ctx = canvas.getContext("2d");
+  canvas.width  = W * window.devicePixelRatio;
+  canvas.height = H * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  ctx.fillStyle = `rgb(${canvasRGB.r},${canvasRGB.g},${canvasRGB.b})`;
+  ctx.fillRect(0, 0, W, H);
+  if (!data || !coords || coords.length === 0) {
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.font = "14px 'DM Sans', sans-serif";
+    ctx.textAlign = "left";
+    const x = Math.min(300, W * 0.25), y = H / 2 - 60;
+    ctx.fillText("Load a data file and (optionally) an image folder.", x, y);
+    ctx.fillText("Or load an image folder and use Extract features.", x, y + 24);
+    ctx.fillText("If using Compare mode, load two data files and/or two image folders.", x, y + 48);
+    ctx.fillText("Then choose data columns for X / Y axes, or run PCA / t-SNE to visualize.", x, y + 72);
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.font = "12px 'DM Sans', sans-serif";
+    ctx.fillText("To visualize images, the data file needs a column listing image filenames", x, y + 108);
+    ctx.fillText("(e.g., image_001.jpg, image_002.jpg, \u2026)", x, y + 126);
+    return;
+  }
+  const margin = { top: 122, right: 30, bottom: 70, left: 100 };
+  const plotW = W - margin.left - margin.right;
+  const plotH = H - margin.top - margin.bottom;
+  const xs = coords.map(c => c.x).filter(v => isFinite(v));
+  const ys = coords.map(c => c.y).filter(v => isFinite(v));
+  const xMin = sharedBounds ? sharedBounds.xMin : Math.min(...xs);
+  const xMax = sharedBounds ? sharedBounds.xMax : Math.max(...xs);
+  const yMin = sharedBounds ? sharedBounds.yMin : Math.min(...ys);
+  const yMax = sharedBounds ? sharedBounds.yMax : Math.max(...ys);
+  const xRange = xMax - xMin || 1;
+  const yRange = yMax - yMin || 1;
+  const pad = 0.08;
+  const scaleX = v => margin.left + (v - xMin + xRange * pad) / (xRange * (1 + 2 * pad)) * plotW;
+  const scaleY = v => margin.top + plotH - (v - yMin + yRange * pad) / (yRange * (1 + 2 * pad)) * plotH;
+
+  function niceTicks(dMin, dMax) {
+    const range = dMax - dMin;
+    if (range === 0) return [dMin];
+    const rough = range / 5;
+    const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+    const norm = rough / mag;
+    let step;
+    if (norm <= 1) step = mag; else if (norm <= 2) step = 2 * mag;
+    else if (norm <= 5) step = 5 * mag; else step = 10 * mag;
+    const start = Math.floor(dMin / step) * step;
+    const end   = Math.ceil(dMax  / step) * step;
+    const ticks = [];
+    for (let v = start; v <= end + step * 0.001; v += step) ticks.push(Math.round(v * 1e6) / 1e6);
+    return ticks;
+  }
+  const xTicks = niceTicks(xMin, xMax);
+  const yTicks = niceTicks(yMin, yMax);
+
+  // Apply zoom & pan
+  ctx.save();
+  const cx = W / 2 + pan.x;
+  const cy = H / 2 + pan.y;
+  ctx.translate(cx, cy);
+  ctx.scale(zoom, zoom);
+  ctx.translate(-cx + pan.x, -cy + pan.y);
+
+  // Grid
+  if (showGrid) {
+    ctx.save();
+    ctx.beginPath(); ctx.rect(margin.left, margin.top, plotW, plotH); ctx.clip();
+    ctx.strokeStyle = "rgb(225,225,225)"; ctx.lineWidth = 0.5;
+    for (const xv of xTicks) { const px = scaleX(xv); ctx.beginPath(); ctx.moveTo(px, margin.top); ctx.lineTo(px, margin.top + plotH); ctx.stroke(); }
+    for (const yv of yTicks) { const py = scaleY(yv); ctx.beginPath(); ctx.moveTo(margin.left, py); ctx.lineTo(margin.left + plotW, py); ctx.stroke(); }
+    ctx.restore();
+  }
+
+  // Tick labels
+  ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.strokeStyle = "rgba(255,255,255,0.6)"; ctx.lineWidth = 1;
+  ctx.font = "300 13px 'DM Sans', sans-serif"; ctx.textAlign = "center";
+  for (const xv of xTicks) {
+    const px = scaleX(xv);
+    ctx.beginPath(); ctx.moveTo(px, margin.top + plotH); ctx.lineTo(px, margin.top + plotH + 6); ctx.stroke();
+    ctx.fillText(Number.isInteger(xv) ? xv.toString() : xv.toFixed(1), px, margin.top + plotH + 20);
+  }
+  ctx.textAlign = "right";
+  for (const yv of yTicks) {
+    const py = scaleY(yv);
+    if (py > margin.top + plotH) continue;
+    ctx.beginPath(); ctx.moveTo(margin.left - 6, py); ctx.lineTo(margin.left, py); ctx.stroke();
+    ctx.fillText(Number.isInteger(yv) ? yv.toString() : yv.toFixed(1), margin.left - 10, py + 4);
+  }
+
+  // Axis labels
+  ctx.fillStyle = "rgba(255,255,255,0.7)"; ctx.font = "14px 'DM Sans', sans-serif"; ctx.textAlign = "center";
+  ctx.fillText(xAxisLabel, margin.left + plotW / 2, margin.top + plotH + 55);
+  ctx.save(); ctx.translate(46, margin.top + plotH / 2); ctx.rotate(-Math.PI / 2);
+  ctx.fillText(yAxisLabel, 0, 0); ctx.restore();
+
+  // Color scale
+  let timeMin = 0, timeMax = 1, timeVals = [];
+  let colorIsNumeric = true, colorLabelMin = "0", colorLabelMax = "1";
+  if (colorCol && data[0][colorCol] !== undefined) {
+    const firstVal = Number(data[0][colorCol].trim());
+    colorIsNumeric = !isNaN(firstVal);
+    if (colorIsNumeric) {
+      timeVals = data.map(r => parseFloat(r[colorCol]));
+      timeMin = Math.min(...timeVals); timeMax = Math.max(...timeVals);
+      colorLabelMin = timeMin.toFixed(0); colorLabelMax = timeMax.toFixed(0);
+    } else {
+      const uniqueVals = [...new Set(data.map(r => (r[colorCol] || "").trim()))].sort();
+      const valToIdx = {}; uniqueVals.forEach((v, i) => { valToIdx[v] = i; });
+      timeVals = data.map(r => valToIdx[(r[colorCol] || "").trim()] || 0);
+      timeMin = 0; timeMax = Math.max(1, uniqueVals.length - 1);
+      colorLabelMin = uniqueVals[0] || ""; colorLabelMax = uniqueVals[uniqueVals.length - 1] || "";
+    }
+  } else {
+    timeVals = data.map((_, i) => i);
+    timeMin = 0; timeMax = data.length - 1;
+    colorLabelMin = "0"; colorLabelMax = String(data.length - 1);
+  }
+
+  // Animation visibility
+  const sorted = data.map((r, i) => ({ idx: i, time: timeVals[i] !== undefined ? timeVals[i] : i })).sort((a, b) => a.time - b.time);
+  const visibleSet = new Set();
+  if (animFrame >= 0) {
+    let animSorted = sorted;
+    if (animCol) {
+      const isNum = !isNaN(Number((data[0][animCol] || "").trim()));
+      animSorted = data.map((r, i) => {
+        const v = (r[animCol] || "").trim();
+        return { idx: i, val: isNum ? (parseFloat(v) || 0) : v };
+      }).sort((a, b) => isNum ? a.val - b.val : String(a.val).localeCompare(String(b.val)));
+    }
+    for (let i = 0; i < Math.min(animFrame, animSorted.length); i++) visibleSet.add(animSorted[i].idx);
+  }
+
+  // Data points
+  const fnCol = fileCol;
+  for (let i = 0; i < data.length; i++) {
+    if (animFrame >= 0 && !visibleSet.has(i)) continue;
+    const c = coords[i];
+    if (!isFinite(c.x) || !isFinite(c.y)) continue;
+    const px = scaleX(c.x), py = scaleY(c.y);
+    const t = timeVals.length ? (timeVals[i] - timeMin) / (timeMax - timeMin || 1) : 0.5;
+    const color = yearToColor(t);
+    const fn = (data[i][fnCol] || "").trim();
+    const img = images[fn] || images[fn.toLowerCase()];
+    if (mode === "images" && img && img.complete && img.naturalWidth > 0) {
+      const s = thumbSize, aspect = img.naturalWidth / img.naturalHeight;
+      const dw = aspect >= 1 ? s : s * aspect, dh = aspect >= 1 ? s / aspect : s;
+      ctx.drawImage(img, px - dw / 2, py - dh / 2, dw, dh);
+    } else {
+      const r = mode === "circles" ? circleSize * (0.5 + t) : 6;
+      ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.fillStyle = color; ctx.globalAlpha = 0.8; ctx.fill();
+      ctx.globalAlpha = 1; ctx.strokeStyle = "rgba(0,0,0,0.15)"; ctx.lineWidth = 0.5; ctx.stroke();
+    }
+    if (showLabels) {
+      const labelText = labelCol && data[i][labelCol] !== undefined ? String(data[i][labelCol]) : data[i].year || fn;
+      ctx.fillStyle = labelColor; ctx.font = `${labelSize}px 'DM Sans', sans-serif`; ctx.textAlign = "center";
+      ctx.fillText(labelText, px, py - (mode === "images" ? thumbSize / 2 : circleSize) - 4);
+    }
+  }
+
+  // Cluster ellipses (PCA / t-SNE only)
+  if (showClusters && clusterData && clusterData.ellipses) {
+    const xFactor = plotW / (xRange * (1 + 2 * pad));
+    const yFactor = plotH / (yRange * (1 + 2 * pad));
+    clusterData.ellipses.forEach((ell, ki) => {
+      if (!ell || ell.a < 1e-9) return;
+      const ex = scaleX(ell.cx), ey = scaleY(ell.cy);
+      const color = CLUSTER_COLORS[ki % CLUSTER_COLORS.length];
+      const cosA = Math.cos(ell.angle), sinA = Math.sin(ell.angle);
+      const ax = ell.a * cosA * xFactor, ay = -ell.a * sinA * yFactor;
+      const bx = -ell.b * sinA * xFactor, by = -ell.b * cosA * yFactor;
+      ctx.beginPath();
+      for (let t = 0; t <= Math.PI * 2 + 0.01; t += 0.04) {
+        const px = ex + ax * Math.cos(t) + bx * Math.sin(t);
+        const py = ey + ay * Math.cos(t) + by * Math.sin(t);
+        if (t < 0.01) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fillStyle = color; ctx.globalAlpha = 0.06; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.beginPath();
+      for (let t = 0; t <= Math.PI * 2 + 0.01; t += 0.04) {
+        const px = ex + ax * Math.cos(t) + bx * Math.sin(t);
+        const py = ey + ay * Math.cos(t) + by * Math.sin(t);
+        if (t < 0.01) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.75; ctx.stroke(); ctx.globalAlpha = 1;
+      ctx.fillStyle = color; ctx.globalAlpha = 0.9;
+      ctx.font = "bold 11px 'DM Sans', sans-serif"; ctx.textAlign = "center";
+      ctx.fillText("Cluster " + (ki + 1), ex, ey - ell.a * yFactor - 6);
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  // No-images message
+  if (mode === "images" && Object.keys(images).length === 0) {
+    ctx.fillStyle = "rgba(40,40,40,0.75)";
+    const msgW = 360, msgH = 44, msgX = (W - msgW) / 2, msgY = margin.top + 10;
+    ctx.fillRect(msgX, msgY, msgW, msgH);
+    ctx.strokeStyle = "#4a4a4a"; ctx.lineWidth = 1; ctx.strokeRect(msgX, msgY, msgW, msgH);
+    ctx.fillStyle = "#d0d0d0"; ctx.font = "13px 'DM Sans', sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("Load an image folder to display images", W / 2, msgY + 28);
+  }
+
+  // Animation counter
+  if (animFrame >= 0 && animFrame <= sorted.length) {
+    const currentItem = sorted[Math.min(animFrame - 1, sorted.length - 1)];
+    if (currentItem) {
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 28px 'DM Sans', sans-serif"; ctx.textAlign = "left";
+      ctx.fillText(data[currentItem.idx][animCol || colorCol || "year"] || "", margin.left + 50, margin.top - 10);
+      ctx.font = "14px 'DM Sans', sans-serif"; ctx.fillStyle = "rgba(255,255,255,0.6)";
+      ctx.fillText(`${animFrame} / ${data.length} images`, margin.left + 50, margin.top + 12);
+    }
+  }
+
+  ctx.restore(); // end zoom/pan
+
+  // Hover tooltip
+  if (hovered !== null && hovered >= 0 && hovered < data.length) {
+    const c = coords[hovered];
+    const rawPx = scaleX(c.x), rawPy = scaleY(c.y);
+    const cxT = W / 2 + pan.x, cyT = H / 2 + pan.y;
+    const px = cxT + zoom * (rawPx - cxT + pan.x);
+    const py = cyT + zoom * (rawPy - cyT + pan.y);
+    const fn = (data[hovered][fnCol] || "").trim();
+    const img = images[fn] || images[fn.toLowerCase()];
+    const coordLine1 = `${xAxisLabel}: ${c.x.toFixed(1)}`;
+    const coordLine2 = `${yAxisLabel}: ${c.y.toFixed(1)}`;
+    ctx.font = "11px 'DM Sans', sans-serif";
+    const textW = Math.max(ctx.measureText(fn).width, ctx.measureText(coordLine1).width, ctx.measureText(coordLine2).width) + 16;
+    const previewSize = 180, pad2 = 12;
+    let tooltipW = Math.max(textW, previewSize) + pad2 * 2, tooltipH = 55 + pad2 * 2;
+    let hasImg = img && img.complete && img.naturalWidth > 0;
+    let imgDw = 0, imgDh = 0;
+    if (hasImg) {
+      const aspect = img.naturalWidth / img.naturalHeight;
+      imgDw = aspect >= 1 ? previewSize : previewSize * aspect;
+      imgDh = aspect >= 1 ? previewSize / aspect : previewSize;
+      tooltipW = Math.max(imgDw, textW, previewSize) + pad2 * 2;
+      tooltipH = imgDh + 65 + pad2 * 2;
+    }
+    let tx = px + 20, ty = py - tooltipH - 10;
+    if (tx + tooltipW > W - 10) tx = px - tooltipW - 20;
+    if (ty < 10) ty = py + 20;
+    if (tx < 10) tx = 10;
+    ctx.fillStyle = "#222222"; ctx.shadowColor = "rgba(0,0,0,0.6)"; ctx.shadowBlur = 20;
+    ctx.beginPath(); ctx.roundRect(tx, ty, tooltipW, tooltipH, 6); ctx.fill();
+    ctx.shadowColor = "transparent"; ctx.strokeStyle = "rgba(255,255,255,0.25)"; ctx.lineWidth = 1; ctx.stroke();
+    if (hasImg) ctx.drawImage(img, tx + (tooltipW - imgDw) / 2, ty + pad2, imgDw, imgDh);
+    const textY = hasImg ? ty + pad2 + imgDh + 24 : ty + pad2 + 14;
+    ctx.fillStyle = "rgba(255,255,255,0.7)"; ctx.font = "11px 'DM Sans', sans-serif"; ctx.textAlign = "left";
+    ctx.fillText(fn, tx + pad2, textY);
+    ctx.fillText(coordLine1, tx + pad2, textY + 15);
+    ctx.fillText(coordLine2, tx + pad2, textY + 30);
+  }
+
+  // Color legend (circles mode only)
+  if (mode === "circles") {
+    const legendW = 260, legendH = 16;
+    const lx = W - legendW - 24, ly = 36;
+    for (let i = 0; i < legendW; i++) { ctx.fillStyle = yearToColor(i / legendW); ctx.fillRect(lx + i, ly, 1, legendH); }
+    ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "300 11px 'DM Sans', sans-serif";
+    ctx.textAlign = "left"; ctx.fillText(colorLabelMin, lx, ly + legendH + 18);
+    ctx.textAlign = "right"; ctx.fillText(colorLabelMax, lx + legendW, ly + legendH + 18);
+    ctx.textAlign = "center"; ctx.fillStyle = "rgba(255,255,255,0.7)"; ctx.font = "12px 'DM Sans', sans-serif";
+    const legendTitle = (colorCol || "row index");
+    const legendTitleFmt = legendTitle.charAt(0).toUpperCase() + legendTitle.slice(1).toLowerCase();
+    ctx.fillText(legendTitleFmt, lx + legendW / 2, ly - 6);
+  }
+
+  // Panel label — drawn last so it sits on top of everything
+  if (panelLabel) {
+    ctx.font = "16px 'DM Sans', sans-serif";
+    ctx.fillStyle = "#f2f2f2";
+    ctx.textAlign = "left";
+    ctx.globalAlpha = 1;
+    ctx.fillText(panelLabel, margin.left, 42);
+  }
+}
+
+function ImagePlot() {
+  const [extracting, setExtracting] = useState(false);
+  const [extractProgress, setExtractProgress] = useState({
+    done: 0,
+    total: 0
+  });
+  const [extractedFeatureCount, setExtractedFeatureCount] = useState(0);
+  const [extractLevel, setExtractLevel] = useState("basic"); // "basic" | "all"
+  const [suggestions, setSuggestions] = useState(null);
+  const [computingSuggestions, setComputingSuggestions] = useState(false);
+  const [data, setData] = useState(null);
+  const [columns, setColumns] = useState([]);
+  const [numericCols, setNumericCols] = useState([]);
+  const [featureCols, setFeatureCols] = useState([]);
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
+  const [images, setImages] = useState({});
+  const [imagesLoaded, setImagesLoaded] = useState(0);
+  const [xAxis, setXAxis] = useState("");
+  const [yAxis, setYAxis] = useState("");
+  const [colorCol, setColorCol] = useState("");
+  const [mode, setMode] = useState("circles"); // images | circles
+  const [dimReduce, setDimReduce] = useState("none"); // none | pca | tsne
+  const [thumbSize, setThumbSize] = useState(48);
+  const [circleSize, setCircleSize] = useState(10);
+  const [animating, setAnimating] = useState(false);
+  const [animCol, setAnimCol] = useState("");
+  const [animFrame, setAnimFrame] = useState(-1);
+  const [animFps, setAnimFps] = useState(8);
+  const [showLabels, setShowLabels] = useState(false);
+  const [showGrid, setShowGrid] = useState(true);
+  const [canvasRGB, setCanvasRGB] = useState({ r: 50, g: 50, b: 50 });
+  const [labelCol, setLabelCol] = useState("");
+  const [labelSize, setLabelSize] = useState(9);
+  const [labelColor, setLabelColor] = useState("#ffffff");
+  const [panelOpen, setPanelOpen] = useState(true);
+  const [computing, setComputing] = useState(false);
+  const [pcaCoords, setPcaCoords] = useState(null);
+  const [tsneCoords, setTsneCoords] = useState(null);
+  const [tsnePerplexity, setTsnePerplexity] = useState(15);
+  const [tsneIterations, setTsneIterations] = useState(500);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({
+    x: 0,
+    y: 0
+  });
+  const [dragging, setDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(null);
+  const [hovered, setHovered] = useState(null);
+  const canvasRef = useRef(null);
+  const wrapRef = useRef(null);
+  const animRef = useRef(null);
+  const [canvasSize, setCanvasSize] = useState({
+    w: 800,
+    h: 600
+  });
+  const fileColRef = useRef("");
+  const dataFileNameRef = useRef("imageplot");
+  const fileDataRef = useRef(null); // stores {rows, headers, numeric, fnCol} from loaded data file
+  const extractedRowsRef = useRef(null); // cache of last extracted feature rows for re-merge
+  const [showClusters, setShowClusters] = useState(false);
+  const [clusterN, setClusterN] = useState("auto");
+  const [clusterData, setClusterData] = useState(null);
+  // ── Compare mode state ───────────────────────────────────────────────────
+  const [compareMode, setCompareMode] = useState(false);
+  const [dataB, setDataB] = useState(null);
+  const [columnsB, setColumnsB] = useState([]);
+  const [numericColsB, setNumericColsB] = useState([]);
+  const [imagesB, setImagesB] = useState({});
+  const [imagesLoadedB, setImagesLoadedB] = useState(0);
+  const [labelA, setLabelA] = useState("Left");
+  const [labelB, setLabelB] = useState("Right");
+  const [sharedAxes, setSharedAxes] = useState(true);
+  const [hoveredB, setHoveredB] = useState(null);
+  const canvasRefB = useRef(null);
+  const fileColRefB = useRef("");
+  const [pcaCoordsB, setPcaCoordsB] = useState(null);
+  const [tsneCoordsB, setTsneCoordsB] = useState(null);
+
+
+  // Resize observer
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(entries => {
+      for (const e of entries) {
+        setCanvasSize({
+          w: Math.floor(e.contentRect.width),
+          h: Math.floor(e.contentRect.height)
+        });
+      }
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // Parse TSV data
+  const handleDataFile = useCallback(e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    dataFileNameRef.current = file.name.replace(/\.[^.]+$/, "");
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const text = ev.target.result.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+      const lines = text.trim().split("\n");
+      const headers = lines[0].split("\t").map(h => h.trim());
+      const rows = lines.slice(1).map(l => {
+        const vals = l.split("\t");
+        const obj = {};
+        headers.forEach((h, i) => {
+          obj[h] = (vals[i] || "").trim();
+        });
+        return obj;
+      }).filter(r => Object.keys(r).length === headers.length);
+      const numeric = headers.filter(h => {
+        return rows.every(r => {
+          const v = r[h];
+          return v !== "" && !isNaN(Number(v));
+        });
+      });
+      // Find the filename column: prioritize exact match on common names, then heuristic
+      const fnCol = headers.find(h => /^filename$/i.test(h)) || headers.find(h => /file|name|image/i.test(h) && !numeric.includes(h)) || headers.find(h => !numeric.includes(h)) || headers[0];
+      fileColRef.current = fnCol;
+
+      // Store the raw file data so extraction can merge into it later
+      fileDataRef.current = {
+        rows,
+        headers,
+        numeric,
+        fnCol
+      };
+      setColumns(headers);
+      setNumericCols(numeric);
+      setData(rows);
+
+      // Identify feature columns (exclude ID-like and time columns)
+      const features = numeric.filter(c => !/^(imageID|year|id|index)$/i.test(c));
+      setSelectedFeatures(features);
+
+      // Auto-select color column only (not axes — let user choose)
+      if (numeric.includes("year")) setColorCol("year");else if (numeric.length > 2) setColorCol(numeric[numeric.length - 1]);
+      setPcaCoords(null);
+      setTsneCoords(null);
+      setSuggestions(null);
+      setDimReduce("none");
+      setAnimFrame(-1);
+
+      // If features were already extracted, immediately re-merge with new file columns
+      if (extractedRowsRef.current) {
+        const cachedRows = extractedRowsRef.current;
+        const featureNames = cachedRows.length > 0 ? Object.keys(cachedRows[0]).filter(k => k !== "filename") : [];
+        const fMap = {};
+        for (const row of cachedRows) {
+          fMap[row.filename] = row;
+          fMap[row.filename.toLowerCase()] = row;
+          fMap[row.filename.trim()] = row;
+          fMap[row.filename.trim().toLowerCase()] = row;
+        }
+        const mergedData = rows.map(r => {
+          const fn = (r[fnCol] || "").trim();
+          const featRow = fMap[fn] || fMap[fn.toLowerCase()] || {};
+          const merged = { ...r };
+          for (const f of featureNames) merged[f] = featRow[f] ?? "";
+          return merged;
+        });
+        const newFeatureCols = featureNames.filter(f => !headers.includes(f));
+        const mergedHeaders = [...headers, ...newFeatureCols];
+        const mergedNumeric = [...numeric, ...newFeatureCols.filter(f => mergedData.every(r => r[f] !== "" && !isNaN(Number(r[f]))))];
+        setColumns(mergedHeaders);
+        setNumericCols(mergedNumeric);
+        setData(mergedData);
+        setSelectedFeatures(mergedNumeric.filter(c => !/^(imageID|year|id|index)$/i.test(c)));
+        setExtractedFeatureCount(featureNames.length);
+      } else {
+        setExtractedFeatureCount(0);
+      }
+    };
+    reader.readAsText(file);
+  }, []);
+
+  // Parse TSV data — dataset B
+  const handleDataFileB = useCallback(e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const text = ev.target.result.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+      const lines2 = text.trim().split("\n");
+      const headers = lines2[0].split("\t").map(h => h.trim());
+      const rows = lines2.slice(1).map(l => {
+        const vals = l.split("\t");
+        const obj = {};
+        headers.forEach((h, i) => { obj[h] = (vals[i] || "").trim(); });
+        return obj;
+      }).filter(r => Object.keys(r).length === headers.length);
+      const numeric = headers.filter(h => rows.every(r => { const v = r[h]; return v !== "" && !isNaN(Number(v)); }));
+      const fnCol = headers.find(h => /^filename$/i.test(h)) || headers.find(h => /file|name|image/i.test(h) && !numeric.includes(h)) || headers.find(h => !numeric.includes(h)) || headers[0];
+      fileColRefB.current = fnCol;
+      setColumnsB(headers);
+      setNumericColsB(numeric);
+      setDataB(rows);
+      setPcaCoordsB(null);
+      setTsneCoordsB(null);
+    };
+    reader.readAsText(file);
+  }, []);
+
+  // Load images from folder
+  const handleImageFolder = useCallback(e => {
+    const files = Array.from(e.target.files);
+    setImagesLoaded(0);
+    let loaded = 0;
+    const imageFiles = files.filter(f => /\.(jpg|jpeg|png|gif|bmp|webp|tiff?)$/i.test(f.name));
+    imageFiles.forEach(f => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const dataUrl = ev.target.result;
+        const img = new Image();
+        img.onload = () => {
+          const baseName = f.webkitRelativePath ? f.webkitRelativePath.split("/").pop() : f.name;
+          setImages(prev => {
+            const next = { ...prev };
+            next[baseName] = img;
+            next[baseName.toLowerCase()] = img;
+            next[baseName.trim()] = img;
+            next[baseName.trim().toLowerCase()] = img;
+            return next;
+          });
+          loaded++;
+          setImagesLoaded(loaded);
+        };
+        img.onerror = () => { loaded++; setImagesLoaded(loaded); };
+        img.src = dataUrl;
+      };
+      reader.readAsDataURL(f);
+    });
+  }, []);
+
+  // Load images from folder — dataset B
+  const handleImageFolderB = useCallback(e => {
+    const files = Array.from(e.target.files);
+    setImagesLoadedB(0);
+    let loaded = 0;
+    const imageFiles = files.filter(f => /\.(jpg|jpeg|png|gif|bmp|webp|tiff?)$/i.test(f.name));
+    imageFiles.forEach(f => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const dataUrl = ev.target.result;
+        const img = new Image();
+        img.onload = () => {
+          const baseName = f.webkitRelativePath ? f.webkitRelativePath.split("/").pop() : f.name;
+          setImagesB(prev => {
+            const next = { ...prev };
+            next[baseName] = img;
+            next[baseName.toLowerCase()] = img;
+            next[baseName.trim()] = img;
+            next[baseName.trim().toLowerCase()] = img;
+            return next;
+          });
+          loaded++;
+          setImagesLoadedB(loaded);
+        };
+        img.onerror = () => { loaded++; setImagesLoadedB(loaded); };
+        img.src = dataUrl;
+      };
+      reader.readAsDataURL(f);
+    });
+  }, []);
+
+  // Extract features from loaded images
+  const runExtraction = useCallback(async () => {
+    const hasA = Object.keys(images).length > 0;
+    const hasB = compareMode && Object.keys(imagesB).length > 0;
+    if (!hasA && !hasB) return;
+
+    setExtracting(true);
+    const isAll = extractLevel === "all";
+    const featureNames = isAll ? ALL_FEATURE_NAMES : BASIC_FEATURE_NAMES;
+
+    // Helper: deduplicate images object into array of {name, img}
+    function dedup(imgDict) {
+      const seen = new Set(), out = [];
+      for (const [name, img] of Object.entries(imgDict)) {
+        if (seen.has(img)) continue;
+        seen.add(img);
+        if (img && img.complete && img.naturalWidth > 0) out.push({ name, img });
+      }
+      return out;
+    }
+
+    // Helper: extract features from an array of images with UI yields
+    async function extractImages(uniqueArr, totalOffset) {
+      const rows = [];
+      for (let i = 0; i < uniqueArr.length; i++) {
+        const { name, img } = uniqueArr[i];
+        const pd = preparePixelData(img);
+        const features = isAll ? extractAllFeatures(pd) : extractBasicFeatures(pd);
+        const row = { filename: name };
+        for (const f of featureNames) row[f] = String(Math.round((features[f] ?? 0) * 1e4) / 1e4);
+        rows.push(row);
+        if (i % 2 === 0) {
+          setExtractProgress({ done: totalOffset + i + 1, total: totalOffset + uniqueArr.length });
+          await new Promise(r => setTimeout(r, 0));
+        }
+      }
+      return rows;
+    }
+
+    // Helper: merge extracted rows into an existing file dataset
+    function mergeIntoFile(fileRows, fileHeaders, fileNumeric, fnCol, extractedRows) {
+      const fmap = {};
+      for (const row of extractedRows) {
+        fmap[row.filename] = row;
+        fmap[row.filename.toLowerCase()] = row;
+        fmap[row.filename.trim()] = row;
+        fmap[row.filename.trim().toLowerCase()] = row;
+      }
+      const finalData = fileRows.map(r => {
+        const fn = (r[fnCol] || "").trim();
+        const feat = fmap[fn] || fmap[fn.toLowerCase()] || {};
+        const merged = { ...r };
+        for (const f of featureNames) merged[f] = feat[f] ?? "";
+        return merged;
+      });
+      const newCols = featureNames.filter(f => !fileHeaders.includes(f));
+      const finalHeaders = [...fileHeaders, ...newCols];
+      const finalNumeric = [...fileNumeric, ...newCols.filter(f => finalData.every(r => r[f] !== "" && !isNaN(Number(r[f]))))];
+      return { finalData, finalHeaders, finalNumeric };
+    }
+
+    const uniqueA = hasA ? dedup(images) : [];
+    const uniqueB = hasB ? dedup(imagesB) : [];
+    const total = uniqueA.length + uniqueB.length;
+    setExtractProgress({ done: 0, total });
+
+    // ── Extract dataset A ─────────────────────────────────────────────────
+    if (hasA) {
+      const rowsA = await extractImages(uniqueA, 0);
+      extractedRowsRef.current = rowsA; // cache for re-merge when data file loaded later
+      let finalData, finalHeaders, finalNumeric, finalFnCol;
+      if (fileDataRef.current) {
+        const { rows: fileRows, headers: fileHeaders, numeric: fileNumeric, fnCol } = fileDataRef.current;
+        finalFnCol = fnCol;
+        ({ finalData, finalHeaders, finalNumeric } = mergeIntoFile(fileRows, fileHeaders, fileNumeric, fnCol, rowsA));
+      } else {
+        finalFnCol = "filename";
+        finalData = rowsA;
+        finalHeaders = ["filename", ...featureNames];
+        finalNumeric = [...featureNames];
+      }
+      fileColRef.current = finalFnCol;
+      dataFileNameRef.current = fileDataRef.current ? dataFileNameRef.current : "imageplot_extracted";
+      setColumns(finalHeaders);
+      setNumericCols(finalNumeric);
+      setData(finalData);
+      setSelectedFeatures(finalNumeric.filter(c => !/^(imageID|year|id|index)$/i.test(c)));
+      setExtractedFeatureCount(featureNames.length);
+      if (fileDataRef.current) {
+        const { numeric: fn2 } = fileDataRef.current;
+        const cands = fn2.filter(c => !/^(imageID|id|index|filename)$/i.test(c));
+        setXAxis(cands[0] || "brightness_median");
+        setYAxis(cands[1] || "saturation_median");
+        setColorCol(cands[2] || cands[0] || "hue_median");
+      } else {
+        setXAxis("brightness_median"); setYAxis("saturation_median"); setColorCol("hue_median");
+      }
+      setPcaCoords(null); setTsneCoords(null); setSuggestions(null);
+      setDimReduce("none"); setAnimFrame(-1);
+    }
+
+    // ── Extract dataset B ─────────────────────────────────────────────────
+    if (hasB) {
+      const rowsB = await extractImages(uniqueB, uniqueA.length);
+      const fnColB = fileColRefB.current || "filename";
+      let finalDataB, finalHeadersB, finalNumericB;
+      if (dataB && dataB.length > 0) {
+        ({ finalData: finalDataB, finalHeaders: finalHeadersB, finalNumeric: finalNumericB } =
+          mergeIntoFile(dataB, columnsB.length ? columnsB : [fnColB], numericColsB.length ? numericColsB : [], fnColB, rowsB));
+      } else {
+        finalDataB = rowsB;
+        finalHeadersB = ["filename", ...featureNames];
+        finalNumericB = [...featureNames];
+      }
+      fileColRefB.current = fnColB;
+      setColumnsB(finalHeadersB);
+      setNumericColsB(finalNumericB);
+      setDataB(finalDataB);
+      setPcaCoordsB(null); setTsneCoordsB(null);
+    }
+
+    setExtracting(false);
+  }, [images, imagesB, extractLevel, compareMode, dataB, columnsB, numericColsB]);
+
+  // Export extracted data as TSV
+  const handleExportTSV = useCallback(() => {
+    if (!data || !columns.length) return;
+    let tsv;
+    if (compareMode && dataB && columnsB.length) {
+      // Combined export: merge all columns from both sets, add a 'set' column
+      const allCols = ["set", ...new Set([...columns, ...columnsB])];
+      const header = allCols.join("\t");
+      const rowsA = data.map(r => allCols.map(c => c === "set" ? (labelA || "left") : (r[c] ?? "")).join("\t"));
+      const rowsB = dataB.map(r => allCols.map(c => c === "set" ? (labelB || "right") : (r[c] ?? "")).join("\t"));
+      tsv = header + "\n" + [...rowsA, ...rowsB].join("\n");
+    } else {
+      const header = columns.join("\t");
+      const body = data.map(r => columns.map(c => r[c] ?? "").join("\t")).join("\n");
+      tsv = header + "\n" + body;
+    }
+    const blob = new Blob([tsv], { type: "text/tab-separated-values" });
+    const link = document.createElement("a");
+    link.download = `${dataFileNameRef.current}.txt`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }, [data, columns, compareMode, dataB, columnsB, labelA, labelB]);
+
+  // Compute PCA
+  const runPCA = useCallback(() => {
+    if (!data || selectedFeatures.length < 2) return;
+    setComputing(true);
+    setTimeout(() => {
+      const matrix = data.map(r => selectedFeatures.map(c => parseFloat(r[c])));
+      setPcaCoords(computePCA(matrix));
+      if (dataB) {
+        const featB = selectedFeatures.filter(f => numericColsB.includes(f));
+        const colsB = featB.length >= 2 ? featB : numericColsB.filter(c => !/^(imageID|year|id|index)$/i.test(c));
+        if (colsB.length >= 2) {
+          const matrixB = dataB.map(r => colsB.map(c => parseFloat(r[c])));
+          setPcaCoordsB(computePCA(matrixB));
+        } else { setPcaCoordsB(null); }
+      }
+      setComputing(false);
+      setDimReduce("pca");
+    }, 50);
+  }, [data, dataB, selectedFeatures, numericColsB]);
+
+  // Compute t-SNE
+  const runTSNE = useCallback(() => {
+    if (!data || selectedFeatures.length < 2) return;
+    setComputing(true);
+    setTimeout(() => {
+      const matrix = data.map(r => selectedFeatures.map(c => parseFloat(r[c])));
+      const perp = Math.min(tsnePerplexity, Math.floor((matrix.length - 1) / 3));
+      setTsneCoords(computeTSNE(matrix, { perplexity: perp, iterations: tsneIterations, learningRate: 100 }));
+      if (dataB) {
+        const featB = selectedFeatures.filter(f => numericColsB.includes(f));
+        const colsB = featB.length >= 2 ? featB : numericColsB.filter(c => !/^(imageID|year|id|index)$/i.test(c));
+        if (colsB.length >= 2) {
+          const matrixB = dataB.map(r => colsB.map(c => parseFloat(r[c])));
+          const perpB = Math.min(tsnePerplexity, Math.floor((matrixB.length - 1) / 3));
+          setTsneCoordsB(computeTSNE(matrixB, { perplexity: perpB, iterations: tsneIterations, learningRate: 100 }));
+        } else { setTsneCoordsB(null); }
+      }
+      setComputing(false);
+      setDimReduce("tsne");
+    }, 50);
+  }, [data, dataB, selectedFeatures, numericColsB, tsnePerplexity, tsneIterations]);
+
+  // Suggest interesting axis pairs
+  const runSuggestAxes = useCallback(() => {
+    if (!data || numericCols.length < 2) return;
+    setComputingSuggestions(true);
+    setTimeout(() => {
+      const results = findInterestingPairs(data, numericCols);
+      setSuggestions(results);
+      setComputingSuggestions(false);
+    }, 50);
+  }, [data, numericCols]);
+
+  // Compute cluster assignments + ellipses whenever projection or settings change
+  useEffect(() => {
+    if (!showClusters || dimReduce === "none") { setClusterData(null); return; }
+    const currentCoords = dimReduce === "pca" ? pcaCoords : tsneCoords;
+    if (!currentCoords || !data || data.length < 20) { setClusterData(null); return; }
+    const points = currentCoords.map(c => [c[0], c[1]]);
+    const n = points.length;
+    let bestK = typeof clusterN === "number" ? clusterN : 2;
+    let bestAssignments = null;
+    if (clusterN === "auto") {
+      let bestScore = -Infinity;
+      for (let k = 2; k <= 5; k++) {
+        if (n < k * 3) continue;
+        const asgn = kmeansCluster(points, k, 20);
+        const score = silhouetteScore(points, asgn, k);
+        if (score > bestScore) { bestScore = score; bestK = k; bestAssignments = asgn; }
+      }
+    } else {
+      if (n >= bestK * 3) bestAssignments = kmeansCluster(points, bestK, 20);
+    }
+    if (!bestAssignments) { setClusterData(null); return; }
+    const ellipses = computeClusterEllipses(points, bestAssignments, bestK);
+    setClusterData({ assignments: bestAssignments, ellipses, k: bestK });
+  }, [showClusters, clusterN, dimReduce, pcaCoords, tsneCoords, data]);
+
+  // Get plot coordinates
+  const getCoords = useCallback(() => {
+    if (!data) return null;
+    if (dimReduce === "pca" && pcaCoords) {
+      return pcaCoords.map(c => ({ x: c[0], y: c[1] }));
+    }
+    if (dimReduce === "tsne" && tsneCoords) {
+      return tsneCoords.map(c => ({ x: c[0], y: c[1] }));
+    }
+    const xCol = xAxis || numericCols[0] || "";
+    const yCol = yAxis || numericCols[1] || numericCols[0] || "";
+    if (!xCol || !yCol) return null;
+    return data.map(r => ({ x: parseFloat(r[xCol]), y: parseFloat(r[yCol]) }));
+  }, [data, dimReduce, pcaCoords, tsneCoords, xAxis, yAxis, numericCols]);
+
+  // Count how many data rows have matching images
+  const matchedImageCount = useMemo(() => {
+    if (!data || Object.keys(images).length === 0) return 0;
+    const fnCol = fileColRef.current;
+    return data.filter(r => {
+      const fn = (r[fnCol] || "").trim();
+      return images[fn] || images[fn.toLowerCase()];
+    }).length;
+  }, [data, images]);
+
+  // Coords for dataset B — mirrors getCoords: uses PCA/t-SNE when computed, else X/Y
+  const getCoordsB = useCallback(() => {
+    if (!dataB) return null;
+    if (dimReduce === "pca" && pcaCoordsB) {
+      return pcaCoordsB.map(c => ({ x: c[0], y: c[1] }));
+    }
+    if (dimReduce === "tsne" && tsneCoordsB) {
+      return tsneCoordsB.map(c => ({ x: c[0], y: c[1] }));
+    }
+    const xCol = xAxis || numericColsB[0] || "";
+    const yCol = yAxis || numericColsB[1] || numericColsB[0] || "";
+    if (!xCol || !yCol) return null;
+    return dataB.map(r => ({ x: parseFloat(r[xCol]), y: parseFloat(r[yCol]) }));
+  }, [dataB, dimReduce, pcaCoordsB, tsneCoordsB, xAxis, yAxis, numericColsB]);
+
+  // Matched image count — dataset B
+  const matchedImageCountB = useMemo(() => {
+    if (!dataB || Object.keys(imagesB).length === 0) return 0;
+    const fnCol = fileColRefB.current;
+    return dataB.filter(r => { const fn = (r[fnCol] || "").trim(); return imagesB[fn] || imagesB[fn.toLowerCase()]; }).length;
+  }, [dataB, imagesB]);
+
+  // Shared axis bounds — combines both datasets so they share the same scale.
+  // Disabled when one frame has projection coords and the other doesn't (incompatible spaces).
+  const sharedBounds = useMemo(() => {
+    if (!compareMode || !sharedAxes) return null;
+    if (dimReduce === "pca" && !(pcaCoords && pcaCoordsB)) return null;
+    if (dimReduce === "tsne" && !(tsneCoords && tsneCoordsB)) return null;
+    const cA = getCoords(), cB = getCoordsB();
+    if (!cA || !cB) return null;
+    const allX = [...cA, ...cB].map(c => c.x).filter(v => isFinite(v));
+    const allY = [...cA, ...cB].map(c => c.y).filter(v => isFinite(v));
+    if (!allX.length || !allY.length) return null;
+    return { xMin: Math.min(...allX), xMax: Math.max(...allX), yMin: Math.min(...allY), yMax: Math.max(...allY) };
+  }, [compareMode, sharedAxes, dimReduce, pcaCoords, pcaCoordsB, tsneCoords, tsneCoordsB, getCoords, getCoordsB]);
+
+  // Animation
+  useEffect(() => {
+    if (!animating || !data) return;
+    const col = animCol || colorCol;
+    let sortVals;
+    if (col && data[0][col] !== undefined && isNaN(Number(data[0][col].trim()))) {
+      const uniqueVals = [...new Set(data.map(r => (r[col] || "").trim()))].sort();
+      const valToIdx = {};
+      uniqueVals.forEach((v, i) => {
+        valToIdx[v] = i;
+      });
+      sortVals = data.map(r => valToIdx[(r[col] || "").trim()] || 0);
+    } else {
+      sortVals = data.map((r, i) => parseFloat(r[col] || r.year || i));
+    }
+    const sorted = data.map((r, i) => ({
+      idx: i,
+      time: sortVals[i]
+    })).sort((a, b) => a.time - b.time);
+    let frame = 0;
+    const interval = setInterval(() => {
+      frame++;
+      if (frame > sorted.length) {
+        setAnimating(false);
+        setAnimFrame(-1);
+        clearInterval(interval);
+        return;
+      }
+      setAnimFrame(frame);
+    }, Math.round(1000 / Math.max(1, animFps)));
+    animRef.current = interval;
+    return () => clearInterval(interval);
+  }, [animating, data, animCol, colorCol, animFps]);
+
+  // Canvas rendering — left / single canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const W = canvas.clientWidth || (compareMode ? Math.floor(canvasSize.w / 2) : canvasSize.w);
+    const H = canvas.clientHeight || canvasSize.h;
+    const coords = getCoords();
+    const xColA = xAxis || numericCols[0] || "";
+    const yColA = yAxis || numericCols[1] || numericCols[0] || "";
+    const xAxisLabel = dimReduce === "pca" ? "PCA 1" : dimReduce === "tsne" ? "t-SNE 1" : xColA;
+    const yAxisLabel = dimReduce === "pca" ? "PCA 2" : dimReduce === "tsne" ? "t-SNE 2" : yColA;
+    drawPlotOnCanvas(canvas, {
+      W, H, data, images, coords, zoom, pan, mode, colorCol,
+      xAxisLabel, yAxisLabel, thumbSize, circleSize, showGrid, showLabels,
+      labelCol, labelSize, labelColor, canvasRGB, animFrame, animCol,
+      hovered, sharedBounds, fileCol: fileColRef.current,
+      panelLabel: compareMode ? labelA : null,
+      showClusters, clusterData
+    });
+  }, [data, images, xAxis, yAxis, numericCols, colorCol, mode, dimReduce, pcaCoords, tsneCoords,
+     thumbSize, circleSize, animFrame, animCol, showLabels, showGrid, canvasRGB, labelCol, labelSize,
+     labelColor, zoom, pan, canvasSize, hovered, getCoords, compareMode, labelA, sharedBounds,
+     showClusters, clusterData]);
+
+  // Canvas rendering — right canvas (compare mode only)
+  useEffect(() => {
+    if (!compareMode) return;
+    const canvas = canvasRefB.current;
+    if (!canvas) return;
+    const W = canvas.clientWidth || Math.floor(canvasSize.w / 2);
+    const H = canvas.clientHeight || canvasSize.h;
+    const coords = getCoordsB();
+    const xColB = xAxis || numericColsB[0] || "";
+    const yColB = yAxis || numericColsB[1] || numericColsB[0] || "";
+    const xAxisLabelB = dimReduce === "pca" ? "PCA 1" : dimReduce === "tsne" ? "t-SNE 1" : xColB;
+    const yAxisLabelB = dimReduce === "pca" ? "PCA 2" : dimReduce === "tsne" ? "t-SNE 2" : yColB;
+    drawPlotOnCanvas(canvas, {
+      W, H, data: dataB, images: imagesB, coords, zoom, pan, mode, colorCol,
+      xAxisLabel: xAxisLabelB, yAxisLabel: yAxisLabelB, thumbSize, circleSize, showGrid, showLabels,
+      labelCol, labelSize, labelColor, canvasRGB, animFrame, animCol,
+      hovered: hoveredB, sharedBounds, fileCol: fileColRefB.current, panelLabel: labelB
+    });
+  }, [compareMode, dataB, imagesB, xAxis, yAxis, numericColsB, colorCol, mode, dimReduce,
+     pcaCoordsB, tsneCoordsB, thumbSize, circleSize, animFrame, animCol, showLabels, showGrid, canvasRGB,
+     labelCol, labelSize, labelColor, zoom, pan, canvasSize, hoveredB, getCoordsB, labelB, sharedBounds]);
+
+
+  // Mouse handling
+  // Wheel zoom — must be non-passive to preventDefault
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const onWheel = e => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.1 : 0.9;
+      setZoom(z => Math.max(0.3, Math.min(10, z * factor)));
+    };
+    canvas.addEventListener("wheel", onWheel, {
+      passive: false
+    });
+    return () => canvas.removeEventListener("wheel", onWheel);
+  }, []);
+  // Wheel zoom — canvas B
+  useEffect(() => {
+    if (!compareMode) return;
+    const canvas = canvasRefB.current;
+    if (!canvas) return;
+    const onWheel = e => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.1 : 0.9;
+      setZoom(z => Math.max(0.3, Math.min(10, z * factor)));
+    };
+    canvas.addEventListener("wheel", onWheel, { passive: false });
+    return () => canvas.removeEventListener("wheel", onWheel);
+  }, [compareMode]);
+  const handleMouseDown = useCallback(e => {
+    if (e.button === 0) {
+      setDragging(true);
+      setDragStart({
+        x: e.clientX - pan.x,
+        y: e.clientY - pan.y
+      });
+    }
+  }, [pan]);
+  const handleMouseMove = useCallback(e => {
+    if (dragging && dragStart) {
+      setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
+    }
+    if (!data || !canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const rawMx = e.clientX - rect.left;
+    const rawMy = e.clientY - rect.top;
+    const coords = getCoords();
+    if (!coords) return;
+    const W = compareMode ? Math.floor(canvasSize.w / 2) : canvasSize.w;
+    const H = canvasSize.h;
+    const mx = (rawMx - W / 2 - pan.x) / zoom + W / 2;
+    const my = (rawMy - H / 2 - pan.y) / zoom + H / 2;
+    const margin = { top: 122, right: 30, bottom: 70, left: 100 };
+    const plotW = W - margin.left - margin.right;
+    const plotH = H - margin.top - margin.bottom;
+    const xs = coords.map(c => c.x).filter(v => isFinite(v));
+    const ys = coords.map(c => c.y).filter(v => isFinite(v));
+    const xMin = sharedBounds ? sharedBounds.xMin : Math.min(...xs);
+    const xMax = sharedBounds ? sharedBounds.xMax : Math.max(...xs);
+    const yMin = sharedBounds ? sharedBounds.yMin : Math.min(...ys);
+    const yMax = sharedBounds ? sharedBounds.yMax : Math.max(...ys);
+    const xRange = xMax - xMin || 1;
+    const yRange = yMax - yMin || 1;
+    const pad = 0.08;
+    const scaleX = v => margin.left + (v - xMin + xRange * pad) / (xRange * (1 + 2 * pad)) * plotW;
+    const scaleY = v => margin.top + plotH - (v - yMin + yRange * pad) / (yRange * (1 + 2 * pad)) * plotH;
+    let closest = null, minDist = 30 / zoom;
+    for (let i = 0; i < coords.length; i++) {
+      const c = coords[i];
+      if (!isFinite(c.x) || !isFinite(c.y)) continue;
+      const px = scaleX(c.x), py = scaleY(c.y);
+      const d = Math.sqrt((mx - px) ** 2 + (my - py) ** 2);
+      if (d < minDist) { minDist = d; closest = i; }
+    }
+    setHovered(closest);
+  }, [dragging, dragStart, data, getCoords, canvasSize, zoom, pan, compareMode, sharedBounds]);
+  const handleMouseUp = useCallback(() => {
+    setDragging(false);
+  }, []);
+  const handleMouseMoveB = useCallback(e => {
+    if (dragging && dragStart) {
+      setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
+    }
+    if (!dataB || !canvasRefB.current) { setHoveredB(null); return; }
+    const rect = canvasRefB.current.getBoundingClientRect();
+    const rawMx = e.clientX - rect.left;
+    const rawMy = e.clientY - rect.top;
+    const coordsB = getCoordsB();
+    if (!coordsB) { setHoveredB(null); return; }
+    const W = Math.floor(canvasSize.w / 2);
+    const H = canvasSize.h;
+    const mx = (rawMx - W / 2 - pan.x) / zoom + W / 2;
+    const my = (rawMy - H / 2 - pan.y) / zoom + H / 2;
+    const margin = { top: 122, right: 30, bottom: 70, left: 100 };
+    const plotW = W - margin.left - margin.right;
+    const plotH = H - margin.top - margin.bottom;
+    const xs = coordsB.map(c => c.x).filter(v => isFinite(v));
+    const ys = coordsB.map(c => c.y).filter(v => isFinite(v));
+    const xMin = sharedBounds ? sharedBounds.xMin : Math.min(...xs);
+    const xMax = sharedBounds ? sharedBounds.xMax : Math.max(...xs);
+    const yMin = sharedBounds ? sharedBounds.yMin : Math.min(...ys);
+    const yMax = sharedBounds ? sharedBounds.yMax : Math.max(...ys);
+    const xRange = xMax - xMin || 1;
+    const yRange = yMax - yMin || 1;
+    const pad = 0.08;
+    const scaleX = v => margin.left + (v - xMin + xRange * pad) / (xRange * (1 + 2 * pad)) * plotW;
+    const scaleY = v => margin.top + plotH - (v - yMin + yRange * pad) / (yRange * (1 + 2 * pad)) * plotH;
+    let closest = null, minDist = 30 / zoom;
+    for (let i = 0; i < coordsB.length; i++) {
+      const c = coordsB[i];
+      if (!isFinite(c.x) || !isFinite(c.y)) continue;
+      const px = scaleX(c.x), py = scaleY(c.y);
+      const d = Math.sqrt((mx - px) ** 2 + (my - py) ** 2);
+      if (d < minDist) { minDist = d; closest = i; }
+    }
+    setHoveredB(closest);
+  }, [dragging, dragStart, dataB, getCoordsB, canvasSize, zoom, pan, sharedBounds]);
+
+  // Export
+  const [exportDataURL, setExportDataURL] = useState(null);
+  const [collapsed, setCollapsed] = useState({ mode: false, dataImages: false, extract: false, visualize: false, display: false, canvasColor: true, labels: true, animation: true, export: false });
+  const tog = key => setCollapsed(prev => ({ ...prev, [key]: !prev[key] }));
+  const handleExport = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    if (!compareMode || !canvasRefB.current) {
+      setExportDataURL(canvas.toDataURL("image/png"));
+      return;
+    }
+    // Compare mode: stitch left + divider + right into one image
+    const cB = canvasRefB.current;
+    const dpr = window.devicePixelRatio || 1;
+    const dividerW = 2;
+    const combined = document.createElement("canvas");
+    combined.width  = canvas.width + dividerW * dpr + cB.width;
+    combined.height = Math.max(canvas.height, cB.height);
+    const ctx = combined.getContext("2d");
+    ctx.drawImage(canvas, 0, 0);
+    ctx.fillStyle = "rgba(255,255,255,0.2)";
+    ctx.fillRect(canvas.width, 0, dividerW * dpr, combined.height);
+    ctx.drawImage(cB, canvas.width + dividerW * dpr, 0);
+    setExportDataURL(combined.toDataURL("image/png"));
+  }, [compareMode]);
+  const selectStyle = {
+    background: "#252525",
+    color: TEXT_DIM,
+    border: `1px solid ${BORDER}`,
+    borderRadius: "6px",
+    padding: "6px 10px",
+    fontSize: "12px",
+    width: "100%",
+    outline: "none",
+    cursor: "pointer"
+  };
+  const btnStyle = (active = false) => ({
+    background: active ? "#909090" : "#252525",
+    color: active ? "#1a1a1a" : TEXT,
+    border: `1px solid ${active ? "#909090" : "rgba(255,255,255,0.18)"}`,
+    borderRadius: "6px",
+    padding: "8px 14px",
+    fontSize: "12px",
+    cursor: "pointer",
+    fontWeight: active ? "600" : "500",
+    transition: "all 0.15s"
+  });
+  const labelStyle = {
+    color: TEXT_DIM,
+    fontSize: "13px",
+    fontWeight: "500",
+    marginBottom: "8px"
+  };
+  const headingStyle = {
+    color: TEXT_BRIGHT,
+    fontSize: "14px",
+    fontWeight: "700",
+    marginBottom: "16px",
+    letterSpacing: "0.02em"
+  };
+  const sectionStyle = {
+    marginBottom: "16px"
+  };
+  const dividerStyle = {
+    borderTop: `1px solid rgba(255,255,255,0.10)`,
+    margin: "24px 0"
+  };
+  const dividerLargeStyle = {
+    borderTop: `1px solid rgba(255,255,255,0.10)`,
+    margin: "24px 0 16px"
+  };
+  const SH = (label, key) => React.createElement("div", {
+    style: { ...headingStyle, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", userSelect: "none", marginBottom: collapsed[key] ? "0" : "16px" },
+    onClick: () => tog(key)
+  }, React.createElement("span", null, label), React.createElement("span", {
+    style: { fontSize: "13px", opacity: 0.45, display: "inline-block", transform: collapsed[key] ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }
+  }, "▾"));
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      height: "100vh",
+      width: "100vw",
+      background: DARK_BG,
+      color: TEXT,
+      fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif",
+      overflow: "hidden",
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("style", {
+    dangerouslySetInnerHTML: {
+      __html: `
+        input[type="range"] { -webkit-appearance: none; appearance: none; height: 3px; background: #444; border-radius: 2px; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #a0a0a0; cursor: pointer; }
+        input[type="range"]::-moz-range-track { height: 3px; background: #444; border-radius: 2px; }
+        input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #a0a0a0; cursor: pointer; border: none; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.32); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.52); }
+      `
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: panelOpen ? "280px" : "0px",
+      minWidth: "0px",
+      background: PANEL_BG,
+      overflowY: panelOpen ? "auto" : "hidden",
+      overflowX: "hidden",
+      display: "flex",
+      flexDirection: "column",
+      transition: "width 0.28s cubic-bezier(0.4,0,0.2,1)",
+      flexShrink: 0,
+      borderRight: "1px solid rgba(255,255,255,0.12)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: "280px",
+      padding: "22px 22px",
+      display: "flex",
+      flexDirection: "column",
+      opacity: panelOpen ? 1 : 0,
+      transition: "opacity 0.15s ease",
+      pointerEvents: panelOpen ? "auto" : "none"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: "24px"
+    }
+  }, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      margin: 0,
+      fontSize: "16px",
+      fontWeight: "800",
+      color: TEXT_BRIGHT,
+      letterSpacing: "-0.5px"
+    }
+  }, "ImagePlot 2"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      margin: "2px 0 25px",
+      fontSize: "14px",
+      color: TEXT,
+      lineHeight: "1.4",
+      fontWeight: "600"
+    }
+  }, "Visualize image collections"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "10px",
+      color: TEXT_DIM,
+      lineHeight: "1.6",
+      marginBottom: "8px"
+    }
+  }, "Scroll to zoom, drag to pan, hover for details"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: "1px",
+      background: "rgba(255,255,255,0.12)",
+      marginBottom: "8px"
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: () => {
+      setZoom(1);
+      setPan({
+        x: 0,
+        y: 0
+      });
+    },
+    style: {
+      background: "#252525",
+      border: `1px solid ${BORDER}`,
+      borderRadius: "6px",
+      cursor: "pointer",
+      color: TEXT_DIM,
+      fontSize: "11px",
+      padding: "5px 10px"
+    },
+    onMouseOver: e => e.currentTarget.style.color = TEXT,
+    onMouseOut: e => e.currentTarget.style.color = TEXT_DIM
+  }, "Reset view")), /*#__PURE__*/React.createElement("div", { style: dividerStyle }), SH("Mode", "mode"), !collapsed.mode && React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", { style: sectionStyle }, /*#__PURE__*/React.createElement("label", { style: { display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "12px", fontWeight: "600", color: TEXT } }, /*#__PURE__*/React.createElement("input", { type: "checkbox", checked: compareMode, onChange: e => setCompareMode(e.target.checked), style: { accentColor: ACCENT } }), "Compare mode")), compareMode && /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: "8px", marginBottom: "16px" } }, /*#__PURE__*/React.createElement("div", { style: { flex: 1 } }, /*#__PURE__*/React.createElement("div", { style: labelStyle }, "Left label"), /*#__PURE__*/React.createElement("input", { type: "text", value: labelA, onChange: e => setLabelA(e.target.value), style: { width: "100%", background: "#252525", border: `1px solid ${BORDER}`, borderRadius: "4px", color: TEXT, fontSize: "12px", padding: "4px 6px", outline: "none" } })), /*#__PURE__*/React.createElement("div", { style: { flex: 1 } }, /*#__PURE__*/React.createElement("div", { style: labelStyle }, "Right label"), /*#__PURE__*/React.createElement("input", { type: "text", value: labelB, onChange: e => setLabelB(e.target.value), style: { width: "100%", background: "#252525", border: `1px solid ${BORDER}`, borderRadius: "4px", color: TEXT, fontSize: "12px", padding: "4px 6px", outline: "none" } }))), /*#__PURE__*/React.createElement("label", { style: { display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "12px", color: TEXT_DIM, marginBottom: "16px" } }, /*#__PURE__*/React.createElement("input", { type: "checkbox", checked: sharedAxes, onChange: e => setSharedAxes(e.target.checked), style: { accentColor: ACCENT } }), "Shared axes")), /*#__PURE__*/React.createElement("div", { style: dividerStyle }), SH("Data and Images", "dataImages"), !collapsed.dataImages && React.createElement(React.Fragment, null, !compareMode && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", { style: sectionStyle }, /*#__PURE__*/React.createElement("div", { style: labelStyle }, "Data File"), /*#__PURE__*/React.createElement("label", { style: { display: "block", padding: "6px 8px", background: "#252525", border: `1px dashed ${BORDER}`, borderRadius: "6px", textAlign: "left", cursor: "pointer", fontSize: "12px", color: TEXT_DIM } }, fileDataRef.current ? `\u2713 ${fileDataRef.current.headers.length} columns loaded` : data ? `\u2713 ${data.length} rows loaded` : "Choose .txt / .tsv file", /*#__PURE__*/React.createElement("input", { type: "file", accept: ".txt,.tsv,.csv", onChange: handleDataFile, style: { display: "none" } }))), /*#__PURE__*/React.createElement("div", { style: sectionStyle }, /*#__PURE__*/React.createElement("div", { style: labelStyle }, "Image Folder"), /*#__PURE__*/React.createElement("label", { style: { display: "block", padding: "6px 8px", background: "#252525", border: `1px dashed ${BORDER}`, borderRadius: "6px", textAlign: "left", cursor: "pointer", fontSize: "12px", color: TEXT_DIM } }, Object.keys(images).length > 0 ? `\u2713 ${imagesLoaded} images loaded` : "Choose folder", /*#__PURE__*/React.createElement("input", { type: "file", webkitdirectory: "", directory: "", multiple: true, onChange: handleImageFolder, style: { display: "none" } })), Object.keys(images).length > 0 && data && /*#__PURE__*/React.createElement("div", { style: { marginTop: "4px", fontSize: "11px", color: matchedImageCount > 0 ? TEXT : "#f87171" } }, matchedImageCount, " of ", data.length, " matched to data"))), compareMode && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", { style: { background: "rgba(255,255,255,0.04)", borderRadius: "6px", padding: "8px", marginBottom: "8px" } }, /*#__PURE__*/React.createElement("div", { style: { fontSize: "11px", fontWeight: "700", color: TEXT_BRIGHT, marginBottom: "8px" } }, labelA || "Left"), /*#__PURE__*/React.createElement("div", { style: sectionStyle }, /*#__PURE__*/React.createElement("div", { style: labelStyle }, "Data File"), /*#__PURE__*/React.createElement("label", { style: { display: "block", padding: "6px 8px", background: "#252525", border: `1px dashed ${BORDER}`, borderRadius: "6px", textAlign: "left", cursor: "pointer", fontSize: "12px", color: TEXT_DIM } }, data ? `\u2713 ${data.length} rows` : "Choose .txt / .tsv", /*#__PURE__*/React.createElement("input", { type: "file", accept: ".txt,.tsv,.csv", onChange: handleDataFile, style: { display: "none" } }))), /*#__PURE__*/React.createElement("div", { style: sectionStyle }, /*#__PURE__*/React.createElement("div", { style: labelStyle }, "Image Folder"), /*#__PURE__*/React.createElement("label", { style: { display: "block", padding: "6px 8px", background: "#252525", border: `1px dashed ${BORDER}`, borderRadius: "6px", textAlign: "left", cursor: "pointer", fontSize: "12px", color: TEXT_DIM } }, Object.keys(images).length > 0 ? `\u2713 ${imagesLoaded} images` : "Choose folder", /*#__PURE__*/React.createElement("input", { type: "file", webkitdirectory: "", directory: "", multiple: true, onChange: handleImageFolder, style: { display: "none" } })), Object.keys(images).length > 0 && data && /*#__PURE__*/React.createElement("div", { style: { marginTop: "4px", fontSize: "11px", color: matchedImageCount > 0 ? TEXT : "#f87171" } }, matchedImageCount, " / ", data.length, " matched"))), /*#__PURE__*/React.createElement("div", { style: { background: "rgba(255,255,255,0.04)", borderRadius: "6px", padding: "8px" } }, /*#__PURE__*/React.createElement("div", { style: { fontSize: "11px", fontWeight: "700", color: TEXT_BRIGHT, marginBottom: "8px" } }, labelB || "Right"), /*#__PURE__*/React.createElement("div", { style: sectionStyle }, /*#__PURE__*/React.createElement("div", { style: labelStyle }, "Data File"), /*#__PURE__*/React.createElement("label", { style: { display: "block", padding: "6px 8px", background: "#252525", border: `1px dashed ${BORDER}`, borderRadius: "6px", textAlign: "left", cursor: "pointer", fontSize: "12px", color: TEXT_DIM } }, dataB ? `\u2713 ${dataB.length} rows` : "Choose .txt / .tsv", /*#__PURE__*/React.createElement("input", { type: "file", accept: ".txt,.tsv,.csv", onChange: handleDataFileB, style: { display: "none" } }))), /*#__PURE__*/React.createElement("div", { style: sectionStyle }, /*#__PURE__*/React.createElement("div", { style: labelStyle }, "Image Folder"), /*#__PURE__*/React.createElement("label", { style: { display: "block", padding: "6px 8px", background: "#252525", border: `1px dashed ${BORDER}`, borderRadius: "6px", textAlign: "left", cursor: "pointer", fontSize: "12px", color: TEXT_DIM } }, Object.keys(imagesB).length > 0 ? `\u2713 ${imagesLoadedB} images` : "Choose folder", /*#__PURE__*/React.createElement("input", { type: "file", webkitdirectory: "", directory: "", multiple: true, onChange: handleImageFolderB, style: { display: "none" } })), Object.keys(imagesB).length > 0 && dataB && /*#__PURE__*/React.createElement("div", { style: { marginTop: "4px", fontSize: "11px", color: matchedImageCountB > 0 ? TEXT : "#f87171" } }, matchedImageCountB, " / ", dataB.length, " matched")))), null), /*#__PURE__*/React.createElement("div", {
+    style: dividerStyle
+  }), SH("Extract features", "extract"), !collapsed.extract && React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      marginBottom: "16px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      padding: 0,
+      fontSize: "11px",
+      fontWeight: extractLevel === "basic" ? "600" : "400",
+      color: extractLevel === "basic" ? TEXT_BRIGHT : TEXT_DIM,
+      textDecoration: extractLevel === "basic" ? "underline" : "none",
+      textUnderlineOffset: "2px"
+    },
+    onClick: () => setExtractLevel("basic")
+  }, "Basic (6)"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: TEXT_DIM,
+      fontSize: "11px"
+    }
+  }, "\xB7"), /*#__PURE__*/React.createElement("button", {
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      padding: 0,
+      fontSize: "11px",
+      fontWeight: extractLevel === "all" ? "600" : "400",
+      color: extractLevel === "all" ? TEXT_BRIGHT : TEXT_DIM,
+      textDecoration: extractLevel === "all" ? "underline" : "none",
+      textUnderlineOffset: "2px"
+    },
+    onClick: () => setExtractLevel("all")
+  }, "All (77)")), /*#__PURE__*/React.createElement("div", {
+    style: { fontSize: "11px", color: TEXT_DIM, marginBottom: "16px" }
+  }, imagesLoaded > 0 || imagesLoadedB > 0
+      ? compareMode
+        ? `${imagesLoaded} left + ${imagesLoadedB} right images ready`
+        : `${imagesLoaded} images ready`
+      : "Load an image folder to enable"
+  ), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: "16px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    style: {
+      ...btnStyle(true),
+      opacity: (Object.keys(images).length === 0 && Object.keys(imagesB).length === 0) || extracting ? 0.45 : 1,
+      background: (Object.keys(images).length > 0 || Object.keys(imagesB).length > 0) && !extracting ? ACCENT : "#333333",
+      color: (Object.keys(images).length > 0 || Object.keys(imagesB).length > 0) && !extracting ? "#1a1a1a" : TEXT,
+      border: "none",
+      fontWeight: "600"
+    },
+    onClick: runExtraction,
+    disabled: (Object.keys(images).length === 0 && Object.keys(imagesB).length === 0) || extracting
+  }, extracting ? `Extracting… ${extractProgress.done} / ${extractProgress.total}` : "Extract"), extracting && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "8px",
+      height: "3px",
+      background: "#575757",
+      borderRadius: "2px",
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: "100%",
+      width: `${extractProgress.total > 0 ? extractProgress.done / extractProgress.total * 100 : 0}%`,
+      background: ACCENT,
+      borderRadius: "2px",
+      transition: "width 0.15s ease-out"
+    }
+  })), extractedFeatureCount > 0 && !extracting && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "8px",
+      fontSize: "11px",
+      color: TEXT_DIM
+    }
+  }, "\u2713 ", data ? data.length : 0, " images \xB7 ", extractedFeatureCount, " features", fileDataRef.current ? " + file cols" : ""))), data && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: dividerStyle
+  }), SH("Visualize", "visualize"), !collapsed.visualize && React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: "8px",
+      flexWrap: "wrap",
+      marginBottom: "16px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    style: btnStyle(dimReduce === "none"),
+    onClick: () => setDimReduce("none")
+  }, "X / Y Axes"), /*#__PURE__*/React.createElement("button", {
+    style: btnStyle(dimReduce === "pca"),
+    onClick: () => {
+      setDimReduce("pca");
+      setPcaCoords(null);
+    }
+  }, "PCA"), /*#__PURE__*/React.createElement("button", {
+    style: btnStyle(dimReduce === "tsne"),
+    onClick: () => {
+      setDimReduce("tsne");
+      setTsneCoords(null);
+    }
+  }, "t-SNE")), dimReduce === "none" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: sectionStyle
+  }, /*#__PURE__*/React.createElement("div", {
+    style: labelStyle
+  }, "X Axis"), /*#__PURE__*/React.createElement("select", {
+    value: xAxis,
+    onChange: e => setXAxis(e.target.value),
+    style: selectStyle
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 select \u2014"), numericCols.map(c => /*#__PURE__*/React.createElement("option", {
+    key: c,
+    value: c
+  }, c)))), /*#__PURE__*/React.createElement("div", {
+    style: sectionStyle
+  }, /*#__PURE__*/React.createElement("div", {
+    style: labelStyle
+  }, "Y Axis"), /*#__PURE__*/React.createElement("select", {
+    value: yAxis,
+    onChange: e => setYAxis(e.target.value),
+    style: selectStyle
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 select \u2014"), numericCols.map(c => /*#__PURE__*/React.createElement("option", {
+    key: c,
+    value: c
+  }, c)))), numericCols.length >= 4 && /*#__PURE__*/React.createElement("div", {
+    style: sectionStyle
+  }, /*#__PURE__*/React.createElement("span", {
+    onClick: !computingSuggestions ? runSuggestAxes : undefined,
+    style: {
+      fontSize: "11px",
+      color: computingSuggestions ? TEXT_DIM : TEXT,
+      cursor: computingSuggestions ? "default" : "pointer",
+      display: "inline-block",
+      padding: "3px 10px",
+      border: `1px solid ${computingSuggestions ? BORDER : "rgba(255,255,255,0.4)"}`,
+      borderRadius: "4px",
+      background: "transparent"
+    }
+  }, computingSuggestions ? "Analyzing…" : "Suggest axes"), suggestions && suggestions.length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "8px",
+      maxHeight: "180px",
+      overflowY: "auto",
+      background: "#252525",
+      border: `1px solid ${BORDER}`,
+      borderRadius: "6px",
+      padding: "4px"
+    }
+  }, suggestions.map((s, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    onClick: () => {
+      setXAxis(s.colA);
+      setYAxis(s.colB);
+      setDimReduce("none");
+    },
+    style: {
+      padding: "5px 8px",
+      borderRadius: "4px",
+      cursor: "pointer",
+      fontSize: "11px",
+      lineHeight: "1.4",
+      color: s.correlated ? TEXT_DIM : TEXT,
+      background: xAxis === s.colA && yAxis === s.colB ? "#707070" : "transparent"
+    },
+    onMouseOver: e => e.currentTarget.style.background = "#626262",
+    onMouseOut: e => e.currentTarget.style.background = xAxis === s.colA && yAxis === s.colB ? "#707070" : "transparent"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: TEXT_BRIGHT,
+      fontFamily: "'DM Mono', monospace",
+      marginRight: "6px"
+    }
+  }, (s.score > 0 ? s.score : 0).toFixed(2)), s.colA, " \xD7 ", s.colB, s.correlated && /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: TEXT_DIM,
+      marginLeft: "4px",
+      fontSize: "10px"
+    }
+  }, "(corr)")))))), dimReduce !== "none" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: sectionStyle
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: "8px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: labelStyle
+  }, "Features (", selectedFeatures.length, " selected)"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: "8px"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "10px",
+      color: ACCENT,
+      cursor: "pointer"
+    },
+    onClick: () => setSelectedFeatures(numericCols.filter(c => !/^(imageID|id|index)$/i.test(c)))
+  }, "All"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "10px",
+      color: ACCENT,
+      cursor: "pointer"
+    },
+    onClick: () => setSelectedFeatures([])
+  }, "None"))),
+  /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "8px" }
+  }, [
+    ["Grayscale", c => /^(brightness_median|brightness_stdev|brightness_entropy|local_contrast)$/.test(c) || /^gray_hist_/.test(c) || /^grid_[A-Z]+_brightness$/.test(c)],
+    ["Color",     c => /^(saturation_median|saturation_stdev|hue_median|hue_stdev|hue_entropy|red_mean|green_mean|blue_mean)$/.test(c) || /^sat_hist_/.test(c) || /^grid_[A-Z]+_(saturation|hue)$/.test(c)],
+    ["Structure", c => /^(edge_density|pct_horizontal|pct_vertical|pct_diagonal|dominant_angle|local_contrast|aspect_ratio)$/.test(c) || /^grid_/.test(c)]
+  ].map(([label, fn]) => /*#__PURE__*/React.createElement("span", {
+    key: label,
+    style: { fontSize: "10px", color: TEXT_DIM, cursor: "pointer", padding: "2px 7px", border: `1px solid ${BORDER}`, borderRadius: "4px" },
+    onClick: () => setSelectedFeatures(numericCols.filter(c => !/^(imageID|id|index)$/i.test(c) && fn(c)))
+  }, label))),
+  /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxHeight: "140px",
+      overflowY: "auto",
+      background: "#252525",
+      border: `1px solid ${BORDER}`,
+      borderRadius: "6px",
+      padding: "6px"
+    }
+  }, numericCols.filter(c => !/^(imageID|id|index)$/i.test(c)).map(c => /*#__PURE__*/React.createElement("label", {
+    key: c,
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      padding: "3px 4px",
+      borderRadius: "4px",
+      cursor: "pointer",
+      fontSize: "12px",
+      color: selectedFeatures.includes(c) ? TEXT : TEXT_DIM
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: selectedFeatures.includes(c),
+    onChange: e => setSelectedFeatures(prev => e.target.checked ? [...prev, c] : prev.filter(f => f !== c)),
+    style: {
+      accentColor: ACCENT,
+      margin: 0
+    }
+  }), c))), selectedFeatures.length < 2 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#f87171",
+      fontSize: "11px",
+      marginTop: "4px"
+    }
+  }, "Select at least 2 features")), /*#__PURE__*/React.createElement("div", {
+    style: sectionStyle
+  }, /*#__PURE__*/React.createElement("button", {
+    style: {
+      ...btnStyle(true),
+      opacity: selectedFeatures.length < 2 || computing ? 0.5 : 1
+    },
+    onClick: dimReduce === "pca" ? runPCA : runTSNE,
+    disabled: selectedFeatures.length < 2 || computing
+  }, computing ? "Computing…" : `Run ${dimReduce.toUpperCase()}`)), dimReduce === "tsne" && /*#__PURE__*/React.createElement("div", {
+    style: sectionStyle
+  }, /*#__PURE__*/React.createElement("div", {
+    style: labelStyle
+  }, "Perplexity: ", tsnePerplexity), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "2",
+    max: "50",
+    value: tsnePerplexity,
+    onChange: e => setTsnePerplexity(+e.target.value),
+    style: {
+      width: "100%",
+      accentColor: ACCENT
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      ...labelStyle,
+      marginTop: "8px"
+    }
+  }, "Iterations: ", tsneIterations), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "100",
+    max: "1500",
+    step: "100",
+    value: tsneIterations,
+    onChange: e => setTsneIterations(+e.target.value),
+    style: {
+      width: "100%",
+      accentColor: ACCENT
+    }
+  })), (dimReduce === "pca" ? pcaCoords : tsneCoords) && data && data.length >= 20 && /*#__PURE__*/React.createElement("div", {
+    style: { marginTop: "16px" }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: { display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "12px", marginBottom: "8px" }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox", checked: showClusters, onChange: e => { setShowClusters(e.target.checked); if (!e.target.checked) setClusterData(null); }, style: { accentColor: ACCENT }
+  }), "Show clusters"), showClusters && /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", gap: "4px", flexWrap: "wrap", alignItems: "center" }
+  }, /*#__PURE__*/React.createElement("div", { style: { fontSize: "11px", color: TEXT_DIM, marginRight: "2px" } }, "N:"), ["auto", 2, 3, 4, 5].map(n => /*#__PURE__*/React.createElement("button", {
+    key: String(n),
+    style: { ...btnStyle(clusterN === n), fontSize: "11px", padding: "3px 8px" },
+    onClick: () => setClusterN(n)
+  }, n === "auto" ? "Auto" : String(n))), clusterData && /*#__PURE__*/React.createElement("div", {
+    style: { marginTop: "8px", fontSize: "11px", color: TEXT_DIM, width: "100%" }
+  }, "✓ ", clusterData.k, " cluster", clusterData.k > 1 ? "s" : "", " found"))))), /*#__PURE__*/React.createElement("div", {
+    style: dividerStyle
+  }), SH("Display", "display"), !collapsed.display && React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: "8px",
+      marginBottom: "16px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    style: btnStyle(mode === "images"),
+    onClick: () => setMode("images")
+  }, "Images"), /*#__PURE__*/React.createElement("button", {
+    style: btnStyle(mode === "circles"),
+    onClick: () => setMode("circles")
+  }, "Circles")), /*#__PURE__*/React.createElement("div", {
+    style: sectionStyle
+  }, /*#__PURE__*/React.createElement("div", {
+    style: labelStyle
+  }, mode === "images" ? `Thumbnail size: ${thumbSize}px` : `Circle size: ${circleSize}`), mode === "images" ? /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "16",
+    max: "200",
+    value: thumbSize,
+    onChange: e => setThumbSize(+e.target.value),
+    style: {
+      width: "100%",
+      accentColor: ACCENT
+    }
+  }) : /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "3",
+    max: "30",
+    value: circleSize,
+    onChange: e => setCircleSize(+e.target.value),
+    style: {
+      width: "100%",
+      accentColor: ACCENT
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: sectionStyle
+  }, /*#__PURE__*/React.createElement("div", {
+    style: labelStyle
+  }, "Color by"), /*#__PURE__*/React.createElement("select", {
+    value: colorCol,
+    onChange: e => setColorCol(e.target.value),
+    style: {
+      ...selectStyle,
+      fontSize: "12px"
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 none \u2014"), columns.filter(c => c !== fileColRef.current).map(c => /*#__PURE__*/React.createElement("option", {
+    key: c,
+    value: c
+  }, c)))), /*#__PURE__*/React.createElement("div", {
+    style: sectionStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: { display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "12px" }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox", checked: showGrid, onChange: e => setShowGrid(e.target.checked), style: { accentColor: ACCENT }
+  }), "Show grid"))), /*#__PURE__*/React.createElement("div", {
+    style: dividerStyle
+  }), SH("Canvas color (RGB)", "canvasColor"), !collapsed.canvasColor && React.createElement(React.Fragment, null,
+     /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: "8px", alignItems: "center" } },
+       ["r","g","b"].map(ch => /*#__PURE__*/React.createElement("div", { key: ch, style: { display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", flex: 1 } },
+         /*#__PURE__*/React.createElement("div", { style: { fontSize: "10px", color: TEXT_DIM, textTransform: "uppercase" } }, ch),
+         /*#__PURE__*/React.createElement("input", {
+           type: "number", min: "0", max: "255", value: canvasRGB[ch],
+           onChange: e => setCanvasRGB(prev => ({ ...prev, [ch]: Math.min(255, Math.max(0, parseInt(e.target.value, 10) || 0)) })),
+           style: { width: "100%", background: "#252525", border: `1px solid ${BORDER}`, borderRadius: "4px", color: TEXT, fontSize: "12px", padding: "4px 6px", textAlign: "center", outline: "none" }
+         })
+       ))
+     ),
+     /*#__PURE__*/React.createElement("div", { style: { marginTop: "8px", height: "14px", borderRadius: "4px", border: `1px solid ${BORDER}`, background: `rgb(${canvasRGB.r},${canvasRGB.g},${canvasRGB.b})` } })
+  ), /*#__PURE__*/React.createElement("div", { style: dividerStyle }), SH("Labels", "labels"), !collapsed.labels && React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("label", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      cursor: "pointer",
+      fontSize: "12px",
+      marginBottom: showLabels ? "8px" : "0"
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: showLabels,
+    onChange: e => setShowLabels(e.target.checked),
+    style: {
+      accentColor: ACCENT
+    }
+  }), "Show labels"), showLabels && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: labelStyle
+  }, "Column"), /*#__PURE__*/React.createElement("select", {
+    value: labelCol,
+    onChange: e => setLabelCol(e.target.value),
+    style: {
+      ...selectStyle,
+      marginBottom: "8px"
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 filename / year \u2014"), columns.map(c => /*#__PURE__*/React.createElement("option", {
+    key: c,
+    value: c
+  }, c))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: "16px",
+      alignItems: "flex-start"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: labelStyle
+  }, "Size: ", labelSize, "px"), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "7",
+    max: "24",
+    value: labelSize,
+    onChange: e => setLabelSize(+e.target.value),
+    style: {
+      width: "100%",
+      accentColor: ACCENT
+    }
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: labelStyle
+  }, "Color"), /*#__PURE__*/React.createElement("input", {
+    type: "color",
+    value: labelColor,
+    onChange: e => setLabelColor(e.target.value),
+    style: {
+      width: "36px",
+      height: "28px",
+      border: `1px solid ${BORDER}`,
+      borderRadius: "4px",
+      background: "none",
+      cursor: "pointer",
+      padding: "1px"
+    }
+  }))))), /*#__PURE__*/React.createElement("div", {
+    style: dividerStyle
+  }), SH("Animation", "animation"), !collapsed.animation && React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: sectionStyle
+  }, /*#__PURE__*/React.createElement("div", {
+    style: labelStyle
+  }, "Column"), /*#__PURE__*/React.createElement("select", {
+    value: animCol,
+    onChange: e => setAnimCol(e.target.value),
+    style: {
+      ...selectStyle,
+      marginBottom: "16px"
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 same as color by \u2014"), columns.map(c => /*#__PURE__*/React.createElement("option", {
+    key: c,
+    value: c
+  }, c))), /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { ...labelStyle, marginBottom: 0, whiteSpace: "nowrap" }
+  }, "Speed (fps)"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    min: "1",
+    max: "60",
+    step: "1",
+    value: animFps,
+    onChange: e => {
+      const v = Math.max(1, Math.min(60, parseInt(e.target.value) || 1));
+      setAnimFps(v);
+    },
+    style: {
+      width: "54px",
+      background: "#252525",
+      color: TEXT,
+      border: `1px solid ${BORDER}`,
+      borderRadius: "4px",
+      padding: "3px 6px",
+      fontSize: "12px"
+    }
+  })), /*#__PURE__*/React.createElement("button", {
+    style: {
+      ...btnStyle(animating),
+      marginBottom: "8px"
+    },
+    onClick: () => {
+      if (animating) {
+        setAnimating(false);
+        setAnimFrame(-1);
+        clearInterval(animRef.current);
+      } else {
+        setAnimFrame(0);
+        setAnimating(true);
+      }
+    }
+  }, animating ? "■  Stop" : "▶  Animate"))), /*#__PURE__*/React.createElement("div", {
+    style: dividerStyle
+  }), SH("Export", "export"), !collapsed.export && React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: { ...sectionStyle, display: "flex", gap: "8px" }
+  }, /*#__PURE__*/React.createElement("button", {
+    style: { ...btnStyle(), flex: 1 },
+    onClick: handleExport
+  }, "Export PNG"), /*#__PURE__*/React.createElement("button", {
+    style: { ...btnStyle(), flex: 1, opacity: data ? 1 : 0.4, cursor: data ? "pointer" : "default" },
+    onClick: data ? handleExportTSV : undefined,
+    title: data ? "Export data with all columns as TSV" : "Load a data file first"
+  }, "Export TSV"))), /*#__PURE__*/React.createElement("div", {
+    style: dividerStyle
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "10px",
+      color: TEXT_DIM,
+      lineHeight: "1.6"
+    }
+  }, "Based on ImagePlot, Cultural Analytics Lab, 2009\u20132011"), /*#__PURE__*/React.createElement("a", {
+    href: "https://lab.culturalanalytics.info/p/projects.html",
+    target: "_blank",
+    rel: "noopener noreferrer",
+    style: {
+      display: "inline-block",
+      marginTop: "4px",
+      fontSize: "10px",
+      color: TEXT_DIM,
+      textDecoration: "underline",
+      textUnderlineOffset: "2px",
+      lineHeight: "1.4"
+    }
+  }, "Examples \u2192")))), /*#__PURE__*/React.createElement("div", {
+    ref: wrapRef,
+    style: {
+      flex: 1,
+      position: "relative",
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setPanelOpen(o => !o),
+    title: panelOpen ? "Hide panel" : "Show panel",
+    style: {
+      position: "absolute",
+      top: "50%",
+      left: "0px",
+      transform: "translateY(-50%)",
+      zIndex: 20,
+      width: "14px",
+      height: "48px",
+      background: "rgba(72,72,72,0.82)",
+      border: "1px solid rgba(255,255,255,0.16)",
+      borderLeft: "none",
+      borderRadius: "0 8px 8px 0",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 0,
+      backdropFilter: "blur(6px)",
+      transition: "background 0.18s, border-color 0.18s, width 0.18s"
+    },
+    onMouseOver: e => { e.currentTarget.style.background = "rgba(105,105,105,0.95)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.35)"; e.currentTarget.style.width = "18px"; },
+    onMouseOut:  e => { e.currentTarget.style.background = "rgba(72,72,72,0.82)";   e.currentTarget.style.borderColor = "rgba(255,255,255,0.16)"; e.currentTarget.style.width = "14px"; }
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "9", height: "14", viewBox: "0 0 9 14", fill: "none",
+    xmlns: "http://www.w3.org/2000/svg",
+    style: { display: "block", transform: panelOpen ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }
+  }, /*#__PURE__*/React.createElement("polyline", {
+    points: "7,1 2,7 7,13",
+    stroke: "rgba(220,220,220,0.85)", strokeWidth: "1.6", strokeLinecap: "round", strokeLinejoin: "round", fill: "none"
+  }))), exportDataURL && React.createElement("div", {
+    onClick: () => setExportDataURL(null),
+    style: { position:"absolute", inset:0, background:"rgba(0,0,0,0.85)", zIndex:100, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"12px" }
+  }, React.createElement("div", { style:{ color:"#fff", fontSize:"12px", opacity:0.7 } }, "Right-click the image → Save As   |   Click anywhere to close"),
+     React.createElement("img", { src: exportDataURL, style:{ maxWidth:"90%", maxHeight:"80vh", border:"1px solid #555" } })
+  ), /*#__PURE__*/React.createElement("canvas", {
+    ref: canvasRef,
+    style: {
+      display: compareMode ? "none" : "block",
+      width: "100%",
+      height: "100%",
+      cursor: dragging ? "grabbing" : "grab"
+    },
+    onMouseDown: handleMouseDown,
+    onMouseMove: handleMouseMove,
+    onMouseUp: handleMouseUp,
+    onMouseLeave: () => {
+      handleMouseUp();
+      setHovered(null);
+    }
+  }), compareMode && /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", width: "100%", height: "100%" }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { flex: 1, minWidth: 0, overflow: "hidden", position: "relative" }
+  }, /*#__PURE__*/React.createElement("canvas", {
+    ref: canvasRef,
+    style: { width: "100%", height: "100%", cursor: dragging ? "grabbing" : "grab", display: "block" },
+    onMouseDown: handleMouseDown,
+    onMouseMove: handleMouseMove,
+    onMouseUp: handleMouseUp,
+    onMouseLeave: () => { handleMouseUp(); setHovered(null); }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: { width: "2px", background: "rgba(255,255,255,0.2)", flexShrink: 0 }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: { flex: 1, minWidth: 0, overflow: "hidden", position: "relative" }
+  }, /*#__PURE__*/React.createElement("canvas", {
+    ref: canvasRefB,
+    style: { width: "100%", height: "100%", cursor: dragging ? "grabbing" : "grab", display: "block" },
+    onMouseDown: handleMouseDown,
+    onMouseMove: handleMouseMoveB,
+    onMouseUp: handleMouseUp,
+    onMouseLeave: () => { handleMouseUp(); setHoveredB(null); }
+  })))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(ImagePlot));
+
+</script>
+</body>
+</html>
