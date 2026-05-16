@@ -1,2 +1,2 @@
 # manovich-interactive
-visual publications + cultural analytics tools by Lev Manovich
+Interactive media tools, experiments and visual essays by Lev Manovich
