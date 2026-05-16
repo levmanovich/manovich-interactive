@@ -1,0 +1,361 @@
+Filename	Year_Month	Label_Place	Year	Month	Title
+197.jpg	1886.2502	2_Paris	1886	4	Plaster Statuette of a Female Torso
+198.jpg	1886.2502	2_Paris	1886	4	Plaster Statuette of a Female Torso
+199.jpg	1886.2502	2_Paris	1886	4	Plaster Statuette of a Female Torso
+200.jpg	1886.2502	2_Paris	1886	4	Plaster Statuette of a Female Torso
+201.jpg	1886.2502	2_Paris	1886	4	Plaster Statuette of a Female Torso
+202.jpg	1886.2502	2_Paris	1886	4	Plaster Statuette of a Female Torso
+203.jpg	1886.2502	2_Paris	1886	4	Plaster Statuette of a Female Torso
+204.jpg	1886.2502	2_Paris	1886	4	Plaster Statuette of a Horse
+205.jpg	1886.2502	2_Paris	1886	4	Plaster Statuette of a Kneeling Man
+206.jpg	1886.2502	2_Paris	1886	4	Plaster Statuette of a Male Torso
+207.jpg	1886.2502	2_Paris	1886	4	Self-Portrait with Dark Felt Hat
+208.jpg	1886.2502	2_Paris	1886	4	Self-Portrait with Dark Felt Hat at the Easel
+209.jpg	1886.2502	2_Paris	1886	4	Self-Portrait with Pipe
+210.jpg	1886.2502	2_Paris	1886	4	Self-Portrait with Pipe
+211.jpg	1886.2502	2_Paris	1886	4	Sloping Path in Montmartre
+212.jpg	1886.2502	2_Paris	1886	4	Still Life with Scabiosa and Ranunculus
+213.jpg	1886.2502	2_Paris	1886	4	Tambourine with Pansies
+214.jpg	1886.2502	2_Paris	1886	4	View of Roofs and Backs of Houses
+215.jpg	1886.417	2_Paris	1886	6	Bowl with Daffodils
+216.jpg	1886.417	2_Paris	1886	6	Flowers in a Blue Vase
+217.jpg	1886.417	2_Paris	1886	6	Lane at the Jardin du Luxembourg
+218.jpg	1886.417	2_Paris	1886	6	Le Blute-Fin Mill
+219.jpg	1886.417	2_Paris	1886	6	Pont du Carrousel and the Louvre The
+220.jpg	1886.417	2_Paris	1886	6	Vase with Flowers
+221.jpg	1886.417	2_Paris	1886	6	Vase with Myosotis and Peonies
+222.jpg	1886.5004	2_Paris	1886	7	Bois de Boulogne with People Walking The
+223.jpg	1886.5004	2_Paris	1886	7	Cineraria in a Flowerpot
+224.jpg	1886.5004	2_Paris	1886	7	Coleus Plant in a Flowerpot
+225.jpg	1886.5004	2_Paris	1886	7	Fourteenth of July Celebration in Paris The
+226.jpg	1886.5004	2_Paris	1886	7	Geranium in a Flowerpot
+227.jpg	1886.5004	2_Paris	1886	7	Ginger Jar Filled with Chrysanthemums
+228.jpg	1886.5004	2_Paris	1886	7	Glass with Roses
+229.jpg	1886.5004	2_Paris	1886	7	Le Moulin de Blute-Fin
+230.jpg	1886.5004	2_Paris	1886	7	Le Moulin de la Galette
+231.jpg	1886.5004	2_Paris	1886	7	Still Life with Bloaters
+232.jpg	1886.5004	2_Paris	1886	7	Still Life with Bloaters
+233.jpg	1886.5004	2_Paris	1886	7	Vase with Asters Salvia and Other Flowers
+234.jpg	1886.5004	2_Paris	1886	7	Vase with Carnations
+235.jpg	1886.5004	2_Paris	1886	7	Vase with Carnations
+236.jpg	1886.5004	2_Paris	1886	7	Vase with Carnations
+237.jpg	1886.5004	2_Paris	1886	7	Vase with Carnations and Other Flowers
+238.jpg	1886.5004	2_Paris	1886	7	Vase with Carnations and Zinnias
+239.jpg	1886.5004	2_Paris	1886	7	Vase with Daisies
+240.jpg	1886.5004	2_Paris	1886	7	Vase with Gladioli and Carnations
+241.jpg	1886.5004	2_Paris	1886	7	Vase with Gladioli and Carnations
+242.jpg	1886.5004	2_Paris	1886	7	Vase with Gladioli and Lilac
+243.jpg	1886.5004	2_Paris	1886	7	Vase with Peonies
+244.jpg	1886.5004	2_Paris	1886	7	Vase with Red Gladioli
+245.jpg	1886.5004	2_Paris	1886	7	Vase with Red Gladioli
+246.jpg	1886.5004	2_Paris	1886	7	Vase with Red Gladioli
+247.jpg	1886.5004	2_Paris	1886	7	Vase with Red Poppies
+248.jpg	1886.5004	2_Paris	1886	7	Vase with Viscaria
+249.jpg	1886.5004	2_Paris	1886	7	Vase with White and Red Carnations
+250.jpg	1886.5004	2_Paris	1886	7	Vase with Zinnias
+251.jpg	1886.5004	2_Paris	1886	7	Vase with Zinnias and Geraniums
+252.jpg	1886.5004	2_Paris	1886	7	Vase with Zinnias and Other Flowers
+253.jpg	1886.5838	2_Paris	1886	8	Bowl with Sunflowers Roses and Other Flowers
+254.jpg	1886.5838	2_Paris	1886	8	Vase with Asters and Phlox
+255.jpg	1886.5838	2_Paris	1886	8	Vase with Gladioli
+256.jpg	1886.5838	2_Paris	1886	8	Vase with Hollyhocks
+257.jpg	1886.5838	2_Paris	1886	8	View of Paris from Montmartre
+258.jpg	1886.5838	2_Paris	1886	8	View of the Roofs of Paris
+259.jpg	1886.6672	2_Paris	1886	9	Kingfisher The
+260.jpg	1886.6672	2_Paris	1886	9	Pair of Shoes A
+261.jpg	1886.6672	2_Paris	1886	9	Terrace of a Cafe on Montmartre (La Guinguette)
+262.jpg	1886.7506	2_Paris	1886	10	Bois de Boulogne with People Walking The
+263.jpg	1886.7506	2_Paris	1886	10	Bowl with Peonies and Roses
+264.jpg	1886.7506	2_Paris	1886	10	Green Parrot The
+265.jpg	1886.7506	2_Paris	1886	10	Hill of Montmartre with Quarry The
+266.jpg	1886.7506	2_Paris	1886	10	Le Moulin de la Galette
+267.jpg	1886.7506	2_Paris	1886	10	Le Moulin de la Galette
+268.jpg	1886.7506	2_Paris	1886	10	Le Moulin de la Galette
+269.jpg	1886.7506	2_Paris	1886	10	Le Moulin de la Galette
+270.jpg	1886.7506	2_Paris	1886	10	Le Moulin de la Galette
+271.jpg	1886.7506	2_Paris	1886	10	Montmartre: Quarry the Mills
+272.jpg	1886.7506	2_Paris	1886	10	Outskirts of Paris
+273.jpg	1886.7506	2_Paris	1886	10	Self-Portrait
+274.jpg	1886.7506	2_Paris	1886	10	Still Life with Mussels and Shrimps
+275.jpg	1886.7506	2_Paris	1886	10	View of Montmartre with Windmills
+276.jpg	1886.7506	2_Paris	1886	10	Windmill on Montmartre
+277.jpg	1886.9174	2_Paris	1886	12	Three Pairs of Shoes
+278.jpg	1887	2_Paris	1887	1	Plaster Statuette of a Female Torso
+279.jpg	1887	2_Paris	1887	1	Portrait of PËre Tanguy
+280.jpg	1887	2_Paris	1887	1	Self-Portrait
+281.jpg	1887	2_Paris	1887	1	Self-Portrait with Grey Felt Hat
+282.jpg	1887	2_Paris	1887	1	Self-Portrait with Straw Hat
+283.jpg	1887	2_Paris	1887	1	Skull
+284.jpg	1887	2_Paris	1887	1	Skull
+285.jpg	1887	2_Paris	1887	1	Still Life with Quince Pears
+286.jpg	1887.0834	2_Paris	1887	2	Agostina Segatori Sitting in the Cafe du Tambourin
+287.jpg	1887.0834	2_Paris	1887	2	Boulevard de Clichy
+288.jpg	1887.0834	2_Paris	1887	2	Nude Woman Reclining
+289.jpg	1887.0834	2_Paris	1887	2	Nude Woman Reclining Seen from the Back
+290.jpg	1887.0834	2_Paris	1887	2	Pair of Shoes A
+291.jpg	1887.0834	2_Paris	1887	2	Self-Portrait with Pipe and Glass
+292.jpg	1887.0834	2_Paris	1887	2	Street Scene in Montmartre: Le Moulin a Poivre
+293.jpg	1887.0834	2_Paris	1887	2	Vegetable Garden in Montmartre
+294.jpg	1887.1668	2_Paris	1887	3	Factories Seen from a Hillside in Moonlight
+295.jpg	1887.1668	2_Paris	1887	3	Flowerpot with Chives
+296.jpg	1887.1668	2_Paris	1887	3	Le Moulin de la Galette
+297.jpg	1887.1668	2_Paris	1887	3	Self-Portrait with Grey Felt Hat
+298.jpg	1887.1668	2_Paris	1887	3	Self-Portrait with Straw Hat
+299.jpg	1887.1668	2_Paris	1887	3	Still Life with a Basket of Crocuses
+300.jpg	1887.1668	2_Paris	1887	3	Still Life with Lemons on a Plate
+301.jpg	1887.2502	2_Paris	1887	4	Banks of the Seine with Boats The
+302.jpg	1887.2502	2_Paris	1887	4	Edge of a Wheatfield with Poppies
+303.jpg	1887.2502	2_Paris	1887	4	Entrance of Voyer d'Argenson Park at AsniËres
+304.jpg	1887.2502	2_Paris	1887	4	Fritillaries in a Copper Vase
+305.jpg	1887.2502	2_Paris	1887	4	Lane in Voyer d'Argenson Park at Asnieres
+306.jpg	1887.2502	2_Paris	1887	4	On the Outskirts of Paris
+307.jpg	1887.2502	2_Paris	1887	4	Pair of Shoes A
+308.jpg	1887.2502	2_Paris	1887	4	Park at Asnieres in Spring (on loan from a private collection)
+309.jpg	1887.2502	2_Paris	1887	4	Pasture in Bloom
+310.jpg	1887.2502	2_Paris	1887	4	Portrait of the Art Dealer Alexander Reid
+311.jpg	1887.2502	2_Paris	1887	4	Restaurant de la SirËne at AsniËres The
+312.jpg	1887.2502	2_Paris	1887	4	Roadway with Underpass (The Viaduct)
+313.jpg	1887.2502	2_Paris	1887	4	Seine with a Rowing Boat The
+314.jpg	1887.2502	2_Paris	1887	4	Self-Portrait
+315.jpg	1887.2502	2_Paris	1887	4	Still Life with Absinthe
+316.jpg	1887.2502	2_Paris	1887	4	Still Life with Bloaters and Garlic
+317.jpg	1887.2502	2_Paris	1887	4	Still Life with Decanter and Lemons on a Plate
+318.jpg	1887.2502	2_Paris	1887	4	View of a River with Rowing Boats
+319.jpg	1887.2502	2_Paris	1887	4	View of Paris from Vincent's Room in the Rue Lepic
+320.jpg	1887.2502	2_Paris	1887	4	View of Paris from Vincent's Room in the Rue Lepic
+321.jpg	1887.2502	2_Paris	1887	4	Woman Sitting by a Cradle
+322.jpg	1887.2502	2_Paris	1887	4	Woman Sitting in the Grass
+323.jpg	1887.3336	2_Paris	1887	5	Banks of the Seine The
+324.jpg	1887.3336	2_Paris	1887	5	Chestnut Tree in Blossom
+325.jpg	1887.3336	2_Paris	1887	5	Self-Portrait
+326.jpg	1887.3336	2_Paris	1887	5	Self-Portrait
+327.jpg	1887.417	2_Paris	1887	6	Banks of the Seine with Pont de Clichy in the Spring
+328.jpg	1887.417	2_Paris	1887	6	Couples in the Voyer d'Argenson Park at Asnieres
+329.jpg	1887.417	2_Paris	1887	6	Garden with Sunflowers
+330.jpg	1887.417	2_Paris	1887	6	Interior of a Restaurant
+331.jpg	1887.417	2_Paris	1887	6	Lane in Voyer d'Argenson Park at Asnieres
+332.jpg	1887.417	2_Paris	1887	6	Montmartre Path with Sunflowers
+333.jpg	1887.417	2_Paris	1887	6	Outskirts of Paris: Road with Peasant Shouldering a Spade
+334.jpg	1887.417	2_Paris	1887	6	Path in the Woods
+335.jpg	1887.417	2_Paris	1887	6	Vegetable Gardens in Montmartre: La Butte Montmartre
+336.jpg	1887.417	2_Paris	1887	6	Walk Along the Banks of the Seine Near Asnieres
+337.jpg	1887.417	2_Paris	1887	6	Woman Walking in a Garden A
+338.jpg	1887.5004	2_Paris	1887	7	Avenue in Voyer d'Argenson Park at Asnieres
+339.jpg	1887.5004	2_Paris	1887	7	Banks of the Seine with the Pont de Clichy
+340.jpg	1887.5004	2_Paris	1887	7	Bathing Float on the Seine at Asnieres
+341.jpg	1887.5004	2_Paris	1887	7	Bridges across the Seine at Asnieres
+342.jpg	1887.5004	2_Paris	1887	7	Corner of Voyer d'Argenson Park at Asnieres
+343.jpg	1887.5004	2_Paris	1887	7	Exterior of a Restaurant at Asnieres
+344.jpg	1887.5004	2_Paris	1887	7	Factories at Asnieres Seen from the Quai de Clichy
+345.jpg	1887.5004	2_Paris	1887	7	Factory at Asnieres The
+346.jpg	1887.5004	2_Paris	1887	7	House with Sunflowers
+347.jpg	1887.5004	2_Paris	1887	7	Lilacs
+348.jpg	1887.5004	2_Paris	1887	7	Restaurant de la SirËne at AsniËres
+349.jpg	1887.5004	2_Paris	1887	7	Rispal Restaurant at AsniËres The
+350.jpg	1887.5004	2_Paris	1887	7	Seine Bridge at Asnieres The
+351.jpg	1887.5004	2_Paris	1887	7	Seine with the Pont de Clichy The
+352.jpg	1887.5004	2_Paris	1887	7	Seine with the Pont de la Grande Jette The
+353.jpg	1887.5004	2_Paris	1887	7	Self-Portrait
+354.jpg	1887.5004	2_Paris	1887	7	Self-Portrait
+355.jpg	1887.5004	2_Paris	1887	7	Self-Portrait
+356.jpg	1887.5004	2_Paris	1887	7	Self-Portrait
+357.jpg	1887.5004	2_Paris	1887	7	Self-Portrait with Straw Hat
+358.jpg	1887.5004	2_Paris	1887	7	Self-Portrait with Straw Hat
+359.jpg	1887.5004	2_Paris	1887	7	Self-Portrait with Straw Hat
+360.jpg	1887.5004	2_Paris	1887	7	Self-Portrait with Straw Hat and Pipe
+361.jpg	1887.5004	2_Paris	1887	7	Trees and Undergrowth
+362.jpg	1887.5004	2_Paris	1887	7	Trees and Undergrowth
+363.jpg	1887.5004	2_Paris	1887	7	Trees in a Field on a Sunny Day
+364.jpg	1887.5004	2_Paris	1887	7	Undergrowth
+365.jpg	1887.5004	2_Paris	1887	7	Undergrowth
+366.jpg	1887.5004	2_Paris	1887	7	Vase with Cornflowers and Poppies
+367.jpg	1887.5004	2_Paris	1887	7	Vase with Daisies and Anemones
+368.jpg	1887.5004	2_Paris	1887	7	Vase with Lilacs Daisies and Anemones
+369.jpg	1887.5004	2_Paris	1887	7	Vegetable Gardens at Montmartre
+370.jpg	1887.5004	2_Paris	1887	7	Wheat Field with a Lark
+371.jpg	1887.5838	2_Paris	1887	8	Four Cut Sunflowers
+372.jpg	1887.5838	2_Paris	1887	8	Japonaiserie: Bridge in the Rain (after Hiroshige)
+373.jpg	1887.5838	2_Paris	1887	8	Japonaiserie: Flowering Plum Tree (after Hiroshige)
+374.jpg	1887.5838	2_Paris	1887	8	Japonaiserie: Oiran (after Kesai Eisen)
+375.jpg	1887.5838	2_Paris	1887	8	Two Cut Sunflowers
+376.jpg	1887.5838	2_Paris	1887	8	Two Cut Sunflowers
+377.jpg	1887.5838	2_Paris	1887	8	Two Cut Sunflowers
+378.jpg	1887.7506	2_Paris	1887	10	Chrysanthemums and Wild Flowers in a Vase
+379.jpg	1887.7506	2_Paris	1887	10	Portrait of Pere Tanguy
+380.jpg	1887.7506	2_Paris	1887	10	Self-Portrait
+381.jpg	1887.7506	2_Paris	1887	10	Still Life with Basket of Apples (to Lucien Pissarro)
+382.jpg	1887.7506	2_Paris	1887	10	Still Life with French Novels and a Rose
+383.jpg	1887.7506	2_Paris	1887	10	Still Life with Grapes
+384.jpg	1887.7506	2_Paris	1887	10	Still Life with Grapes Pears and Lemons
+385.jpg	1887.7506	2_Paris	1887	10	Still Life with Red Cabbages and Onions
+386.jpg	1887.834	2_Paris	1887	11	Still Life with Apples
+387.jpg	1887.834	2_Paris	1887	11	Still Life with Basket of Apples
+388.jpg	1887.9174	2_Paris	1887	12	Self-Portrait with a Japanese Print
+389.jpg	1887.9174	2_Paris	1887	12	Still Life with Plaster Statuette a Rose and Two Novels
+390.jpg	1887.9174	2_Paris	1887	12	Italian Woman (Agostina Segatori?)
+391.jpg	1888.0834	2_Paris	1888	2	Landscape with Snow
+392.jpg	1888.0834	2_Paris	1888	2	Old Woman of Arles An
+393.jpg	1888.0834	2_Paris	1888	2	Pork-Butcher's Shop Seen from a Window A
+394.jpg	1888.0834	2_Paris	1888	2	Self-Portrait in Front of the Easel
+395.jpg	1888.0834	2_Paris	1888	2	Snowy Landscape with Arles in the Background
+396.jpg	1888.1668	3_Arles	1888	3	Avenue of Plane Trees near Arles Station
+397.jpg	1888.1668	3_Arles	1888	3	Blossoming Almond Branch in a Glass
+398.jpg	1888.1668	3_Arles	1888	3	Blossoming Almond Branch in a Glass with a Book
+399.jpg	1888.1668	3_Arles	1888	3	Gleize Bridge over the Vigueirat Canal The
+400.jpg	1888.1668	3_Arles	1888	3	Langlois Bridge at Arles with Road Alongside the Canal The
+401.jpg	1888.1668	3_Arles	1888	3	Langlois Bridge at Arles with Women Washing The
+402.jpg	1888.1668	3_Arles	1888	3	Orchard in Blossom
+403.jpg	1888.1668	3_Arles	1888	3	Orchard with Blossoming Apricot Trees
+404.jpg	1888.1668	3_Arles	1888	3	Pair of Leather Clogs A
+405.jpg	1888.1668	3_Arles	1888	3	Pink Peach Tree in Blossom (Reminiscence of Mauve)
+406.jpg	1888.1668	3_Arles	1888	3	Still Life with Basket and Six Oranges
+407.jpg	1888.1668	3_Arles	1888	3	Still Life: Potatoes in a Yellow Dish
+408.jpg	1888.1668	3_Arles	1888	3	Two Lovers (Fragment)
+409.jpg	1888.2502	3_Arles	1888	4	Almond Tree in Blossom
+410.jpg	1888.2502	3_Arles	1888	4	Apricot Trees in Blossom
+411.jpg	1888.2502	3_Arles	1888	4	Blossoming Pear Tree
+412.jpg	1888.2502	3_Arles	1888	4	Langlois Bridge at Arles The
+413.jpg	1888.2502	3_Arles	1888	4	Orchard in Blossom
+414.jpg	1888.2502	3_Arles	1888	4	Orchard in Blossom
+415.jpg	1888.2502	3_Arles	1888	4	Orchard in Blossom (Plum Trees)
+416.jpg	1888.2502	3_Arles	1888	4	Orchard in Blossom Bordered by Cypresses
+417.jpg	1888.2502	3_Arles	1888	4	Orchard in Blossom Bordered by Cypresses
+418.jpg	1888.2502	3_Arles	1888	4	Orchard with Peach Trees in Blossom
+419.jpg	1888.2502	3_Arles	1888	4	Path Through a Field with Willows
+420.jpg	1888.2502	3_Arles	1888	4	Peach Tree in Blossom
+421.jpg	1888.2502	3_Arles	1888	4	White Orchard The
+422.jpg	1888.3336	3_Arles	1888	5	Farmhouse in a Wheat Field
+423.jpg	1888.3336	3_Arles	1888	5	Farmhouses in a Wheat Field Near Arles
+424.jpg	1888.3336	3_Arles	1888	5	Landscape Under a Stormy Sky
+425.jpg	1888.3336	3_Arles	1888	5	Lane near Arles A
+426.jpg	1888.3336	3_Arles	1888	5	Langlois Bridge at Arles The
+427.jpg	1888.3336	3_Arles	1888	5	Still Life: Blue Enamel Coffeepot Earthenware and Fruit
+428.jpg	1888.3336	3_Arles	1888	5	Still Life: Bottle Lemons and Oranges
+429.jpg	1888.3336	3_Arles	1888	5	Still Life: Bowl with Daisies
+430.jpg	1888.3336	3_Arles	1888	5	Still Life: Majolica Jug with Wildflowers
+431.jpg	1888.3336	3_Arles	1888	5	View of Arles with Irises in the Foreground
+432.jpg	1888.417	3_Arles	1888	6	Arles: View from the Wheat Fields
+433.jpg	1888.417	3_Arles	1888	6	Bridge at Trinquetaille The
+434.jpg	1888.417	3_Arles	1888	6	Canal with Women Washing
+435.jpg	1888.417	3_Arles	1888	6	Farmhouse in Provence
+436.jpg	1888.417	3_Arles	1888	6	Fishing Boats on the Beach at Saintes-Maries
+437.jpg	1888.417	3_Arles	1888	6	Girl with Ruffled Hair (The Mudlark)
+438.jpg	1888.417	3_Arles	1888	6	Green Ears of Wheat
+439.jpg	1888.417	3_Arles	1888	6	Harvest at La Crau with Montmajour in the Background
+440.jpg	1888.417	3_Arles	1888	6	Harvest in Provence
+441.jpg	1888.417	3_Arles	1888	6	Haystacks in Provence
+442.jpg	1888.417	3_Arles	1888	6	Seascape at Saintes-Maries
+443.jpg	1888.417	3_Arles	1888	6	Seascape at Saintes-Maries
+444.jpg	1888.417	3_Arles	1888	6	Seated Zouave The
+445.jpg	1888.417	3_Arles	1888	6	Sower The
+446.jpg	1888.417	3_Arles	1888	6	Street in Saintes-Maries
+447.jpg	1888.417	3_Arles	1888	6	Sunset: Wheat Fields Near Arles
+448.jpg	1888.417	3_Arles	1888	6	Three White Cottages in Saintes-Maries
+449.jpg	1888.417	3_Arles	1888	6	View of Saintes-Maries
+450.jpg	1888.417	3_Arles	1888	6	Wheat Field
+451.jpg	1888.417	3_Arles	1888	6	Wheat Field with Sheaves
+452.jpg	1888.417	3_Arles	1888	6	Wheat Field with the Alpilles Foothills in the Background
+453.jpg	1888.417	3_Arles	1888	6	Wheat Fields with Stacks
+454.jpg	1888.417	3_Arles	1888	6	Zouave (Half Length) The
+455.jpg	1888.5004	3_Arles	1888	7	Flowering Garden
+456.jpg	1888.5004	3_Arles	1888	7	Flowering Garden with Path
+457.jpg	1888.5004	3_Arles	1888	7	La Mousme Sitting
+458.jpg	1888.5004	3_Arles	1888	7	Painter on His Way to Work The
+459.jpg	1888.5004	3_Arles	1888	7	Rocks with Oak Tree
+460.jpg	1888.5004	3_Arles	1888	7	Sunny Lawn in a Public Park
+461.jpg	1888.5838	3_Arles	1888	8	Coal Barges
+462.jpg	1888.5838	3_Arles	1888	8	Coal Barges
+463.jpg	1888.5838	3_Arles	1888	8	Encampment of Gypsies with Caravans
+464.jpg	1888.5838	3_Arles	1888	8	Garden Behind a House
+465.jpg	1888.5838	3_Arles	1888	8	Interior of a Restaurant in Arles
+466.jpg	1888.5838	3_Arles	1888	8	Interior of the Restaurant Carrel in Arles
+467.jpg	1888.5838	3_Arles	1888	8	Pair of Shoes A
+468.jpg	1888.5838	3_Arles	1888	8	Portrait of Patience Escalier
+469.jpg	1888.5838	3_Arles	1888	8	Portrait of the Postman Joseph Roulin
+470.jpg	1888.5838	3_Arles	1888	8	Portrait of the Postman Joseph Roulin
+471.jpg	1888.5838	3_Arles	1888	8	Quay with Men Unloading Sand Barges
+472.jpg	1888.5838	3_Arles	1888	8	Railway Carriages
+473.jpg	1888.5838	3_Arles	1888	8	Self-Portrait with Pipe and Straw Hat
+474.jpg	1888.5838	3_Arles	1888	8	Still Life: Vase with Fifteen Sunflowers
+475.jpg	1888.5838	3_Arles	1888	8	Still Life: Vase with Five Sunflowers
+476.jpg	1888.5838	3_Arles	1888	8	Still Life: Vase with Oleanders
+477.jpg	1888.5838	3_Arles	1888	8	Still Life: Vase with Oleanders and Books
+478.jpg	1888.5838	3_Arles	1888	8	Still Life: Vase with Twelve Sunflowers
+479.jpg	1888.5838	3_Arles	1888	8	Still Life: Vase with Zinnias
+480.jpg	1888.5838	3_Arles	1888	8	Thistles
+481.jpg	1888.5838	3_Arles	1888	8	Three Sunflowers in a Vase
+482.jpg	1888.5838	3_Arles	1888	8	Two Thistles
+483.jpg	1888.6672	3_Arles	1888	9	Cafe Terrace on the Place du Forum Arles at Night The
+484.jpg	1888.6672	3_Arles	1888	9	Entrance to the Public Park in Arles
+485.jpg	1888.6672	3_Arles	1888	9	Green Vineyard The
+486.jpg	1888.6672	3_Arles	1888	9	Lane in the Public Garden at Arles A
+487.jpg	1888.6672	3_Arles	1888	9	Night Cafe in the Place Lamartine in Arles The
+488.jpg	1888.6672	3_Arles	1888	9	Old Mill The
+489.jpg	1888.6672	3_Arles	1888	9	Ploughed Field
+490.jpg	1888.6672	3_Arles	1888	9	Portrait of Eugene Boch
+491.jpg	1888.6672	3_Arles	1888	9	Self-Portrait (Dedicated to Paul Gauguin)
+492.jpg	1888.6672	3_Arles	1888	9	Sower: Outskirts of Arles in the Background The
+493.jpg	1888.6672	3_Arles	1888	9	Starry Night Over the Rhone
+494.jpg	1888.6672	3_Arles	1888	9	Vincent's House in Arles (The Yellow House)
+495.jpg	1888.7506	3_Arles	1888	10	Brothel The
+496.jpg	1888.7506	3_Arles	1888	10	Les Alyscamps
+497.jpg	1888.7506	3_Arles	1888	10	Portrait of the Artist's Mother
+498.jpg	1888.7506	3_Arles	1888	10	Public Garden with Couple and Blue Fir Tree: The Poet's Garden III
+499.jpg	1888.7506	3_Arles	1888	10	Public Park at Arles The
+500.jpg	1888.7506	3_Arles	1888	10	Railway Bridge over Avenue Montmajour Arles The
+501.jpg	1888.7506	3_Arles	1888	10	Sower The
+502.jpg	1888.7506	3_Arles	1888	10	Still Life: French Novels
+503.jpg	1888.7506	3_Arles	1888	10	Tarascon Diligence
+504.jpg	1888.7506	3_Arles	1888	10	Trinquetaille Bridge The
+505.jpg	1888.7506	3_Arles	1888	10	Trunk of an Old Yew Tree
+506.jpg	1888.7506	3_Arles	1888	10	Vincent's Bedroom in Arles
+507.jpg	1888.7506	3_Arles	1888	10	Willows at Sunset
+508.jpg	1888.834	3_Arles	1888	11	L'Arlesienne: Madame Ginoux with Books
+509.jpg	1888.834	3_Arles	1888	11	L'Arlesienne: Madame Ginoux with Gloves and Umbrella
+510.jpg	1888.834	3_Arles	1888	11	Les Alyscamps
+511.jpg	1888.834	3_Arles	1888	11	Les Alyscamps
+512.jpg	1888.834	3_Arles	1888	11	Les Alyscamps: Falling Autumn Leaves
+513.jpg	1888.834	3_Arles	1888	11	Memory of the Garden at Etten
+514.jpg	1888.834	3_Arles	1888	11	Mother Roulin with Her Baby
+515.jpg	1888.834	3_Arles	1888	11	Mother Roulin with Her Baby
+516.jpg	1888.834	3_Arles	1888	11	Novel Reader The
+517.jpg	1888.834	3_Arles	1888	11	Portrait of Armand Roulin
+518.jpg	1888.834	3_Arles	1888	11	Portrait of Armand Roulin
+519.jpg	1888.834	3_Arles	1888	11	Portrait of Camille Roulin
+520.jpg	1888.834	3_Arles	1888	11	Portrait of Camille Roulin
+521.jpg	1888.834	3_Arles	1888	11	Portrait of Madame Augustine Roulin
+522.jpg	1888.834	3_Arles	1888	11	Portrait of the Postman Joseph Roulin
+523.jpg	1888.834	3_Arles	1888	11	Red Vineyard The
+524.jpg	1888.834	3_Arles	1888	11	Self-Portrait
+525.jpg	1888.834	3_Arles	1888	11	Sower The
+526.jpg	1888.834	3_Arles	1888	11	Sower The
+527.jpg	1888.9174	3_Arles	1888	12	Baby Marcelle Roulin The
+528.jpg	1888.9174	3_Arles	1888	12	Baby Marcelle Roulin The
+529.jpg	1888.9174	3_Arles	1888	12	Baby Marcelle Roulin The
+530.jpg	1888.9174	3_Arles	1888	12	Dance Hall in Arles The
+531.jpg	1888.9174	3_Arles	1888	12	La Berceuse (Augustine Roulin)
+532.jpg	1888.9174	3_Arles	1888	12	Paul Gauguin's Armchair
+533.jpg	1888.9174	3_Arles	1888	12	Portrait of a One-Eyed Man
+534.jpg	1888.9174	3_Arles	1888	12	Portrait of Joseph-Michel Ginoux
+535.jpg	1888.9174	3_Arles	1888	12	Schoolboy (Camille Roulin) The
+536.jpg	1888.9174	3_Arles	1888	12	Smoker The
+537.jpg	1888.9174	3_Arles	1888	12	Spectators in the Arena at Arles
+538.jpg	1888.9174	3_Arles	1888	12	Vincent's Chair with His Pipe
+539.jpg	1888.9174	3_Arles	1888	12	Young Man with a Cap
+540.jpg	1889	3_Arles	1889	1	Crab on Its Back
+541.jpg	1889	3_Arles	1889	1	La Berceuse (Augustine Roulin)
+542.jpg	1889	3_Arles	1889	1	Portrait of Doctor Felix Rey
+543.jpg	1889	3_Arles	1889	1	Self-Portrait with Bandaged Ear
+544.jpg	1889	3_Arles	1889	1	Self-Portrait with Bandaged Ear and Pipe
+545.jpg	1889	3_Arles	1889	1	Still Life with Oranges Lemons and Blue Gloves
+546.jpg	1889	3_Arles	1889	1	Still Life: Bloaters on a Piece of Yellow Paper
+547.jpg	1889	3_Arles	1889	1	Still Life: Drawing Board Pipe Onions and Sealing-Wax
+548.jpg	1889	3_Arles	1889	1	Still Life: Two Red Herrings
+549.jpg	1889	3_Arles	1889	1	Still Life: Vase with Fifteen Sunflowers
+550.jpg	1889	3_Arles	1889	1	Still Life: Vase with Fifteen Sunflowers
+551.jpg	1889	3_Arles	1889	1	Still Life: Vase with Twelve Sunflowers
+552.jpg	1889	3_Arles	1889	1	Two Crabs
+553.jpg	1889.0834	3_Arles	1889	2	La Berceuse (Augustine Roulin)
+554.jpg	1889.1668	3_Arles	1889	3	La Berceuse (Augustine Roulin)
+555.jpg	1889.1668	3_Arles	1889	3	Two White Butterflies
+556.jpg	1889.2502	3_Arles	1889	4	Clumps of Grass
