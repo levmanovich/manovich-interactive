@@ -66,7 +66,7 @@ Plotting the same paintings with brightness mean on X and hue median on Y reveal
 1. Open `imageplot_2.html` in any modern browser
 2. Load a collection using the **Load Images** button (folder of JPEGs or PNGs)
 3. Optionally load a metadata TSV file to add dates and any other information to be used in the visualizations
-4. Choose X and Y axes from the 48 extracted features, or switch to PCA / t-SNE
+4. Choose X and Y axes from the 48 extracted features, or switch to PCA / t-SNE / UMAP
 5. Explore, zoom, compare, save
 
 See `imageplot2_guide.html` for full step-by-step instructions.
@@ -94,4 +94,4 @@ For dozens of examples of cultural analytics projects applying image visualizati
 ImagePlot 2 — Lev Manovich, 2024–2025.  
 Original ImagePlot — Lev Manovich, Jeremy Douglass, Nadia Xiangfei Zeng, Software Studies Initiative, 2009–2011.
 
-Part of [manovich-interactive](https://github.com/manovich/manovich-interactive).
+Part of [manovich-interactive](https://github.com/levmanovich/manovich-interactive).
