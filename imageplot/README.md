@@ -1,15 +1,14 @@
 # ImagePlot 2
 
 **Interactive visualization of image collections.**  
-Single self-contained HTML file — open in any browser, no installation required.
 
-![Mondrian paintings organized by UMAP](screenshots/ImagePlot_v2_Mondrian_Umap.png)
+Single self-contained HTML file — open in any browser, no installation required.
 
 ---
 
 ## What it does
 
-ImagePlot 2 automatically extracts **48 visual features** from a set of images — brightness, saturation, hue, entropy, contrast, and others — and plots your collection as an interactive scatter visualization, with images rendered directly as data points.
+ImagePlot 2 automatically extracts **77 visual features** from a set of images — brightness, saturation, hue, entropy, contrast, and others — and plots your collection as an interactive scatter visualization, with images rendered directly as data points.
 
 Key capabilities:
 
@@ -51,7 +50,7 @@ Plotting 199 Paris paintings (1886–1888) and 161 Arles paintings (1888) on bri
 
 ### Mondrian: evolution over time
 
-Compute all 48 features for 128 Mondrian paintings (1905–1917), project them into 2D using UMAP, then play the animation with image ID on the X axis. This traces the trajectory of Mondrian's work through feature space in chronological order, making gradual stylistic shifts visible as movement across the plot.
+Compute all 77 features for 128 Mondrian paintings (1905–1917), project them into 2D using UMAP, then play the animation with image ID on the X axis. This traces the trajectory of Mondrian's work through feature space in chronological order, making gradual stylistic shifts visible as movement across the plot.
 
 ![Mondrian — UMAP with year labels](screenshots/ImagePlot_v2_Mondrian_Umap.png)
 
@@ -68,7 +67,7 @@ Plotting the same paintings with brightness mean on X and hue median on Y reveal
 1. Open `imageplot_2.html` in any modern browser
 2. Load a collection using the **Load Images** button (folder of JPEGs or PNGs)
 3. Optionally load a metadata TSV file to add dates and any other information to be used in the visualizations
-4. Choose X and Y axes from the 48 extracted features, or switch to PCA / t-SNE / UMAP
+4. Choose X and Y axes from the 77 extracted features, or switch to PCA / t-SNE / UMAP
 5. Explore, zoom, compare, save
 
 See `imageplot2_guide.html` for full step-by-step instructions.
@@ -93,7 +92,8 @@ For dozens of examples of cultural analytics projects applying image visualizati
 
 ## Credits
 
-ImagePlot 2 — Lev Manovich, 2024–2025.  
+ImagePlot 2 — Lev Manovich, 2026.  
+
 Original ImagePlot — Lev Manovich, Jeremy Douglass, Nadia Xiangfei Zeng, Software Studies Initiative, 2009–2011.
 
 Part of [manovich-interactive](https://github.com/levmanovich/manovich-interactive).
