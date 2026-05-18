@@ -1,1 +1,1631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photography & Automation — A Detailed Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Space+Mono:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ── Base palette ── */
+    --bg:        #f4f7fc;
+    --bg-card:   #ffffff;
+    --text:      #1e1e1e;
+    --text-mid:  #444444;
+    --text-soft: #666666;
+    --border:    #d8d4cc;
 
+    /* ── Era accent colors (timeline sections) ── */
+    --era1: #4a3580;   /* deep indigo — Pre-Photographic */
+    --era2: #7a3010;   /* burnt sienna — Birth of Photography */
+    --era3: #1a6040;   /* forest green — Mass Photography */
+    --era4: #8a1a2e;   /* burgundy — 35mm Century */
+    --era5: #1a4a7a;   /* steel blue — Electronic Automation */
+    --era6: #4a1a70;   /* deep violet — Mobile & Computational */
+    --era7: #b8202a;   /* deep red — Generative "Photography" (= --generative) */
+    --generative: #b8202a;  /* deep red — Generative */
+
+    /* ── Automation type colors ── */
+    --mechanical: #a85418;
+    --chemical:   #1a7a70;
+    --electronic: #1e52b8;
+    --software:   #9a1a90;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 70px 60px 50px;
+    border-bottom: 2px solid var(--border);
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--bg);
+  }
+  .header-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 18px;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.64rem, 6vw, 4.56rem);
+    font-weight: 900;
+    line-height: 1.12;
+    color: var(--era4);
+    max-width: 700px;
+    margin-top: 36px;
+  }
+  header h1 em   { font-style: italic; color: var(--era4); }
+  header h1 .num { color: var(--era4); font-style: normal; }
+  header h1 .word{ color: var(--era4); font-style: normal; }
+  .header-sub strong { font-weight:700; color: var(--era4); }
+  .header-sub {
+    margin-top: 22px;
+    font-family: 'Playfair Display', serif;
+    font-style: normal;
+    font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+    color: var(--era5);
+    max-width: 640px;
+    line-height: 1.65;
+    font-weight: 400;
+  }
+  .header-sub strong {
+    font-weight: 700;
+    color: var(--era4);
+  }
+  .header-stats {
+    display: flex; gap: 40px; margin-top: 32px; flex-wrap: wrap;
+  }
+  .stat { display: flex; flex-direction: column; gap: 4px; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--era4);
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+  }
+
+  /* ── AUTOMATION LEGEND ── */
+  .legend-bar {
+    display: flex; gap: 0;
+    max-width: 1100px; margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+    background: #fff;
+  }
+  .legend-item {
+    flex: 1; padding: 16px 18px 13px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+    border-right: 1px solid var(--border);
+  }
+  .legend-item:last-child { border-right: none; }
+  .legend-text { font-size: 0.73rem; color: var(--text-soft); line-height: 1.4; }
+  .legend-text strong {
+    display: block;
+    font-weight: 700; font-size: 0.78rem; margin-bottom: 2px;
+  }
+  .legend-item.mech .legend-text strong { color: var(--mechanical); }
+  .legend-item.chem .legend-text strong { color: var(--chemical); }
+  .legend-item.elec .legend-text strong { color: var(--electronic); }
+  .legend-item.soft .legend-text strong { color: var(--software); }
+  .legend-item.gen  .legend-text strong { color: var(--generative); }
+
+  /* ── TIMELINE ── */
+  .timeline-wrapper {
+    max-width: 1100px; margin: 0 auto; padding: 28px 60px 0;
+    position: relative;
+  }
+
+  /* ERA HEADERS — each gets its own era color */
+  .era-header {
+    border-top: 1px solid var(--border);
+    padding: 24px 0 16px;
+    margin-top: 64px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+  }
+  .era-header:first-child { margin-top: 0; }
+  .era-numeral {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.15;
+    flex-shrink: 0;
+    letter-spacing: -0.02em;
+    align-self: center;
+  }
+  .era-body { display: flex; flex-direction: column; gap: 4px; }
+  .era-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .era-dates {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+  .era-i   { color: var(--era1); }
+  .era-ii  { color: var(--era2); }
+  .era-iii { color: var(--era3); }
+  .era-iv  { color: var(--era4); }
+  .era-v   { color: var(--era5); }
+  .era-vi  { color: var(--era6); }
+  .era-vii { color: var(--generative); }
+
+  /* SPINE */
+  .timeline-track {
+    position: relative;
+    padding-left: 30px;
+  }
+  .timeline-track::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--border);
+    border-radius: 1px;
+  }
+
+  /* ENTRY */
+  .entry {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 0 24px;
+    margin-bottom: 22px;
+    position: relative;
+    animation: fadeSlide 0.35s ease both;
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .entry-year-col {
+    text-align: right;
+    padding-top: 5px;
+    position: relative;
+  }
+  .entry-year {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: block;
+  }
+  .entry-dot {
+    position: absolute;
+    right: -33px; top: 9px;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    transition: transform 0.2s;
+  }
+  .entry:hover .entry-dot { transform: scale(1.5); }
+
+  .entry-body {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 4px solid transparent;
+    border-radius: 4px;
+    padding: 14px 18px;
+    transition: box-shadow 0.2s;
+  }
+  .entry:hover .entry-body { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+
+  /* TYPE COLORS — dot, left border, year, tag */
+  .type-mechanical .entry-body   { border-left-color: var(--mechanical); }
+  .type-mechanical .entry-dot    { border-color: var(--mechanical); background: #fff7ec; }
+  .type-mechanical .entry-year   { color: var(--mechanical); }
+  .type-chemical   .entry-body   { border-left-color: var(--chemical); }
+  .type-chemical   .entry-dot    { border-color: var(--chemical); background: #edfaf4; }
+  .type-chemical   .entry-year   { color: var(--chemical); }
+  .type-electronic .entry-body   { border-left-color: var(--electronic); }
+  .type-electronic .entry-dot    { border-color: var(--electronic); background: #edf3fc; }
+  .type-electronic .entry-year   { color: var(--electronic); }
+  .type-software   .entry-body   { border-left-color: var(--software); }
+  .type-software   .entry-dot    { border-color: var(--software); background: #faedf8; }
+  .type-software   .entry-year   { color: var(--software); }
+
+  .entry-tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .type-mechanical .entry-tag { background: #fff0d8; color: var(--mechanical); }
+  .type-chemical   .entry-tag { background: #d8f5ea; color: var(--chemical); }
+  .type-electronic .entry-tag { background: #d8eafa; color: var(--electronic); }
+  .type-software   .entry-tag { background: #f5d8f2; color: var(--software); }
+
+  .entry-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.0rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .entry-who {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-soft);
+    margin-bottom: 7px;
+  }
+  .entry-auto {
+    font-size: 0.84rem;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .entry-auto strong {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  /* ── TABLE ── */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .section-title em { color: var(--era5); font-style: italic; }
+
+  .table-section {
+    max-width: 1100px; margin: 80px auto 0; padding: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+    font-size: 0.83rem;
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+  thead th {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    text-align: left;
+    padding: 11px 14px;
+    border-bottom: 2px solid var(--border);
+  }
+  tbody tr {
+    border-bottom: 1px solid #eeece8;
+    transition: background 0.12s;
+  }
+  tbody tr:hover { background: #f9f7f3; }
+  tbody td {
+    padding: 9px 14px;
+    vertical-align: top;
+    line-height: 1.5;
+    color: var(--text-mid);
+  }
+  td:first-child {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    font-weight: 700;
+  }
+  td:nth-child(2) { color: var(--text); font-weight: 600; }
+  td:nth-child(3) { color: var(--text-mid); }
+  .tag-pill {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin-right: 4px;
+    font-weight: 700;
+  }
+
+  /* ── AUTOMATION TYPES SECTION ── */
+  .types-section {
+    max-width: 1100px; margin: 80px auto 0; padding: 0;
+  }
+  .types-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+  }
+  .type-card {
+    padding: 24px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+  .type-card-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+  .type-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .type-card p {
+    font-size: 0.83rem;
+    color: var(--text-mid);
+    line-height: 1.7;
+  }
+  .type-card ul {
+    margin-top: 10px; padding-left: 14px;
+    font-size: 0.79rem; color: var(--text-soft); line-height: 1.8;
+  }
+
+  .mech-card { border-top: 4px solid var(--mechanical); }
+  .chem-card { border-top: 4px solid var(--chemical); }
+  .elec-card { border-top: 4px solid var(--electronic); }
+  .soft-card { border-top: 4px solid var(--software); }
+
+  .mech-card .type-card-label, .mech-card h3 { color: var(--mechanical); }
+  .chem-card .type-card-label, .chem-card h3 { color: var(--chemical); }
+  .elec-card .type-card-label, .elec-card h3 { color: var(--electronic); }
+  .soft-card .type-card-label, .soft-card h3 { color: var(--software); }
+
+  footer {
+    max-width: 1100px; margin: 80px auto 0; padding: 30px 60px;
+    border-top: 1px solid rgba(200,135,42,0.2);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    display: flex; justify-content: space-between;
+    background: #fff;
+  }
+
+  /* ── CREDIT ── */
+  .header-credit { font-family:'Lato',sans-serif; font-size:15px; letter-spacing:0.02em; color:#2e2e2a; font-weight:400; line-height:1.7; }
+  .header-credit strong { font-weight:400; color:#111110; }
+  .header-credit .role  { color:#aaaaaa; font-weight:400; }
+
+  /* ── TOC ── */
+  .toc {
+    margin-top:32px;
+    padding-top:20px;
+    border-top:2px solid var(--border);
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    max-width:560px;
+  }
+  .toc a {
+    display:flex;
+    align-items:baseline;
+    gap:11px;
+    padding:11px 0;
+    text-decoration:none;
+    border-bottom:1px solid #e4e0d8;
+    transition:color 0.15s;
+  }
+  .toc a:hover .toc-label { color:var(--era5); }
+  .toc a:hover .toc-num   { color:var(--era5); }
+  .toc-num {
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    font-weight:700;
+    color:var(--era4);
+    flex-shrink:0;
+    letter-spacing:0.05em;
+  }
+  .toc-label {
+    font-family:'Lato',sans-serif;
+    font-size:16px;
+    font-weight:600;
+    color:var(--text);
+    line-height:1.35;
+    transition:color 0.15s;
+  }
+
+  /* ── AUTOMATION INDEX ── */
+  .index-section {
+    max-width: 1100px; margin: 80px auto 0; padding: 0 60px;
+  }
+  .index-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0;
+    margin-top: 28px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .index-entry {
+    display: flex;
+    gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eeece8;
+    border-right: 1px solid #eeece8;
+    align-items: baseline;
+    transition: background 0.12s;
+  }
+  .index-entry:hover { background: #f9f7f3; }
+  .index-year {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 42px;
+  }
+  .index-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .index-text {
+    font-size: 0.81rem;
+    color: var(--text-mid);
+    line-height: 1.45;
+  }
+  .index-text strong { color: var(--text); font-weight: 700; }
+
+  /* type colors for index */
+  .idx-mech .index-year { color: var(--mechanical); }
+  .idx-mech .index-dot  { background: var(--mechanical); }
+  .idx-chem .index-year { color: var(--chemical); }
+  .idx-chem .index-dot  { background: var(--chemical); }
+  .idx-elec .index-year { color: var(--electronic); }
+  .idx-elec .index-dot  { background: var(--electronic); }
+  .idx-soft .index-year { color: var(--software); }
+  .idx-soft .index-dot  { background: var(--software); }
+
+  @media (max-width: 680px) {
+    header, .timeline-wrapper, .table-section, .types-section, .index-section { padding-left: 20px; padding-right: 20px; }
+    .entry { grid-template-columns: 62px 1fr; gap: 0 16px; }
+    .legend-bar { flex-wrap: wrap; }
+    .legend-item { flex: 0 0 33.33%; }
+    footer { flex-direction: column; gap: 8px; }
+    .header-stats { gap: 24px; }
+    .index-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">History of Visual Media</div>
+  <hr style="border:none;border-top:1px solid var(--border);margin:12px 0 14px;">
+  <div class="header-credit">
+    <div><strong>Lev Manovich</strong> <span class="role">(concept, intellectual direction, editorial decisions, text editing, art direction)</span></div>
+    <div><strong>Claude</strong> <span class="role">(initial research and timeline content, design and typography, production)</span></div>
+  </div>
+  <h1>How photography<br>was reinvented<br><span class="num">43</span>&nbsp;<span class="word">times</span></h1>
+  <p class="header-sub">This timeline presents a history of the <strong>automation</strong> of image capturing, processing, editing, and audience — and how it led to the disappearance of the photographic image from photography.</p>
+  <div style="font-family:'Playfair Display',serif;font-size:clamp(0.85rem,1.6vw,1.0rem);color:var(--era5);max-width:640px;line-height:1.7;margin-top:16px;font-weight:400;">
+    <p>This timeline extends historical analysis of imaging automation developed by Lev Manovich in his PhD dissertation <em>The Engineering of Vision from Constructivism to Computers</em> (1993) and a number of later articles: <a href="https://manovich.net/index.php/projects/article-1993" target="_blank" style="color:#8a1a2e;text-decoration:none;border-bottom:1px solid rgba(138,26,46,0.3);">The Mapping of Space: Perspective, Radar, and 3-D Computer Graphics</a> (1993), <a href="https://manovich.net/index.php/projects/automation-of-sight-from-photography-to-computer-vision" target="_blank" style="color:#8a1a2e;text-decoration:none;border-bottom:1px solid rgba(138,26,46,0.3);">Automation of Sight from Photography to Computer Vision</a> (1996), and <a href="https://manovich.net/index.php/projects/automating-aesthetics-artificial-intelligence-and-image-culture" target="_blank" style="color:#8a1a2e;text-decoration:none;border-bottom:1px solid rgba(138,26,46,0.3);">Automating Aesthetics: Artificial Intelligence and Image Culture</a> (2017).</p>
+  </div>
+  </div>
+  <div style="font-family:'Playfair Display',serif;font-size:clamp(1.76rem,4vw,3.04rem);font-weight:900;letter-spacing:0.03em;color:var(--era4);margin-top:32px;padding-top:20px;border-top:2px solid var(--border);">Content</div>
+  <nav style="margin-top:20px;max-width:560px;">
+    <a href="#modes" style="display:flex;align-items:baseline;gap:20px;padding:12px 0;border-top:1px solid var(--border);text-decoration:none;">
+      <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#8a1a2e;min-width:24px;">01</span>
+      <span style="font-family:'Lato',sans-serif;font-size:16px;font-weight:700;color:#1e1e1e;">Five Modes of Automation</span>
+    </a>
+    <a href="#index" style="display:flex;align-items:baseline;gap:20px;padding:12px 0;border-top:1px solid var(--border);text-decoration:none;">
+      <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#8a1a2e;min-width:24px;">02</span>
+      <span style="font-family:'Lato',sans-serif;font-size:16px;font-weight:700;color:#1e1e1e;">Index of 43 Automations</span>
+    </a>
+    <a href="#table" style="display:flex;align-items:baseline;gap:20px;padding:12px 0;border-top:1px solid var(--border);text-decoration:none;">
+      <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#8a1a2e;min-width:24px;">03</span>
+      <span style="font-family:'Lato',sans-serif;font-size:16px;font-weight:700;color:#1e1e1e;">Milestones Reference Table</span>
+    </a>
+    <a href="#timeline" style="display:flex;align-items:baseline;gap:20px;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);text-decoration:none;">
+      <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#8a1a2e;min-width:24px;">04</span>
+      <span style="font-family:'Lato',sans-serif;font-size:16px;font-weight:700;color:#1e1e1e;">Detailed Timeline</span>
+    </a>
+  </nav>
+</header>
+
+<!-- LEGEND -->
+<div class="legend-bar">
+  <div class="legend-item mech">
+    <div class="legend-text"><strong>Mechanical</strong> optics, shutters, film advance, gears</div>
+  </div>
+  <div class="legend-item chem">
+    <div class="legend-text"><strong>Chemical</strong> emulsions, developers, fixing agents</div>
+  </div>
+  <div class="legend-item elec">
+    <div class="legend-text"><strong>Electronic</strong> sensors, meters, motors, CCD/CMOS</div>
+  </div>
+  <div class="legend-item soft">
+    <div class="legend-text"><strong>Software</strong> algorithms, AI, computational imaging</div>
+  </div>
+  <div class="legend-item gen">
+    <div class="legend-text"><strong>Generative</strong> GANs, diffusion models, text-to-image</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ TYPES SECTION ══════════════════════════ -->
+<div class="types-section" id="modes">
+  <div class="section-title">Five Modes of <em>Photographic Automation</em></div>
+
+  <div class="types-grid">
+
+    <div class="type-card mech-card">
+      <div class="type-card-label">Mode I · ~1000–1940s</div>
+      <h3>Mechanical Automation</h3>
+      <p>Gears, springs, levers, and optical glass automate the <em>physics of capture</em>: how light is gathered, timed, and recorded onto a substrate. The photographer still makes almost all decisions — the machine just executes them faster and more precisely.</p>
+      <ul>
+        <li>Focal-plane shutters (1/1000s timing)</li>
+        <li>Roll film advance mechanisms</li>
+        <li>Rangefinder coupling</li>
+        <li>Reflex mirror systems (SLR)</li>
+        <li>Motor drive film winding</li>
+      </ul>
+    </div>
+
+    <div class="type-card chem-card">
+      <div class="type-card-label">Mode II · 1826–1990s</div>
+      <h3>Chemical Automation</h3>
+      <p>Photosensitive emulsions automate the <em>inscription of light into matter</em>. Each generation of chemistry increased sensitivity (ISO), reduced processing time, and eventually eliminated the need for specialist knowledge entirely. Polaroid was the terminal point of this mode.</p>
+      <ul>
+        <li>Daguerreotype development (mercury vapor)</li>
+        <li>Gelatin silver emulsion (factory-made)</li>
+        <li>Color chromogenic development (C-41)</li>
+        <li>Integral instant film (SX-70)</li>
+        <li>DX-coded film cartridges (auto ISO setting)</li>
+      </ul>
+    </div>
+
+    <div class="type-card elec-card">
+      <div class="type-card-label">Mode III · 1960s–2000s</div>
+      <h3>Electronic Automation</h3>
+      <p>Sensors, microprocessors, and motors replace the photographer's real-time technical judgments about <em>exposure, focus, and timing</em>. The camera becomes an intelligent agent that optimizes conditions the photographer cannot consciously track. Film becomes optional, then obsolete.</p>
+      <ul>
+        <li>TTL light metering (CdS cells)</li>
+        <li>Programmed auto-exposure (AE-1 CPU)</li>
+        <li>Phase-detection autofocus</li>
+        <li>CCD / CMOS image sensors</li>
+        <li>Digital file storage (CompactFlash, SD)</li>
+      </ul>
+    </div>
+
+    <div class="type-card soft-card">
+      <div class="type-card-label">Mode IV · 1990–present</div>
+      <h3>Software / Computational Automation</h3>
+      <p>Algorithms and neural networks automate <em>interpretation, aesthetics, and distribution</em> — not just capture. The image is no longer a record of what light did to a surface; it is the output of a model that decides what the image <em>should</em> look like. The camera is now a computer that occasionally uses a lens.</p>
+      <ul>
+        <li>Photoshop (darkroom → software)</li>
+        <li>RAW processing pipelines</li>
+        <li>HDR burst-frame merging</li>
+        <li>Neural portrait segmentation</li>
+        <li>Scene-classification AI; night-mode stacking</li>
+        <li>Algorithmic feed curation (Instagram, etc.)</li>
+      </ul>
+    </div>
+
+    <div class="type-card" style="border-top:4px solid var(--generative);">
+      <div class="type-card-label" style="color:var(--generative);">Mode V · 2014–present</div>
+      <h3 style="color:var(--generative);">Generative Automation</h3>
+      <p>Neural networks and diffusion models automate the <em>production of images from nothing</em> — no camera, no scene, no light. The image is generated entirely from statistical patterns learned from millions of photographs. Photography's indexical bond to reality is severed.</p>
+      <ul>
+        <li>Generative Adversarial Networks (GANs)</li>
+        <li>Diffusion models (Stable Diffusion, Midjourney)</li>
+        <li>Text-to-image generation (DALL-E)</li>
+        <li>Generative Fill in Photoshop (Firefly)</li>
+        <li>AI generation embedded in smartphone cameras</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════ AUTOMATION INDEX ══════════════════════════ -->
+<div class="index-section" id="index">
+  <div class="section-title">What Was <em>Automated</em> — a timeline</div>
+  <p style="font-size:0.85rem;color:var(--text-soft);margin-top:6px;">Every automation point from the timeline, in sequence. Color = mode type.</p>
+
+  <div class="index-grid">
+
+    <div class="index-entry idx-mech">
+      <span class="index-year">~1000</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Optical projection</strong> of the external world onto a surface — first capture proxy, replacing mental composition</span>
+    </div>
+
+    <div class="index-entry idx-mech">
+      <span class="index-year">1568</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Light concentration and sharpness control</strong> via convex lens; first aperture (diaphragm) manages depth of field</span>
+    </div>
+
+    <div class="index-entry idx-chem">
+      <span class="index-year">1727</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Tone inscription</strong> by light acting on silver salts — chemistry draws, not the hand</span>
+    </div>
+
+    <div class="index-entry idx-chem">
+      <span class="index-year">1826</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Permanent self-recording</strong> of a scene onto a bitumen-coated plate — the image fixes itself</span>
+    </div>
+
+    <div class="index-entry idx-chem">
+      <span class="index-year">1839</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Latent image development</strong> via mercury vapor; exposure time from hours to minutes</span>
+    </div>
+
+    <div class="index-entry idx-chem">
+      <span class="index-year">1841</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Infinite identical copies</strong> from one negative — automated reproductive distribution of images</span>
+    </div>
+
+    <div class="index-entry idx-chem">
+      <span class="index-year">1851</span>
+      <span class="index-dot"></span>
+      <span class="index-text">Faster exposures and sharper images; <strong>chemistry moves entirely to the photographer's hands in the field</strong></span>
+    </div>
+
+    <div class="index-entry idx-chem">
+      <span class="index-year">1871</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Decoupling of capture from field chemistry</strong> — factory-coated plates processed separately; handheld cameras become possible</span>
+    </div>
+
+    <div class="index-entry idx-mech">
+      <span class="index-year">1888</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Darkroom processing outsourced entirely</strong> to a factory — photography-as-a-service model; user only presses the button</span>
+    </div>
+
+    <div class="index-entry idx-mech">
+      <span class="index-year">1900</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Economic and skill barriers to photography</strong> eliminated — fixed focus removes need to understand optics</span>
+    </div>
+
+    <div class="index-entry idx-mech">
+      <span class="index-year">1913</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Portability and discretion</strong> via 35mm cinema film — candid photography impossible with larger cameras now feasible</span>
+    </div>
+
+    <div class="index-entry idx-mech">
+      <span class="index-year">1925</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Film advance, shutter cocking, and frame spacing</strong> via precision mechanical engineering; 35mm standardized</span>
+    </div>
+
+    <div class="index-entry idx-mech">
+      <span class="index-year">1936</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Through-the-lens framing</strong> — reflex mirror shows the actual focused image, eliminating parallax error</span>
+    </div>
+
+    <div class="index-entry idx-chem">
+      <span class="index-year">1947</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>In-camera instant chemical processing</strong> — self-developing print in 60 seconds; entire lab eliminated</span>
+    </div>
+
+    <div class="index-entry idx-mech">
+      <span class="index-year">1959</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Professional adaptability</strong> via modular system cameras; motor drives automate film winding for high-speed burst</span>
+    </div>
+
+    <div class="index-entry idx-elec">
+      <span class="index-year">~1963</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Exposure calculation</strong> from measured light — TTL metering replaces handheld meter or guesswork</span>
+    </div>
+
+    <div class="index-entry idx-chem">
+      <span class="index-year">1963</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Film loading and threading</strong> via drop-in cartridge; flash synchronization automated via cube flash</span>
+    </div>
+
+    <div class="index-entry idx-elec">
+      <span class="index-year">1963</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>One half of the exposure equation</strong> — shutter-priority or aperture-priority AE; camera handles technical response</span>
+    </div>
+
+    <div class="index-entry idx-chem">
+      <span class="index-year">1972</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>All chemistry fully hidden</strong> — integral film develops in daylight with no timing, no peel-apart steps</span>
+    </div>
+
+    <div class="index-entry idx-elec">
+      <span class="index-year">1975</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Conversion of light to digital data</strong> — image recorded electronically for the first time; no film required</span>
+    </div>
+
+    <div class="index-entry idx-elec">
+      <span class="index-year">1977</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Full program exposure selection</strong> by onboard microprocessor — entire exposure decision delegated to a CPU</span>
+    </div>
+
+    <div class="index-entry idx-elec">
+      <span class="index-year">1978</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Focus</strong> — the last great manual photographic skill automated via phase-detection and ultrasonic sonar</span>
+    </div>
+
+    <div class="index-entry idx-elec">
+      <span class="index-year">1985</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>All camera subsystems unified</strong> — AF, AE, film advance, and DX coding integrated into a single body</span>
+    </div>
+
+    <div class="index-entry idx-soft">
+      <span class="index-year">1990</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Entire darkroom chemistry replicated in software</strong> — dodging, burning, retouching, color correction all on a desktop</span>
+    </div>
+
+    <div class="index-entry idx-elec">
+      <span class="index-year">1991</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Digital file delivery for professional photojournalists</strong> — images transmitted by modem from the field within minutes</span>
+    </div>
+
+    <div class="index-entry idx-elec">
+      <span class="index-year">1995</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Immediate image review and selective deletion</strong> via rear LCD — exposure feedback no longer requires waiting for film development</span>
+    </div>
+
+    <div class="index-entry idx-elec">
+      <span class="index-year">2000</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Capture and communication collapsed</strong> into one device — photos transmittable instantly via MMS from a pocket</span>
+    </div>
+
+    <div class="index-entry idx-soft">
+      <span class="index-year">2007</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Capture → edit → share workflow unified</strong> — App Store creates ecosystem for photographic software automation</span>
+    </div>
+
+    <div class="index-entry idx-soft">
+      <span class="index-year">2011</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Photographic curation and audience discovery</strong> by algorithm; one-tap filters automate aesthetic decisions</span>
+    </div>
+
+    <div class="index-entry idx-soft">
+      <span class="index-year">2013</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Multi-frame burst merge</strong> — many underexposed frames aligned and merged into one composite; the single photograph as a discrete captured moment ends</span>
+    </div>
+
+    <div class="index-entry idx-soft">
+      <span class="index-year">2016</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Burst-merge as invisible default</strong> on every photo — software imaging quality permanently surpasses what the physical sensor could capture in a single exposure</span>
+    </div>
+
+    <div class="index-entry idx-soft">
+      <span class="index-year">2017</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Real-time scene understanding</strong> via on-device NPU — camera identifies scene type (food, night, landscape…) and applies a specialized processing pipeline per subject</span>
+    </div>
+
+    <div class="index-entry idx-soft">
+      <span class="index-year">2017</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Subject–background segmentation</strong> by neural network — shallow depth-of-field simulated without optics; AI calculates what the lens did not capture</span>
+    </div>
+
+    <div class="index-entry idx-soft">
+      <span class="index-year">2018</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Per-pixel and per-person best-parts selection</strong> across frames — each person taken from a different moment; the photo becomes an algorithmic collage, not a recording of any single instant</span>
+    </div>
+
+    <div class="index-entry idx-soft">
+      <span class="index-year">2019+</span>
+      <span class="index-dot"></span>
+      <span class="index-text"><strong>Long-exposure stacking for near-darkness</strong> and neural upscaling — images produced in conditions where film photography was physically impossible</span>
+    </div>
+
+    <div class="index-entry" style="border-left-color:var(--generative)">
+      <span class="index-year" style="color:var(--generative)">2014</span>
+      <span class="index-dot" style="background:var(--generative)"></span>
+      <span class="index-text"><strong>Image generation from random noise</strong> — GANs produce plausible images without any camera, scene, or captured light</span>
+    </div>
+
+    <div class="index-entry" style="border-left-color:var(--generative)">
+      <span class="index-year" style="color:var(--generative)">2015</span>
+      <span class="index-dot" style="background:var(--generative)"></span>
+      <span class="index-text"><strong>Neural "imagination"</strong> — networks run in reverse amplify their own pattern recognition into hallucinatory images; machine sees and generates simultaneously</span>
+    </div>
+
+    <div class="index-entry" style="border-left-color:var(--generative)">
+      <span class="index-year" style="color:var(--generative)">2017</span>
+      <span class="index-dot" style="background:var(--generative)"></span>
+      <span class="index-text"><strong>Synthetic faces indistinguishable from photographs</strong> — NVIDIA Progressive GAN closes the perceptual gap five years before general text-to-image</span>
+    </div>
+
+    <div class="index-entry" style="border-left-color:var(--generative)">
+      <span class="index-year" style="color:var(--generative)">2021</span>
+      <span class="index-dot" style="background:var(--generative)"></span>
+      <span class="index-text"><strong>Language replaces the lens</strong> — text prompts generate photographic-looking images; the photographer's craft becomes optional</span>
+    </div>
+
+    <div class="index-entry" style="border-left-color:var(--generative)">
+      <span class="index-year" style="color:var(--generative)">2022</span>
+      <span class="index-dot" style="background:var(--generative)"></span>
+      <span class="index-text"><strong>Mass-accessible image generation</strong> — millions of users make generative images daily; the boundary between photography and generation enters public debate</span>
+    </div>
+
+    <div class="index-entry" style="border-left-color:var(--generative)">
+      <span class="index-year" style="color:var(--generative)">2023</span>
+      <span class="index-dot" style="background:var(--generative)"></span>
+      <span class="index-text"><strong>Captured and generated pixels coexist in a single image</strong> — Generative Fill &amp; Expand dissolve the photograph's status as a unified record of a moment</span>
+    </div>
+
+    <div class="index-entry" style="border-left-color:var(--generative)">
+      <span class="index-year" style="color:var(--generative)">2023–24</span>
+      <span class="index-dot" style="background:var(--generative)"></span>
+      <span class="index-text"><strong>The camera invents as well as records</strong> — generation embedded at point of capture in smartphones, invisible before the photographer sees the image</span>
+    </div>
+
+    <div class="index-entry" style="border-left-color:var(--generative)">
+      <span class="index-year" style="color:var(--generative)">2023–25</span>
+      <span class="index-dot" style="background:var(--generative)"></span>
+      <span class="index-text"><strong>Trust in the image becomes cryptographic</strong> — distinction between photograph and generated image moves from visual to metadata; the photograph must prove it is a photograph</span>
+    </div>
+
+  </div>
+</div>
+<!-- ══════════════════════════ TABLE ══════════════════════════ -->
+<div class="table-section" id="table">
+  <div class="section-title">Milestones <em>Reference Table</em></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th>Technology / Event</th>
+        <th>Automation Leap</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>~1000</td><td>Camera Obscura (Alhazen)</td><td>Optical projection of the world without the hand</td><td><span class="tag-pill" style="background:#fff0d8;color:#8a5a10">Mech</span></td></tr>
+      <tr><td>1727</td><td>Silver salt light sensitivity (Schulze)</td><td>Chemistry captures light — tone without drawing</td><td><span class="tag-pill" style="background:#d8f5ea;color:#1a6a50">Chem</span></td></tr>
+      <tr><td>1826</td><td>Heliography (Niépce)</td><td>Scene permanently self-records</td><td><span class="tag-pill" style="background:#d8f5ea;color:#1a6a50">Chem</span></td></tr>
+      <tr><td>1839</td><td>Daguerreotype (Daguerre)</td><td>Automated latent image development; minutes vs hours</td><td><span class="tag-pill" style="background:#d8f5ea;color:#1a6a50">Chem</span></td></tr>
+      <tr><td>1841</td><td>Calotype / Negative (Talbot)</td><td>Automated infinite reproduction from a single capture</td><td><span class="tag-pill" style="background:#d8f5ea;color:#1a6a50">Chem</span></td></tr>
+      <tr><td>1871</td><td>Gelatin dry plate (Maddox)</td><td>Decoupled capture from field chemistry</td><td><span class="tag-pill" style="background:#d8f5ea;color:#1a6a50">Chem</span></td></tr>
+      <tr><td>1888</td><td>Kodak No. 1 (Eastman)</td><td>Outsourced processing entirely; photography-as-service</td><td><span class="tag-pill" style="background:#fff0d8;color:#8a5a10">Mech</span></td></tr>
+      <tr><td>1900</td><td>Kodak Brownie</td><td>Automated economic access; fixed focus eliminated skill</td><td><span class="tag-pill" style="background:#fff0d8;color:#8a5a10">Mech</span></td></tr>
+      <tr><td>1925</td><td>Leica I (Barnack / Leitz)</td><td>35mm portability; precision mechanical film transport</td><td><span class="tag-pill" style="background:#fff0d8;color:#8a5a10">Mech</span></td></tr>
+      <tr><td>1936</td><td>Kine Exakta (SLR)</td><td>Through-the-lens framing — eliminated parallax error</td><td><span class="tag-pill" style="background:#fff0d8;color:#8a5a10">Mech</span></td></tr>
+      <tr><td>1947</td><td>Polaroid Land Camera (Land)</td><td>In-camera instant chemical processing; no lab needed</td><td><span class="tag-pill" style="background:#d8f5ea;color:#1a6a50">Chem</span></td></tr>
+      <tr><td>1959</td><td>Nikon F</td><td>Modular system; motor drive automation; pro standard</td><td><span class="tag-pill" style="background:#fff0d8;color:#8a5a10">Mech</span></td></tr>
+      <tr><td>~1963</td><td>Built-in TTL metering</td><td>Automated exposure calculation from measured light</td><td><span class="tag-pill" style="background:#d8eafa;color:#1a4a8a">Elec</span></td></tr>
+      <tr><td>1963</td><td>Kodak Instamatic (126 cartridge)</td><td>Automated film loading; flash sync automation</td><td><span class="tag-pill" style="background:#d8f5ea;color:#1a6a50">Chem</span></td></tr>
+      <tr><td>1972</td><td>Polaroid SX-70 (integral film)</td><td>Chemistry fully hidden; image develops in daylight</td><td><span class="tag-pill" style="background:#d8f5ea;color:#1a6a50">Chem</span></td></tr>
+      <tr><td>1975</td><td>First digital camera prototype (Sasson, Kodak)</td><td>Light-to-digital conversion; no film at all</td><td><span class="tag-pill" style="background:#d8eafa;color:#1a4a8a">Elec</span></td></tr>
+      <tr><td>1977</td><td>Canon AE-1 (microprocessor AE)</td><td>CPU controls entire exposure program automatically</td><td><span class="tag-pill" style="background:#d8eafa;color:#1a4a8a">Elec</span></td></tr>
+      <tr><td>1978</td><td>Konica C35 AF / Polaroid Sonar</td><td>Automated focusing — the last great manual skill removed</td><td><span class="tag-pill" style="background:#d8eafa;color:#1a4a8a">Elec</span></td></tr>
+      <tr><td>1985</td><td>Minolta Maxxum 7000</td><td>Integrated AF + AE + film advance; all subsystems unified</td><td><span class="tag-pill" style="background:#d8eafa;color:#1a4a8a">Elec</span></td></tr>
+      <tr><td>1990</td><td>Adobe Photoshop 1.0</td><td>Entire darkroom chemistry replicated in software</td><td><span class="tag-pill" style="background:#f5d8f2;color:#6a1a60">Soft</span></td></tr>
+      <tr><td>1991</td><td>Kodak DCS 100 (first DSLR)</td><td>Automated film-to-digital for professional journalism</td><td><span class="tag-pill" style="background:#d8eafa;color:#1a4a8a">Elec</span></td></tr>
+      <tr><td>1995</td><td>Casio QV-10 (LCD screen)</td><td>Immediate review automation; selective deletion</td><td><span class="tag-pill" style="background:#d8eafa;color:#1a4a8a">Elec</span></td></tr>
+      <tr><td>2000</td><td>Sharp J-SH04 (camera phone, Japan)</td><td>Capture + communication collapsed into one device</td><td><span class="tag-pill" style="background:#d8eafa;color:#1a4a8a">Elec</span></td></tr>
+      <tr><td>2007</td><td>Apple iPhone</td><td>Capture + edit + share unified in one workflow</td><td><span class="tag-pill" style="background:#f5d8f2;color:#6a1a60">Soft</span></td></tr>
+      <tr><td>2011</td><td>Instagram</td><td>Algorithmic curation + one-tap aesthetic filters</td><td><span class="tag-pill" style="background:#f5d8f2;color:#6a1a60">Soft</span></td></tr>
+      <tr><td>2013</td><td>Google HDR+ / Nexus 5 (GCam / Marc Levoy)</td><td>Multi-frame burst merge: many frames → one composite; the single photograph ends</td><td><span class="tag-pill" style="background:#f5d8f2;color:#6a1a60">Soft</span></td></tr>
+      <tr><td>2016</td><td>Google Pixel — HDR+ as default</td><td>Burst-merge runs on every photo automatically; software imaging surpasses hardware</td><td><span class="tag-pill" style="background:#f5d8f2;color:#6a1a60">Soft</span></td></tr>
+      <tr><td>2017</td><td>Huawei Mate 10 Pro — AI scene detection (NPU)</td><td>Camera identifies scene type in real time and applies a tailored processing pipeline</td><td><span class="tag-pill" style="background:#f5d8f2;color:#6a1a60">Soft</span></td></tr>
+      <tr><td>2017</td><td>Portrait Mode / AI Bokeh (Apple iPhone 7 Plus)</td><td>Neural segmentation simulates large-aperture lens; AI replaces optical physics</td><td><span class="tag-pill" style="background:#f5d8f2;color:#6a1a60">Soft</span></td></tr>
+      <tr><td>2018</td><td>Top Shot / Smart HDR (Google Pixel 3; Apple iPhone XS)</td><td>Per-pixel and per-person best-parts selection across frames; photo becomes editorial collage from fragments of time</td><td><span class="tag-pill" style="background:#f5d8f2;color:#6a1a60">Soft</span></td></tr>
+      <tr><td>2019+</td><td>Night Mode &amp; Neural upscaling (universal)</td><td>Long-exposure stacking produces images from near-darkness; sensor limits overridden by computation</td><td><span class="tag-pill" style="background:#f5d8f2;color:#6a1a60">Soft</span></td></tr>
+      <tr><td>2014</td><td>GANs — Generative Adversarial Networks (Goodfellow)</td><td>First algorithm generating plausible images from noise; no camera, no scene, no light</td><td><span class="tag-pill" style="background:#fae0e0;color:var(--generative)">Gen</span></td></tr>
+      <tr><td>2015</td><td>DeepDream (Google / Mordvintsev)</td><td>Neural network runs image recognition in reverse, generating hallucinatory imagery</td><td><span class="tag-pill" style="background:#fae0e0;color:var(--generative)">Gen</span></td></tr>
+      <tr><td>2017</td><td>NVIDIA Progressive GAN — photorealistic synthetic faces</td><td>Synthetic faces indistinguishable from photographs; "This Person Does Not Exist" (2019)</td><td><span class="tag-pill" style="background:#fae0e0;color:var(--generative)">Gen</span></td></tr>
+      <tr><td>2021</td><td>DALL-E (OpenAI)</td><td>Text prompt replaces lens; natural language generates photographic-looking images</td><td><span class="tag-pill" style="background:#fae0e0;color:var(--generative)">Gen</span></td></tr>
+      <tr><td>2022</td><td>Stable Diffusion &amp; Midjourney</td><td>Mass-accessible text-to-image; generative images enter artistic practice at scale</td><td><span class="tag-pill" style="background:#fae0e0;color:var(--generative)">Gen</span></td></tr>
+      <tr><td>2023</td><td>Adobe Generative Fill &amp; Expand (Firefly / Photoshop)</td><td>AI generation inside the photograph; captured and generated pixels coexist invisibly</td><td><span class="tag-pill" style="background:#fae0e0;color:var(--generative)">Gen</span></td></tr>
+      <tr><td>2023–24</td><td>Generative AI in smartphone cameras (Samsung, Google, Apple)</td><td>Camera invents as well as records; generation embedded at point of capture</td><td><span class="tag-pill" style="background:#fae0e0;color:var(--generative)">Gen</span></td></tr>
+      <tr><td>2023–25</td><td>C2PA Content Credentials &amp; SynthID watermarking</td><td>Distinction between photograph and generated image becomes cryptographic, not visual</td><td><span class="tag-pill" style="background:#fae0e0;color:var(--generative)">Gen</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════ TIMELINE ══════════════════════════ -->
+<div class="table-section" id="timeline-heading" style="margin-top:80px;margin-bottom:0;padding-bottom:0;">
+  <div class="section-title" id="timeline">Detailed <em>Timeline</em></div>
+</div>
+<div class="timeline-wrapper">
+
+  <!-- ERA 1 -->
+  <div class="era-header era-i"><span class="era-numeral">I</span><div class="era-body"><span class="era-title">Pre-Photographic Optics</span><span class="era-dates">~1000–1825</span></div></div>
+  <div class="timeline-track">
+
+    <div class="entry type-mechanical">
+      <div class="entry-year-col">
+        <span class="entry-year">~1000</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Mechanical</span>
+        <div class="entry-title">Camera Obscura</div>
+        <div class="entry-who">Ibn al-Haytham (Alhazen) &amp; later European scholars</div>
+        <div class="entry-auto">Automated the projection of the external world onto a surface. A pinhole (later a lens) replaced the eye's need to mentally compose a scene — the first optical <strong>capture proxy</strong>. Artists used it for tracing; it was the prototype of every camera to follow.</div>
+      </div>
+    </div>
+
+    <div class="entry type-mechanical">
+      <div class="entry-year-col">
+        <span class="entry-year">1568</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Mechanical</span>
+        <div class="entry-title">Lens-Based Camera Obscura</div>
+        <div class="entry-who">Daniello Barbaro</div>
+        <div class="entry-auto">Replaced the pinhole with a convex lens, automating <strong>light concentration and sharpness control</strong>. The diaphragm (iris) was introduced to manage depth of field — the first aperture control.</div>
+      </div>
+    </div>
+
+    <div class="entry type-chemical">
+      <div class="entry-year-col">
+        <span class="entry-year">1727</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Chemical</span>
+        <div class="entry-title">Light-Sensitive Silver Salts</div>
+        <div class="entry-who">Johann Heinrich Schulze</div>
+        <div class="entry-auto">Demonstrated that silver nitrate darkens under light, establishing the <strong>chemical substrate</strong> for photography. The reaction itself began automating tone — light did the drawing, not the hand.</div>
+      </div>
+    </div>
+
+  </div><!-- /track -->
+
+  <!-- ERA 2 -->
+  <div class="era-header era-ii"><span class="era-numeral">II</span><div class="era-body"><span class="era-title">Birth of Photography</span><span class="era-dates">1826–1880</span></div></div>
+  <div class="timeline-track">
+
+    <div class="entry type-chemical">
+      <div class="entry-year-col">
+        <span class="entry-year">1826</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Chemical</span>
+        <div class="entry-title">Heliography — First Permanent Photograph</div>
+        <div class="entry-who">Joseph Nicéphore Niépce</div>
+        <div class="entry-auto">The world's oldest surviving photograph (<em>View from the Window at Le Gras</em>). Automated permanent image retention: <strong>the scene fixed itself</strong> on a bitumen-coated pewter plate over an ~8-hour exposure. No painter required.</div>
+      </div>
+    </div>
+
+    <div class="entry type-chemical">
+      <div class="entry-year-col">
+        <span class="entry-year">1839</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Chemical</span>
+        <div class="entry-title">Daguerreotype</div>
+        <div class="entry-who">Louis-Jacques-Mandé Daguerre, announced by the French Academy</div>
+        <div class="entry-auto">Reduced exposure to minutes, not hours. Automated <strong>tonal resolution and latent image development</strong> via mercury vapor. Each plate was unique — no copies. Killed portrait miniature painting within a decade.</div>
+      </div>
+    </div>
+
+    <div class="entry type-chemical">
+      <div class="entry-year-col">
+        <span class="entry-year">1841</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Chemical</span>
+        <div class="entry-title">Calotype (Talbotype) — Negative/Positive Process</div>
+        <div class="entry-who">William Henry Fox Talbot</div>
+        <div class="entry-auto">Invented the <strong>negative, enabling infinite identical copies</strong> from a single capture. This is the structural ancestor of all film photography. Automated reproductive distribution of images.</div>
+      </div>
+    </div>
+
+    <div class="entry type-chemical">
+      <div class="entry-year-col">
+        <span class="entry-year">1851</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Chemical</span>
+        <div class="entry-title">Wet Collodion Process</div>
+        <div class="entry-who">Frederick Scott Archer</div>
+        <div class="entry-auto">Halved exposure times further and improved sharpness. But required coating, exposing, and developing the plate while still wet — <strong>no automation yet</strong>; the photographer became a portable chemist.</div>
+      </div>
+    </div>
+
+    <div class="entry type-chemical">
+      <div class="entry-year-col">
+        <span class="entry-year">1871</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Chemical</span>
+        <div class="entry-title">Gelatin Dry Plate</div>
+        <div class="entry-who">Richard Leach Maddox; commercialized ~1878</div>
+        <div class="entry-auto">Pre-coated, factory-manufactured plates that could be exposed and developed separately. <strong>Decoupled capture from chemistry in the field</strong> — the photographer no longer needed a darkroom tent on location. Enabled handheld cameras.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ERA 3 -->
+  <div class="era-header era-iii"><span class="era-numeral">III</span><div class="era-body"><span class="era-title">Mass Photography &amp; Roll Film</span><span class="era-dates">1880–1924</span></div></div>
+  <div class="timeline-track">
+
+    <div class="entry type-mechanical">
+      <div class="entry-year-col">
+        <span class="entry-year">1888</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Mechanical</span>
+        <div class="entry-title">Kodak No. 1 — "You Press the Button, We Do the Rest"</div>
+        <div class="entry-who">George Eastman / Eastman Kodak</div>
+        <div class="entry-auto">Roll film + factory processing automated <strong>darkroom work entirely for the amateur</strong>. The user mailed the whole camera back; Kodak returned prints and a reloaded camera. Photography's first service-industry automation model.</div>
+      </div>
+    </div>
+
+    <div class="entry type-mechanical">
+      <div class="entry-year-col">
+        <span class="entry-year">1900</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Mechanical</span>
+        <div class="entry-title">Kodak Brownie — Mass Market Camera</div>
+        <div class="entry-who">Eastman Kodak (design by Frank Brownell)</div>
+        <div class="entry-auto">$1 price automated <strong>the economic barrier to photography</strong>. A box-shaped fixed-focus camera with no settings to learn. Introduced the snapshot aesthetic — unposed, informal, ubiquitous.</div>
+      </div>
+    </div>
+
+    <div class="entry type-mechanical">
+      <div class="entry-year-col">
+        <span class="entry-year">1913</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Mechanical</span>
+        <div class="entry-title">Leica Prototype (Ur-Leica)</div>
+        <div class="entry-who">Oskar Barnack, Leitz Wetzlar</div>
+        <div class="entry-auto">Designed to use 35mm cinema film — automated <strong>portability and discretion</strong>. The small body and fast lenses enabled candid street photography impossible with larger cameras. Commercial release delayed to 1925 by WWI.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ERA 4 -->
+  <div class="era-header era-iv"><span class="era-numeral">IV</span><div class="era-body"><span class="era-title">The 35mm Century</span><span class="era-dates">1925–1974</span></div></div>
+  <div class="timeline-track">
+
+    <div class="entry type-mechanical">
+      <div class="entry-year-col">
+        <span class="entry-year">1925</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Mechanical</span>
+        <div class="entry-title">Leica I — Commercial 35mm Camera</div>
+        <div class="entry-who">Ernst Leitz GmbH</div>
+        <div class="entry-auto">Established <strong>35mm as the dominant format</strong>. Precision mechanical engineering automated film advance, shutter cocking, and frame spacing. The rangefinder focusing system remained manual but was far faster than ground-glass focusing.</div>
+      </div>
+    </div>
+
+    <div class="entry type-mechanical">
+      <div class="entry-year-col">
+        <span class="entry-year">1936</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Mechanical</span>
+        <div class="entry-title">Kine Exakta — First 35mm SLR</div>
+        <div class="entry-who">Ihagee, Dresden</div>
+        <div class="entry-auto">Through-the-lens viewing automated <strong>what-you-see-is-what-you-get framing</strong>, replacing the separate viewfinder. The reflex mirror showed the actual focused image. Precursor to the SLR system cameras that would dominate the next 50 years.</div>
+      </div>
+    </div>
+
+    <div class="entry type-chemical">
+      <div class="entry-year-col">
+        <span class="entry-year">1947</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Chemical</span>
+        <div class="entry-title">Polaroid Land Camera Model 95</div>
+        <div class="entry-who">Edwin Land, Polaroid Corporation</div>
+        <div class="entry-auto">In-camera <strong>instant chemical processing</strong> — a self-developing print in 60 seconds. Automated the lab entirely. Introduced immediate feedback as part of photographic practice, anticipating the digital preview by 50 years.</div>
+      </div>
+    </div>
+
+    <div class="entry type-mechanical">
+      <div class="entry-year-col">
+        <span class="entry-year">1959</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Mechanical</span>
+        <div class="entry-title">Nikon F — Professional SLR System</div>
+        <div class="entry-who">Nippon Kogaku (Nikon)</div>
+        <div class="entry-auto">Modular system with interchangeable lenses, finders, and motor drives. Automated <strong>professional adaptability</strong>. Became the standard for photojournalists; used on the moon during Apollo missions.</div>
+      </div>
+    </div>
+
+    <div class="entry type-electronic">
+      <div class="entry-year-col">
+        <span class="entry-year">1960</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Electronic</span>
+        <div class="entry-title">Built-in Light Metering</div>
+        <div class="entry-who">Various (Topcon RE Super 1963; widespread by mid-1960s)</div>
+        <div class="entry-auto">A selenium or CdS photoelectric cell automated <strong>exposure calculation</strong>. Previously the photographer used a separate handheld meter or guessed. Through-the-lens (TTL) metering later eliminated parallax errors entirely.</div>
+      </div>
+    </div>
+
+    <div class="entry type-chemical">
+      <div class="entry-year-col">
+        <span class="entry-year">1963</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Chemical</span>
+        <div class="entry-title">Kodak Instamatic — Cartridge Loading</div>
+        <div class="entry-who">Eastman Kodak</div>
+        <div class="entry-auto">126-format drop-in cartridge automated <strong>film loading and threading</strong> — previously a fiddly, failure-prone step. Sold 50 million units in the first 7 years. Also introduced the cube flash, automating flash synchronization.</div>
+      </div>
+    </div>
+
+    <div class="entry type-electronic">
+      <div class="entry-year-col">
+        <span class="entry-year">1963</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Electronic</span>
+        <div class="entry-title">Automatic Exposure (AE) Cameras</div>
+        <div class="entry-who">Topcon, Pentax, Canon; popularized by Canon EX Auto (1969)</div>
+        <div class="entry-auto">Shutter-priority and aperture-priority modes automated <strong>one half of the exposure equation</strong>. The photographer set creative intent; the camera handled the technical response. A fundamental cognitive offload.</div>
+      </div>
+    </div>
+
+    <div class="entry type-chemical">
+      <div class="entry-year-col">
+        <span class="entry-year">1972</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Chemical</span>
+        <div class="entry-title">Polaroid SX-70 — Integral Instant Film</div>
+        <div class="entry-who">Edwin Land, Polaroid</div>
+        <div class="entry-auto">The image developed in daylight in front of your eyes — <strong>no peel-apart chemistry, no timing</strong>. The SLR folding design automated focus alignment. Andy Warhol called it the best invention since television.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ERA 5 -->
+  <div class="era-header era-v"><span class="era-numeral">V</span><div class="era-body"><span class="era-title">Electronic Automation</span><span class="era-dates">1975–1999</span></div></div>
+  <div class="timeline-track">
+
+    <div class="entry type-electronic">
+      <div class="entry-year-col">
+        <span class="entry-year">1975</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Electronic</span>
+        <div class="entry-title">First Digital Camera Prototype</div>
+        <div class="entry-who">Steven Sasson, Eastman Kodak</div>
+        <div class="entry-auto">A 0.01-megapixel image recorded to a cassette tape in 23 seconds. Automated <strong>conversion of light to digital data</strong> for the first time. Kodak shelved it to protect film sales — one of history's most consequential product decisions.</div>
+      </div>
+    </div>
+
+    <div class="entry type-electronic">
+      <div class="entry-year-col">
+        <span class="entry-year">1977</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Electronic</span>
+        <div class="entry-title">Canon AE-1 — Programmed Automation</div>
+        <div class="entry-who">Canon</div>
+        <div class="entry-auto">A microprocessor inside a camera automated <strong>full program exposure selection</strong>. First mass-market camera with a CPU. Sold 5 million units. Demonstrated that electronic intelligence inside a camera was commercially viable and desirable.</div>
+      </div>
+    </div>
+
+    <div class="entry type-electronic">
+      <div class="entry-year-col">
+        <span class="entry-year">1978</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Electronic</span>
+        <div class="entry-title">Autofocus — Konica C35 AF &amp; Polaroid OneStep Sonar</div>
+        <div class="entry-who">Konica; Polaroid</div>
+        <div class="entry-auto">Automated <strong>the last great manual skill</strong> of photography: focus. Konica used a passive phase-detection system; Polaroid used ultrasonic sonar ranging. Shifted focus from craft to intent — the photographer no longer needed to know how lenses work.</div>
+      </div>
+    </div>
+
+    <div class="entry type-electronic">
+      <div class="entry-year-col">
+        <span class="entry-year">1981</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Electronic</span>
+        <div class="entry-title">Sony Mavica — First Electronic Still Camera</div>
+        <div class="entry-who">Sony</div>
+        <div class="entry-auto">Recorded analog video frames to a 2-inch floppy disk. Automated <strong>immediate image playback and magnetic storage</strong> — no chemicals, no lab. The image could be shown on a television instantly. Newspapers began experimenting with electronic photo transmission.</div>
+      </div>
+    </div>
+
+    <div class="entry type-electronic">
+      <div class="entry-year-col">
+        <span class="entry-year">1985</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Electronic</span>
+        <div class="entry-title">Minolta Maxxum 7000 — Integrated AF SLR</div>
+        <div class="entry-who">Minolta</div>
+        <div class="entry-auto">First SLR with <strong>autofocus motor built into the camera body</strong> (not lens), plus multi-mode auto-exposure. Integrated all automation subsystems for the first time: metering, AF, film advance, DX coding. Forced Canon and Nikon to fully redesign their lens mounts.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">1990</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Adobe Photoshop 1.0</div>
+        <div class="entry-who">Thomas &amp; John Knoll; Adobe Systems</div>
+        <div class="entry-auto">Automated <strong>the darkroom's entire chemical toolkit in software</strong>: dodging, burning, cropping, color correction, retouching. What required specialized equipment, chemicals, and hours of skill could now be done by anyone with a computer. Redefined post-processing as a creative domain.</div>
+      </div>
+    </div>
+
+    <div class="entry type-electronic">
+      <div class="entry-year-col">
+        <span class="entry-year">1991</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Electronic</span>
+        <div class="entry-title">Kodak DCS 100 — First Commercial DSLR</div>
+        <div class="entry-who">Eastman Kodak (Nikon F3 body)</div>
+        <div class="entry-auto">1.3 megapixel, $13,000. Automated <strong>digital file delivery for photojournalists</strong>. Images could be transmitted via modem from the field within minutes. The first decisive elimination of film from professional practice.</div>
+      </div>
+    </div>
+
+    <div class="entry type-electronic">
+      <div class="entry-year-col">
+        <span class="entry-year">1995</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Electronic</span>
+        <div class="entry-title">Casio QV-10 — Consumer Digital with LCD Screen</div>
+        <div class="entry-who">Casio</div>
+        <div class="entry-auto">First consumer digital camera with a rear LCD screen. Automated <strong>immediate review and selective deletion</strong> — the "chimp" review behavior. Ended the anxiety of not knowing if an image was good until film was developed. Changed compositional confidence fundamentally.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ERA 6 -->
+  <div class="era-header era-vi"><span class="era-numeral">VI</span><div class="era-body"><span class="era-title">Mobile &amp; Computational Photography</span><span class="era-dates">2000–present</span></div></div>
+  <div class="timeline-track">
+
+    <div class="entry type-electronic">
+      <div class="entry-year-col">
+        <span class="entry-year">2000</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Electronic</span>
+        <div class="entry-title">Sharp J-SH04 — First Commercial Camera Phone</div>
+        <div class="entry-who">Sharp / J-Phone (Japan)</div>
+        <div class="entry-auto">110,000-pixel CMOS sensor integrated into a mobile phone. Automated <strong>the context collapse between capture and communication</strong> — photos could be sent instantly via MMS. Photography left the specialist object and entered the pocket of everyday life.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2007</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">iPhone — Touch Interface &amp; App Ecosystem</div>
+        <div class="entry-who">Apple</div>
+        <div class="entry-auto">Not the best camera at launch, but automated <strong>the integration of capture, edit, and share into a single seamless workflow</strong>. The App Store created an ecosystem for photographic software automation (filters, editing, sharing) that bypassed all previous distribution models.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2011</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Instagram — Algorithmic Distribution</div>
+        <div class="entry-who">Kevin Systrom &amp; Mike Krieger</div>
+        <div class="entry-auto">Automated <strong>photographic curation and audience discovery</strong> via algorithm. One-tap filters automated aesthetic decisions previously requiring Photoshop expertise. The platform's feed algorithm replaced the editor, the gallery, and the critic simultaneously.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2013</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Google HDR+ — Multi-Frame Burst Photography</div>
+        <div class="entry-who">Marc Levoy / GCam team, Google · Nexus 5 (Dec 2013)</div>
+        <div class="entry-auto">The first clear break from digital photography into <strong>computational photography</strong>. When you press the shutter, the camera captures a rapid burst of 5–15 underexposed frames rather than one correctly-exposed frame. An algorithm then analyzes them, discards the blurry ones, and <strong>aligns and merges the sharpest frames into a single composite image</strong>. The final photo never existed as a single moment of capture — it is a mathematical construction from many moments. Dynamic range and noise reduction now exceed what the physical sensor could achieve in any single exposure.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2016</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Google Pixel — Burst Merge Becomes the Default</div>
+        <div class="entry-who">Google</div>
+        <div class="entry-auto">HDR+ multi-frame processing was no longer a mode you switched on — it ran <strong>automatically on every single photo</strong>, invisibly. The concept of a "single photograph" quietly ended for Pixel users: every image the camera produced was already a composite. This was the moment software-defined imaging permanently surpassed hardware optics in smartphone photography quality.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2017</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">AI Scene Detection — Camera Recognizes What It Sees</div>
+        <div class="entry-who">Huawei Mate 10 Pro (Oct 2017); Samsung Galaxy S9 (Mar 2018)</div>
+        <div class="entry-auto">The Huawei Mate 10 Pro introduced the first dedicated NPU (Neural Processing Unit) in a smartphone, running a real-time neural network that <strong>identified the type of scene in the viewfinder</strong> — food, night, landscape, portrait, text — and automatically adjusted all camera parameters to match. Previously, the camera applied the same processing to every scene. Now it applied a specialized pipeline tailored to the subject. Samsung followed months later with Scene Optimizer on the Galaxy S9. This is fundamentally different from burst-merge: it is the camera <strong>understanding what it is looking at</strong>, not just improving how it captures it.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2017</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Portrait Mode — AI Bokeh Simulation</div>
+        <div class="entry-who">Apple iPhone 7 Plus (dual camera); Google Pixel 2 (single-lens ML, 2017)</div>
+        <div class="entry-auto">Deep learning automated <strong>the segmentation of subject from background</strong> to simulate the shallow depth-of-field of a large-aperture lens. A creative effect previously requiring an expensive 85mm f/1.4 lens and technical skill was reduced to a single tap. AI began replacing optical physics — the blur was not captured, it was calculated.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2018</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Top Shot &amp; Smart HDR — Per-Pixel Best-Parts Selection</div>
+        <div class="entry-who">Google Pixel 3 (Top Shot, Oct 2018); Apple iPhone XS (Smart HDR, Sep 2018)</div>
+        <div class="entry-auto">A conceptually different step beyond burst-merge. Earlier burst systems merged all frames to improve quality. Now the algorithm <strong>selects the best pixel — or best person — from each individual frame independently</strong>. Google's Top Shot analyzed up to 90 frames from 1.5 seconds around the shutter press, ranking each by focus, motion, expression, and blink detection. Its "all-smile" mode could produce a group photo in which <strong>every person is taken from a different moment</strong> — the image is no longer a recording of any single instant in time. Apple's Smart HDR did the same at the pixel level for exposure. The photograph became an editorial construction assembled from fragments of time by an algorithm.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2019+</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Night Mode &amp; Neural Upscaling — Light from Darkness</div>
+        <div class="entry-who">Google Night Sight (Pixel 3, 2018); Apple Night Mode (iPhone 11, 2019); universal by 2020</div>
+        <div class="entry-auto">Long-exposure stacking pushed to its limit: the camera holds the shutter open across many frames, <strong>aligning and fusing them to reconstruct a bright, sharp image from near-total darkness</strong>. Neural upscaling then reconstructs fine detail that the sensor never actually captured. Images taken in conditions where film photography was physically impossible became routine snapshots. The photographer's primary remaining decision: what to point the camera at.</div>
+      </div>
+    </div>
+
+
+  </div>
+</div><!-- /timeline-wrapper -->
+
+
+  <!-- ERA 7 -->
+<div class="timeline-wrapper" style="padding-top:0">
+  <div class="era-header era-vii"><span class="era-numeral">VII</span><div class="era-body"><span class="era-title">Generative &ldquo;Photography&rdquo;</span><span class="era-dates">2014–present</span></div></div>
+  <div class="timeline-track">
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2014</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Generative Adversarial Networks (GANs)</div>
+        <div class="entry-who">Ian Goodfellow et al., Google Brain</div>
+        <div class="entry-auto">The theoretical foundation of generative imagery: <strong>two neural networks competing to produce and evaluate images</strong> — a generator and a discriminator. Neither network captures light; both manipulate learned statistical patterns extracted from millions of photographs. The first algorithm able to generate plausible images from random noise rather than transforming existing ones.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2015</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">DeepDream — Neural Networks Learn to "Imagine"</div>
+        <div class="entry-who">Alexander Mordvintsev, Google</div>
+        <div class="entry-auto">Running image-recognition networks in reverse: instead of identifying what is in an image, the network <strong>amplifies the visual patterns it was trained to detect</strong>, generating hallucinatory imagery from noise or photographs. The first widely seen demonstration that a machine could simultaneously see and imagine. A conceptual hinge between photography and generation.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2017</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Progressive GAN — First Photorealistic Synthetic Faces</div>
+        <div class="entry-who">Tero Karras et al., NVIDIA; "This Person Does Not Exist" website, Feb 2019</div>
+        <div class="entry-auto">Progressive training produced synthetic human portraits at 1024×1024 resolution <strong>indistinguishable from photographs</strong> — freckles, pores, stray hairs, asymmetrical irises. In February 2019 the website "This Person Does Not Exist" made this publicly visible: every page refresh generated a new, never-existing human face. The gap between photograph and generated image closed for the human eye, five years before general text-to-image.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2021</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">DALL-E — Language Replaces the Lens</div>
+        <div class="entry-who">OpenAI (January 2021)</div>
+        <div class="entry-auto">The first public text-to-image system at scale: <strong>a written prompt replaces the camera as the interface for making images</strong>. "A photograph of an astronaut riding a horse" produces a plausible photograph of exactly that. Natural language, for the first time, could generate imagery that looked photographic. The photographer's craft — framing, lighting, focus, timing — became optional.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2022</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Stable Diffusion &amp; Midjourney — Generation at Scale</div>
+        <div class="entry-who">Stability AI (Stable Diffusion, Aug 2022); Midjourney Inc. (Jul 2022)</div>
+        <div class="entry-auto">Open-source and commercially accessible text-to-image reached millions of users simultaneously. High-quality generative images entered artistic practice broadly. <strong>The first year artists, designers, and media theorists seriously debated whether these constituted a new medium</strong> — or the end of photography as a distinct practice. Daily use by artists became routine.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2023</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Generative Fill &amp; Generative Expand — Generation Enters the Photograph</div>
+        <div class="entry-who">Adobe Photoshop / Firefly (May 2023)</div>
+        <div class="entry-auto">AI generation entered the photographer's editing workflow directly. Any region of a photograph could be <strong>replaced, extended, or invented via a text prompt</strong> — seamlessly, indistinguishably. A single image could now contain both captured and generated pixels, with no visual marker distinguishing one from the other. The photograph as a unified record of a moment dissolved at the pixel level.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2023–24</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">Generative AI Embedded in Smartphone Cameras</div>
+        <div class="entry-who">Samsung Galaxy AI; Google Magic Editor; Apple Clean Up</div>
+        <div class="entry-auto">Generation moved into the capture device itself. <strong>The camera no longer only records — it invents</strong>: extending a frame beyond its edges, erasing people, replacing skies, completing missing details. These operations happen silently, before the photographer reviews the image. The photograph and the generated image became indistinguishable not just to observers, but within the device that made them.</div>
+      </div>
+    </div>
+
+    <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2024</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">GenAI Images Cross the Perceptual Threshold</div>
+        <div class="entry-who">Tree et al. (Swansea University / University of Lincoln / Ariel University); Conjointly consumer survey (2024)</div>
+        <div class="entry-auto">Empirical research confirmed what many had suspected: <strong>AI-generated images had become indistinguishable from real photographs to human observers</strong>. In four experiments across multiple countries, participants could not reliably distinguish DALL-E-generated faces from genuine photos — even when provided with comparison images or prior familiarity with the subjects. A parallel consumer survey found only 10% of participants could correctly identify AI-generated images (down from 25% the previous year). The perceptual gap that had defined photography's claim to truth for 185 years had closed.</div>
+      </div>
+    </div>
+
+        <div class="entry type-software">
+      <div class="entry-year-col">
+        <span class="entry-year">2023–25</span>
+        <div class="entry-dot"></div>
+      </div>
+      <div class="entry-body">
+        <span class="entry-tag">Software</span>
+        <div class="entry-title">C2PA Content Credentials — Trust Becomes Cryptographic</div>
+        <div class="entry-who">C2PA coalition founded Feb 2021 (Adobe, BBC, Intel, Microsoft); Leica M11-P — first camera to ship C2PA (Oct 2023); Google SynthID watermarking (Aug 2023); Sony Alpha firmware update (2024); Samsung Galaxy AI (2024); Nikon Z6 III (Aug 2025); Canon (announced, pending)</div>
+        <div class="entry-auto">Since the image can no longer be distinguished by looking at it, <strong>distinction became cryptographic</strong>. Camera hardware signs every photo with a tamper-proof key; AI generators embed invisible watermarks. Real photographs and AI-generated images differ not in appearance but in their verified metadata chain. Trust in the photographic image is no longer optical — it is computational. The history of photography automation arrives at its logical endpoint: the photograph must now prove it is a photograph.</div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /timeline-wrapper -->
+
+
+
+
+<footer>
+  <span>How Photography Was Reinvented 43 Times — Detailed Timeline</span>
+  <span>Mechanical · Chemical · Electronic · Software · Generative</span>
+</footer>
+
+</body>
+</html>
