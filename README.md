@@ -4,8 +4,6 @@
 
 A collection of **browser-based tools** for exploring cultural data, and selected essays presented as interactive HTML documents. All tools run directly in the browser — no installation required.
 
-Since **1994**, Lev Manovich has published all his work online, experimented with new ways to present his ideas and research using new media technologies, and explored their artistic possibilities through projects such as *Little Movies* (1994–1997), *Soft Cinema* (2002–2005), and ImagePlot visualizations of large cultural datasets (2009–). This repository is the latest step in that ongoing practice, now taking the form of **browser-based interactive tools and visual essays** built with AI coding assistants.
-
 ---
 
 ## Projects
@@ -33,5 +31,7 @@ A browser-based interactive tool for exploring **patterns in MoMA exhibitions be
 ## About
 
 Lev Manovich is Presidential Professor at The Graduate Center, City University of New York, and a leading theorist in **computational media theory**, **software studies**, **cultural analytics**, and **AI media studies**. His books include *The Language of New Media* (MIT Press, 2001), *Software Takes Command* (Bloomsbury, 2013), and *Cultural Analytics* (MIT Press, 2020).
+
+Since **1994**, Lev Manovich has published all his work online, experimented with new ways to present his ideas and research using new media technologies, and explored their artistic possibilities through projects such as *Little Movies* (1994–1997), *Soft Cinema* (2002–2005), and ImagePlot visualizations of large cultural datasets (2009–). This repository is the latest step in that ongoing practice, now taking the form of **browser-based interactive tools and visual essays** built with AI coding assistants.
 
 → [manovich.net](http://manovich.net) · [manovich.art](http://manovich.art) · [Cultural Analytics Lab](http://lab.culturalanalytics.info)
