@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manovich Interactive</title>
+  <title>manovich-interactive</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 900px;
+      max-width: 960px;
       margin: 40px auto;
-      padding: 0 20px;
+      padding: 0 20px 60px 20px;
       line-height: 1.7;
       color: #222;
+      background: #fff;
     }
 
     h1, h2, h3 {
@@ -19,26 +20,53 @@
     }
 
     h1 {
-      margin-bottom: 30px;
+      margin-bottom: 10px;
+      font-size: 2.2rem;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      margin-bottom: 24px;
+      color: #444;
+    }
+
+    .github-link {
+      margin-bottom: 36px;
+      font-size: 0.98rem;
+    }
+
+    .github-link a {
+      display: inline-block;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #111;
+      background: #f7f7f7;
+    }
+
+    .github-link a:hover {
+      background: #efefef;
+    }
+
+    p {
+      margin-bottom: 18px;
     }
 
     h2 {
-      margin-top: 40px;
-      margin-bottom: 20px;
+      margin-top: 42px;
+      margin-bottom: 18px;
+      padding-bottom: 8px;
       border-bottom: 2px solid #ddd;
-      padding-bottom: 10px;
     }
 
-    .project {
-      margin-bottom: 40px;
-    }
-
-    .project h3 {
+    h3 {
+      margin-top: 0;
       margin-bottom: 12px;
     }
 
-    .project p {
-      margin-bottom: 14px;
+    .project {
+      margin-bottom: 34px;
     }
 
     a {
@@ -51,15 +79,43 @@
     }
 
     hr {
-      margin: 30px 0;
       border: none;
       border-top: 1px solid #ddd;
+      margin: 28px 0;
+    }
+
+    .about-links a {
+      margin-right: 10px;
+      white-space: nowrap;
     }
   </style>
 </head>
 <body>
 
-  <h1>Manovich Interactive</h1>
+  <h1>manovich-interactive</h1>
+  <p class="subtitle"><strong>Interactive tools and visual essays by Lev Manovich</strong></p>
+
+  <p class="github-link">
+    <a href="https://github.com/levmanovich/manovich-interactive" target="_blank" rel="noopener noreferrer">
+      View source on GitHub
+    </a>
+  </p>
+
+  <p>
+    A collection of <strong>browser-based tools</strong> for exploring cultural data, and selected essays
+    presented as interactive HTML documents. All tools run directly in the browser — no installation required.
+  </p>
+
+  <p>
+    Since <strong>1994</strong>, Lev Manovich has published all his work online, experimented with new ways
+    to present his ideas and research using new media technologies, and explored their artistic possibilities
+    through projects such as <em>Little Movies</em> (1994–1997), <em>Soft Cinema</em> (2002–2005), and
+    ImagePlot visualizations of large cultural datasets (2009–). This repository is the latest step in that
+    ongoing practice, now taking the form of <strong>browser-based interactive tools and visual essays</strong>
+    built with AI coding assistants.
+  </p>
+
+  <hr>
 
   <h2>Projects</h2>
 
@@ -68,10 +124,10 @@
 
     <p>
       A browser-based tool for the <strong>visualization and analysis of image collections</strong>.
-      Load any set of images, extract <strong>77 visual features</strong> automatically, and explore
-      the collection as an interactive scatter plot — with images rendered directly as data points.
-      Supports PCA, t-SNE, and UMAP projections, compare mode for two collections side by side,
-      and animation along any feature axis.
+      Load any set of images, extract <strong>77 visual features</strong> automatically, and explore the
+      collection as an interactive scatter plot — with images rendered directly as data points. Supports
+      PCA, t-SNE, and UMAP projections, compare mode for two collections side by side, and animation along
+      any feature axis.
     </p>
 
     <p>
@@ -83,14 +139,44 @@
   <hr>
 
   <div class="project">
-    <h3>2. <a href="moma-networks/">MoMA Artist Networks</a></h3>
+    <h3>2. <a href="photography-timeline/">How Photography Was Reinvented 43 Times</a></h3>
 
     <p>
-      A browser-based interactive tool for exploring <strong>patterns in MoMA exhibitions between
-      1929 and 1990</strong>. Visualizes relationships between artists, nationalities, media, and
-      curatorial decisions across <strong>six decades</strong> of the museum's exhibition history.
+      An interactive timeline tracing the <strong>history of automation in photography</strong> — from early
+      mechanisms for capturing and processing images to contemporary AI-driven tools for editing, generation,
+      and distribution. Each entry marks a moment when photography was <strong>technically or conceptually transformed</strong>.
     </p>
   </div>
+
+  <hr>
+
+  <div class="project">
+    <h3>3. <a href="moma-networks/">MoMA Artist Networks</a></h3>
+
+    <p>
+      A browser-based interactive tool for exploring <strong>patterns in MoMA exhibitions between 1929 and 1990</strong>.
+      Visualizes relationships between artists, nationalities, media, and curatorial decisions across
+      <strong>six decades</strong> of the museum's exhibition history.
+    </p>
+  </div>
+
+  <hr>
+
+  <h2>About</h2>
+
+  <p>
+    Lev Manovich is Presidential Professor at The Graduate Center, City University of New York, and a leading
+    theorist in <strong>computational media theory</strong>, <strong>software studies</strong>,
+    <strong>cultural analytics</strong>, and <strong>AI media studies</strong>. His books include
+    <em>The Language of New Media</em> (MIT Press, 2001), <em>Software Takes Command</em> (Bloomsbury, 2013),
+    and <em>Cultural Analytics</em> (MIT Press, 2020).
+  </p>
+
+  <p class="about-links">
+    <a href="http://manovich.net" target="_blank" rel="noopener noreferrer">manovich.net</a> ·
+    <a href="http://manovich.art" target="_blank" rel="noopener noreferrer">manovich.art</a> ·
+    <a href="http://lab.culturalanalytics.info" target="_blank" rel="noopener noreferrer">Cultural Analytics Lab</a>
+  </p>
 
 </body>
 </html>
