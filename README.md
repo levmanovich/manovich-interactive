@@ -26,7 +26,7 @@ An interactive timeline tracing the **history of automation in photography** —
 
 ### 3. [MoMA Artist Networks](moma-networks/)
 
-A browser-based interactive tool for exploring **patterns in MoMA exhibitions between 1929 and 1990**. Visualizes relationships between artists, nationalities, media, and curatorial decisions across **six decades** of the museum's exhibition history.
+A browser-based interactive tool for exploring **patterns in MoMA exhibitions between 1929 and 1990** using 500 most exhibited artists during this period. Explore the networks between artists based on co-occurence in exhibitions, and filer by decade, geographic region, gender, and more. 
 
 ---
 
