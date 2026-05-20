@@ -16,9 +16,9 @@ Originally developed as part of cultural analytics research at the Software Stud
 
 ---
 
-### 2. [How Photography Was Reinvented 43 Times](photo/photo-timeline.png)
+### 2. [How Photography Was Reinvented 43 Times](photo/screenshots/photo-timeline.png)
 
-An interactive timeline tracing the **history of automation in photography** — from early mechanisms for capturing and processing images to contemporary AI-driven tools for editing, generation, and distribution. Each entry marks a moment when photography was **technically or conceptually transformed**.
+An interactive timeline tracing the **history of automation in photography** — from the beginning of the medium in early 19th c. to AI-driven tools for editing and generation developed in 2020s. Each entry marks a moment when photography was **technically or conceptually transformed**.
 
 ---
 
