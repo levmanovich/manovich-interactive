@@ -217,7 +217,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
       </div></div>
     <div class="grow" id="animRow"><span class="lab">Animate</span><div class="items">
       <div class="seg" role="group" aria-label="Animation" id="animSeg"><button type="button" data-anim="rev" aria-pressed="false">Revisions</button><button type="button" data-anim="ver" aria-pressed="false">Versions</button><button type="button" data-anim="write" aria-pressed="false">Write</button></div>
-      <span class="mid" id="writeCtl"><button type="button" class="play" id="write">Play</button><button type="button" class="play" id="closeup" disabled title="Pause the writing to look closer">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
+      <span class="mid" id="writeCtl"><button type="button" class="play" id="write">Play</button><button type="button" class="play" id="closeup" disabled title="Pause and look closer: a magnifier follows the mouse">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
       <span class="mid" id="playCtl"><button type="button" class="play" id="play">Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.15" max="3" step="0.05" value="0.9"> <span id="speedv">0.9 s</span></span>
       <span class="mid" id="gapCtl" hidden><label for="gap">Spacing</label> <input type="range" id="gap" min="0.04" max="0.4" step="0.01" value="0.17"> <label for="transp">Transparency</label> <input type="range" id="transp" min="0" max="1" step="0.01" value="0.28"></span>
       <span class="note" id="animHint">Choose an animation.</span>
@@ -793,7 +793,7 @@ playBtn.addEventListener('click',()=>{
 // ---- write: the chapter typed out word by word, round after round ----
 const writeBtn=document.getElementById('write'), wpsEl=document.getElementById('wps');
 wpsEl.addEventListener('input',()=>{document.getElementById('wpsv').textContent=wpsEl.value});
-let wordHTML=null, events=null, wSpans=null, wRAF=null, wPos=0, wAcc=0, wLast=0, wCur=null, writing=false;
+let wordHTML=null, events=null, wSpans=null, wRAF=null, wPos=0, wAcc=0, wLast=0, wCur=null, wHeld=null, writing=false;
 function buildWords(){
   if(wordHTML)return;
   const paras=[];let cur=[],idx=[];
@@ -821,6 +821,7 @@ function stopWrite(reset){
   if(wRAF){cancelAnimationFrame(wRAF);wRAF=null}
   writeBtn.textContent=writing&&!reset?'Resume':'Play';writeBtn.setAttribute('aria-pressed','false');
   setTimeout(updateCuBtn,0);
+  wHeld=reset?null:wCur;   // the close-up opens on the last word written
   if(wCur){wCur.classList.remove('cur');wCur=null}
   if(reset&&writing){writing=false;wPos=0;render();paint();fit()}
   if(reset)document.getElementById('wlabel').hidden=true;
@@ -865,7 +866,7 @@ writeBtn.addEventListener('click',()=>{if(wRAF){stopWrite(false)}else{if(!writin
 // ---- close-up lens: magnifies the paused page as readable text ----
 const lens=document.getElementById('lens'), lensIn=document.getElementById('lensIn'), cuBtn=document.getElementById('closeup');
 let lensOn=false, lensCopy=null, lensZ=3;
-function canCloseup(){return writing&&!wRAF&&st.view==='one'}
+function canCloseup(){return writing&&st.view==='one'}
 function updateCuBtn(){cuBtn.disabled=!canCloseup();if(cuBtn.disabled&&lensOn)lensOff()}
 function lensOff(){lensOn=false;lens.hidden=true;pageEl.classList.remove('lensing');cuBtn.setAttribute('aria-pressed','false');lensIn.innerHTML=''}
 let colW=100, colGap=10, nCols=1;
@@ -889,11 +890,14 @@ function lensStart(){
   lens.style.width=Math.round((colW+2*fs)*lensZ)+'px';   // one full column plus a small margin
   lens.style.height=Math.round(fs*1.32*lensZ*6.5)+'px';  // about six lines
   lensOn=true;lens.hidden=false;pageEl.classList.add('lensing');cuBtn.setAttribute('aria-pressed','true');
-  const fr=flow.getBoundingClientRect();let x=fr.width/2,y=fr.height/2;
-  if(wCur){const r=wCur.getBoundingClientRect();x=r.left-fr.left+r.width/2;y=r.top-fr.top+r.height/2}
+  // open on the last word written; without one, on the middle of the part of the page that is on screen
+  const fr=flow.getBoundingClientRect(),w=wCur||wHeld;
+  let x=fr.width/2,y=Math.max(0,Math.min(fr.height,innerHeight/2-fr.top));
+  if(w&&w.getClientRects().length){const r=w.getBoundingClientRect();x=r.left-fr.left+r.width/2;y=r.top-fr.top+r.height/2}
   lensAt(x,y);
+  lens.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
-cuBtn.addEventListener('click',()=>{if(!canCloseup())return;lensOn?lensOff():lensStart()});
+cuBtn.addEventListener('click',()=>{if(!canCloseup())return;if(lensOn){lensOff();return}if(wRAF)stopWrite(false);lensStart()});   // while writing: pause, then look closer
 pageEl.addEventListener('mousemove',e=>{if(!lensOn)return;const fr=flow.getBoundingClientRect();lensAt(e.clientX-fr.left,e.clientY-fr.top)});
 setStops();
 document.getElementById('preset').addEventListener('change',e=>{const c=e.target.value.split(',');['c0','c1','c2'].forEach((id,i)=>document.getElementById(id).value=c[i]);setStops();paint()});

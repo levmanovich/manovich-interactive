@@ -57,7 +57,7 @@ The page starts with a few main controls. More options appear when you choose a 
 
 - **Revisions** shows each version's changes in turn: new words are written in, cut words are crossed out and disappear, and rewrites replace the old words. It opens the player, described below.
 - **Versions** shows the chosen text view (for example Final text) one whole version at a time: v1, then v2, and so on. Its controls are Play / Stop and Time per version.
-- **Write** shows all text ever written, word by word, version after version, with cut words crossed out. Its controls are Play / Pause, Close-up (a magnifier while paused) and Words/s.
+- **Write** shows all text ever written, word by word, version after version, with cut words crossed out. Its controls are Play / Pause, Close-up (pauses and opens a magnifier on the last word written; move the mouse to read other parts) and Words/s.
 
 ### Player
 
