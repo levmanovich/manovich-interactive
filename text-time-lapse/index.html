@@ -90,6 +90,7 @@ b.endmark{display:block;height:0;overflow:hidden}
 .mp:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 .mp .l{font-family:var(--f-ui);font-size:11px;font-weight:400;line-height:1.35;font-variant-numeric:tabular-nums}
 #markCtl[hidden]{display:none}
+#olderSeg.idle{opacity:.4}
 .rounds{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;margin-top:2px}
 #note{font-size:11px;font-weight:400}
 .info{display:flex;align-items:center;gap:8px;margin-top:10px}
@@ -212,7 +213,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
       </div></div>
       <div class="grow" id="coloringRow"><span class="lab">Coloring</span><div class="items">
         <div class="seg" role="group" aria-label="Edits"><button type="button" data-pk="split" data-v="same">Edits same color</button><button type="button" data-pk="split" data-v="darker">Edits darker</button></div>
-        <div class="seg" role="group" aria-label="Earlier versions"><button type="button" data-pk="older" data-v="color">Earlier in color</button><button type="button" data-pk="older" data-v="gray">Earlier in gray</button></div>
+        <div class="seg" role="group" aria-label="Earlier versions" id="olderSeg"><button type="button" data-pk="older" data-v="color">Earlier in color</button><button type="button" data-pk="older" data-v="gray">Earlier in gray</button></div>
       </div></div>
     <div class="grow" id="animRow"><span class="lab">Animate</span><div class="items">
       <div class="seg" role="group" aria-label="Animation" id="animSeg"><button type="button" data-anim="rev" aria-pressed="false">Revisions</button><button type="button" data-anim="ver" aria-pressed="false">Versions</button><button type="button" data-anim="write" aria-pressed="false">Write</button></div>
@@ -516,8 +517,12 @@ function paint(){
   // Coloring row: edits darker (new words a little lighter), and earlier versions in gray while Versions or Write runs
   const po=PO(),darker=po.split==='darker'&&typeof Player!=='undefined';
   const cur=po.older==='gray'?(writing?wRound:(st.view==='one'&&st.upto?st.upto:0)):0;
+  // on the static page, with versions picked: earlier versions that are not picked show in gray (not faded out)
+  const selMax=sel.size?Math.max(...sel):0, grayEarlier=po.older==='gray'&&!cur&&selMax>0;
+  {const og=document.getElementById('olderSeg'),active=!!cur||writing||!!(st.view==='one'&&st.upto)||selMax>0||!document.getElementById('pview').hidden;
+    og.classList.toggle('idle',!active);og.title=active?'':'Applies during animations, or when you pick a version below'}
   for(let k=1;k<=NR;k++){
-    const faded=sel.size&&!sel.has(k), old=cur>1&&k<cur, c=faded?FADE:old?'#c9ced6':darker?Player.newCol(k):colorK(k), q=`span[data-e="${k}"]`;
+    const faded=sel.size&&!sel.has(k)&&!(grayEarlier&&k<selMax), old=(cur>1&&k<cur)||(grayEarlier&&!sel.has(k)&&k<selMax), c=faded?FADE:old?'#c9ced6':darker?Player.newCol(k):colorK(k), q=`span[data-e="${k}"]`;
     const bc=faded||old?c:lighten(c);
     css+=`#flow ${q}{color:${c}}#flow.blocks ${q}{background:${bc}}`;
     if(darker&&!faded&&!old){const e=Player.darkCol(k);css+=`#flow ${q}[data-x]{color:${e}}#flow.blocks ${q}[data-x]{background:${lighten(e)}}`}
@@ -559,6 +564,17 @@ Object.assign(ghostPage.style,{position:'absolute',left:'-10000px',top:'0',visib
 const ghost=document.createElement('div');ghost.className='flow';ghostPage.appendChild(ghost);document.body.appendChild(ghostPage);
 const fitCache={};
 let lastW=0;
+// Some browsers have a minimum font size setting (in Chrome: Settings > Appearance > Customize fonts).
+// It enlarges the tiny type of a whole page so the text runs off the page. Where it is set, small type is
+// drawn at a size above the minimum and shrunk with CSS zoom, which the setting does not affect.
+const MINF=(()=>{try{const d=document.createElement('span');d.style.fontSize='1px';d.textContent='x';document.body.appendChild(d);const m=parseFloat(getComputedStyle(d).fontSize);d.remove();return m>1.5?m:0}catch(e){return 0}})();
+function setFS(el,px){
+  const k=MINF&&px<MINF+1?(MINF+1)/px:1;el._px=px;el._k=k;
+  el.style.zoom=k===1?'':String(1/k);el.style.fontSize=(px*k)+'px';
+  if(typeof el._h==='number')el.style.height=(el._h*k)+'px';
+}
+function setH(el,h){el._h=h;el.style.height=typeof h==='number'?(h*(el._k||1))+'px':h}
+const kOf=el=>el._k||1;
 function pageW(){const w=pageEl.getBoundingClientRect().width;if(w>0)lastW=w;return lastW||900}
 function solve(mode){
   const key=mode+'|'+Math.round(pageW())+'|'+pkey();if(fitCache[key])return fitCache[key];
@@ -566,9 +582,9 @@ function solve(mode){
   ghostPage.style.width=pageW()+'px';
   {const W=parseFloat(ghostPage.style.width);ghostPage.style.padding=`${0.07*W}px ${0.08*W}px`;ghostPage.style.height=(W*PR())+'px';textStyle(ghost);ghostPage.style.aspectRatio='auto'}
   if(ghost.dataset.mode!==mode){ghost.innerHTML=htmlCache[mode];ghost.dataset.mode=mode}
-  const W=ghost.clientWidth,H=ghost.clientHeight;
+  const W=ghost.clientWidth/kOf(ghost),H=ghost.clientHeight/kOf(ghost);
   const chars=htmlCache[mode].replace(/<[^>]+>/g,'').length*1.06;
-  const fits=px=>{ghost.style.fontSize=px+'px';return !overflows(ghost)};
+  const fits=px=>{setFS(ghost,px);return !overflows(ghost)};
   // estimate: c columns at size px hold c*(H/(1.32px))*(colW/(charW*px)) characters; aim for ~65 per line
   const est=c=>{const px=Math.sqrt(W*H/(chars*charW*1.32*(1+0.034*(c-1)))); return (W-2.2*px*(c-1))/c/(charW*px)};
   let bestC=1,bd=1e9;for(let c=1;c<=8;c++){const d=Math.abs(Math.log(est(c)/65));if(d<bd){bd=d;bestC=c}}
@@ -592,8 +608,8 @@ const shp=()=>SHAPES[PO().shape]||SHAPES.a4;
 const PR=()=>shp()[1]/shp()[0];           // page height / width
 const pkey=()=>{const o=PO();return o.shape+'|'+o.align+'|'+o.lh};
 function textStyle(el){const o=PO();el.style.lineHeight=o.lh;el.style.textAlign=o.align==='left'?'left':'justify';el.style.hyphens=o.align==='left'?'manual':'auto'}
-function sizePage(){pageEl.style.width=`min(100%,${shp()[2]}px)`;pageEl.style.alignSelf='center';const w=pageEl.getBoundingClientRect().width||pageW();pageEl.style.aspectRatio='auto';pageEl.style.height=(w*PR())+'px';flow.style.height=(w*PR()-2*0.07*w-2)+'px';textStyle(flow)}
-function fit(){if(st.view!=='one')return;sizePage();const b=solve(st.mode);flow.style.columnCount=b.c;flow.style.fontSize=b.px+'px';if(typeof MZ!=='undefined'&&Math.abs(MZ-1)>0.001)mainZoom(MZ)}
+function sizePage(){pageEl.style.width=`min(100%,${shp()[2]}px)`;pageEl.style.alignSelf='center';const w=pageEl.getBoundingClientRect().width||pageW();pageEl.style.aspectRatio='auto';pageEl.style.padding=`${0.07*w}px ${0.08*w}px`;pageEl.style.height=(w*PR())+'px';setH(flow,w*PR()-2*0.07*w-2);textStyle(flow)}
+function fit(){if(st.view!=='one')return;sizePage();const b=solve(st.mode);flow.style.columnCount=b.c;setFS(flow,b.px);if(typeof MZ!=='undefined'&&Math.abs(MZ-1)>0.001)mainZoom(MZ)}
 function prefetch(){const left=Object.keys(MODES).filter(m=>!fitCache[m+'|'+Math.round(pageW())+'|'+pkey()]);if(!left.length)return;
   setTimeout(()=>{solve(left[0]);prefetch()},30)}
 function prefetchRects(){const left=Object.keys(MODES).filter(m=>!rectCache[m+'|'+Math.round(pageW())+'|'+pkey()]);if(!left.length)return;setTimeout(()=>{rectsFor(left[0]);prefetchRects()},40)}
@@ -604,7 +620,7 @@ function rectsFor(mode){
   const key=mode+'|'+Math.round(pageW())+'|'+pkey();if(rectCache[key])return rectCache[key];
   const b=solve(mode);
   if(ghost.dataset.mode!==mode){ghost.innerHTML=htmlCache[mode];ghost.dataset.mode=mode}
-  ghost.style.columnCount=b.c;ghost.style.fontSize=(b.full||b.px)+'px';
+  ghost.style.columnCount=b.c;setFS(ghost,b.full||b.px);
   const o=ghostPage.getBoundingClientRect(), W=o.width, out=[];
   for(const sp of ghost.querySelectorAll('span')){
     const e=+sp.dataset.e, h=sp.dataset.h?1:0;
@@ -689,15 +705,15 @@ function mainZoom(z,scrollTop){
   if(MZ>1.001){
     // zoomed in: one long column to scroll; the page keeps the width of the chosen shape
     sizePage();
-    pageEl.style.aspectRatio='auto';pageEl.style.height='auto';flow.style.height='auto';
-    flow.style.columnCount=1;flow.style.fontSize=(b.px*MZ)+'px';
+    pageEl.style.aspectRatio='auto';pageEl.style.height='auto';setH(flow,'auto');
+    flow.style.columnCount=1;setFS(flow,b.px*MZ);
   }else if(MZ<0.999){
     // zoomed out: the page keeps the chosen shape, with smaller type inside
     sizePage();
-    flow.style.columnCount=b.c;flow.style.fontSize=(b.px*MZ)+'px';
+    flow.style.columnCount=b.c;setFS(flow,b.px*MZ);
   }else{
     sizePage();
-    flow.style.columnCount=b.c;flow.style.fontSize=b.px+'px';
+    flow.style.columnCount=b.c;setFS(flow,b.px);
   }
   if(scrollTop)pageEl.scrollIntoView({block:'start'});
   document.getElementById('mzoom').value=MZ;document.getElementById('mzoomv').textContent=MZ.toFixed(1)+'×';
@@ -866,8 +882,8 @@ function lensStart(){
   lensCopy=flow.cloneNode(true);lensCopy.id='flowLens';lensCopy.classList.remove('blocks');
   lensCopy.style.width=flow.clientWidth+'px';lensCopy.style.height=flow.clientHeight+'px';
   lensIn.innerHTML='';lensIn.appendChild(lensCopy);
-  const fs=parseFloat(getComputedStyle(flow).fontSize);
-  nCols=+flow.style.columnCount||1;colGap=2.2*fs;colW=(flow.clientWidth-colGap*(nCols-1))/nCols;
+  const fs=parseFloat(getComputedStyle(flow).fontSize)/kOf(flow);
+  nCols=+flow.style.columnCount||1;colGap=2.2*fs;colW=(flow.clientWidth/kOf(flow)-colGap*(nCols-1))/nCols;
   const pw=pageEl.clientWidth;
   lensZ=Math.min(16/fs,(pw-24)/(colW+2*fs));
   lens.style.width=Math.round((colW+2*fs)*lensZ)+'px';   // one full column plus a small margin
@@ -1036,7 +1052,7 @@ const charW=0.5;let fitKey='';
 function fit(){
   if(!N)return;
   {const pw=pageEl.offsetWidth,ph=pageEl.offsetHeight,m=Math.min(pw,ph);pageEl.style.padding=`${Math.round(m*0.06)}px ${Math.round(m*0.065)}px`}
-  const Wp=flow.clientWidth,Hp=flow.clientHeight,key=[Math.round(Wp),Math.round(Hp),opt.removed,opt.layout,opt.lh,opt.align,opt.shape,N].join('|');
+  const Wp=flow.clientWidth/kOf(flow),Hp=flow.clientHeight/kOf(flow),key=[Math.round(Wp),Math.round(Hp),opt.removed,opt.layout,opt.lh,opt.align,opt.shape,N].join('|');
   if(key===fitKey||!Wp)return;fitKey=key;
   let peak=1,best=-1;
   for(let r=1;r<=NR;r++){let n=0;for(let k=0;k<N;k++)if(born[k]<=r&&(opt.removed==='stay'||!died[k]||died[k]>=r))n++;if(n>best){best=n;peak=r}}
@@ -1052,14 +1068,14 @@ function fit(){
     if(c<1||c>7)continue;
     flow.style.columnCount=c;
     // short text: the type stops at a modest size, so check that size first
-    flow.style.fontSize=cap+'px';if(!overflows(flow)){const cpl=(Wp-2.2*cap*(c-1))/c/(charW*cap),score=Math.abs(Math.log(cpl/65));if(!choice||score<choice.score)choice={c,px:cap,score};continue}
+    setFS(flow,cap);if(!overflows(flow)){const cpl=(Wp-2.2*cap*(c-1))/c/(charW*cap),score=Math.abs(Math.log(cpl/65));if(!choice||score<choice.score)choice={c,px:cap,score};continue}
     let lo=Math.max(0.5,est(c)*0.5),hi=Math.min(cap,est(c)*1.6);
-    flow.style.fontSize=lo+'px';if(overflows(flow))lo=0.5;
-    for(let i=0;i<7;i++){const m=(lo+hi)/2;flow.style.fontSize=m+'px';if(!overflows(flow))lo=m;else hi=m}
+    setFS(flow,lo);if(overflows(flow))lo=0.5;
+    for(let i=0;i<7;i++){const m=(lo+hi)/2;setFS(flow,m);if(!overflows(flow))lo=m;else hi=m}
     const cpl=(Wp-2.2*lo*(c-1))/c/(charW*lo),score=Math.abs(Math.log(cpl/65));
     if(!choice||score<choice.score)choice={c,px:lo*0.985,score}}
   choice.px=Math.min(choice.px,cap);
-  flow.style.columnCount=choice.c;flow.style.fontSize=choice.px+'px';
+  flow.style.columnCount=choice.c;setFS(flow,choice.px);
   state.fill(-1);pbState.fill(-1);apply(false);
 }
 
@@ -1123,7 +1139,7 @@ function follow(jump){
   const rr=el.getClientRects()[0];if(!rr)return;const pr=pageEl.getBoundingClientRect();
   const cw=pageEl.clientWidth,ch=pageEl.clientHeight;
   // across: center on the column the word is in, so the view does not swing along each line
-  const fr=flow.getBoundingClientRect(),fs=parseFloat(flow.style.fontSize)||10,nc=+flow.style.columnCount||1;
+  const fr=flow.getBoundingClientRect(),fs=flow._px||parseFloat(flow.style.fontSize)||10,nc=+flow.style.columnCount||1;
   const gap=2.2*fs*Z,colW=(fr.width-gap*(nc-1))/nc,ci=Math.max(0,Math.min(nc-1,Math.floor((rr.left-fr.left)/(colW+gap))));
   const tx=pageEl.scrollLeft+(fr.left+ci*(colW+gap)+colW/2-pr.left-pageEl.clientLeft)-cw/2;
   const ty=pageEl.scrollTop+(rr.top+rr.height/2-pr.top-pageEl.clientTop)-ch/2;
