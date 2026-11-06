@@ -30,7 +30,7 @@ A browser-based interactive tool for exploring **patterns in MoMA exhibitions be
 
 ### 4. [Text Time-lapse](text-time-lapse/)
 
-A browser-based tool that shows **how a text changed across its saved versions**. Load versions of your text you were saving while working (.txt, .md or .docx), and the tool creates a visualization of your writing process. It shows which version each word was written in, which words were later removed, and which were rewritten. See the result on one page, as one small page per version, or as a 3D stack of pages, and animate it to watch the text being written and revised. Files are read on your own computer and never uploaded. See the [guide](text-time-lapse/README.md).
+A browser-based tool that shows **how a text changed across its saved versions**. Load versions of your text you were saving while working (.txt, .md or .docx), and the tool creates a visualization of your writing process. You can step through versions and see which words were added, edited and removed in each. See the result on one page, as one small page per version, or as a 3D stack of pages, and animate it to watch the text being written and revised. Files are read on your own computer and never uploaded. See the [guide](text-time-lapse/README.md).
 
 <p>
   <img src="text-time-lapse/screenshots/cover.webp" alt="Text Time-lapse: visualize your writing process" width="290">
