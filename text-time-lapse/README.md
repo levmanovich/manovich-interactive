@@ -8,7 +8,7 @@ Nov 4, 2026 · @Lev Manovich
 
 ## What it does
 
-Text Time-lapse shows how a text changed across its saved versions. Load versions of your text you were saving while working, and the tool creates a visualization of your writing process. You can step through versions and see which words were added, edited and removed in each. You can see the result on one page, as one small page per version or as a 3D stack of pages, and you can animate it to watch the text being written and revised.
+Text Time-lapse shows how a text changed across its saved versions. Load versions of your text you were saving while working, and the tool creates a visualization of your writing process. You can step through versions and see which text parts were added, edited and removed in each. You can see the result on one page, as one small page per version or as a 3D stack of pages, and you can animate it to watch the text being written and revised.
 
 <p>
   <img src="screenshots/cover.webp" alt="Text Time-lapse: visualize your writing process" width="290">
