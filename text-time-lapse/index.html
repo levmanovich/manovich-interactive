@@ -74,7 +74,7 @@ b.endmark{display:block;height:0;overflow:hidden}
 #page.lensing{cursor:none}
 .rb.future{opacity:.3}
 .rb.now{border-color:var(--ink)}
-.rb.now .sw{height:9px}
+.rb.now .sw{height:9px;margin-top:-2px;margin-bottom:-1px}
 .page{position:relative}
 .page{container-type:inline-size}
 #wlabel{position:absolute;top:2.2cqw;right:8cqw;font-family:var(--f-ui);font-weight:100;font-size:max(11px,1.25cqw);line-height:1;color:#999;pointer-events:none}
@@ -118,6 +118,9 @@ b.endmark{display:block;height:0;overflow:hidden}
 .groups{display:flex;flex-direction:column;border-bottom:1px solid var(--line)}
 .grow{display:grid;grid-template-columns:86px minmax(0,1fr);gap:8px;align-items:center;border-top:1px solid var(--line);padding:5px 0}
 .grow[hidden]{display:none}
+.grow.na .items{opacity:.3}
+#animRow{min-height:46px}
+.rhint{min-height:2.9em}
 .lab{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:500;color:var(--ink)}
 .items{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center;min-width:0}
 #drop.over{background:var(--chip)}
@@ -684,9 +687,11 @@ function setView(v){
   pageEl.hidden=v!=='one';multi.hidden=v!=='ten';stackWrap.hidden=v!=='stack';
   const pv=v==='player';document.getElementById('pview').hidden=!pv;
   {const n=document.getElementById('info'),r=document.getElementById(pv?'prounds':'rounds');r.parentNode.insertBefore(n,r)}
-  ['textViewRow','rounds','rhint'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=pv});
+  ['rounds','rhint'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=pv});
+  // rows that do not apply stay in place, faded, so the controls do not jump
+  {const tv=document.getElementById('textViewRow');tv.classList.toggle('na',pv);tv.inert=pv}
   if(!pv)lastView=v;
-  document.getElementById('zoomRow').hidden=v!=='one';if(v!=='one')mainZoom(1);
+  {const zr=document.getElementById('zoomRow');zr.classList.toggle('na',v!=='one');zr.inert=v!=='one'}if(v!=='one')mainZoom(1);
   if(!pv){Player.hide();document.querySelector('.wrap').style.maxWidth=''}
   document.getElementById('gapCtl').hidden=v!=='stack';
   if(typeof updateAnim==='function')updateAnim();
