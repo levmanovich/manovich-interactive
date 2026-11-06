@@ -686,9 +686,15 @@ let MZ=1;
 function mainZoom(z,scrollTop){
   MZ=Math.max(0.2,Math.min(8,z));
   const b=solve(st.mode);
-  if(Math.abs(MZ-1)>0.001){
+  if(MZ>1.001){
+    // zoomed in: one long column to scroll; the page keeps the width of the chosen shape
+    sizePage();
     pageEl.style.aspectRatio='auto';pageEl.style.height='auto';flow.style.height='auto';
     flow.style.columnCount=1;flow.style.fontSize=(b.px*MZ)+'px';
+  }else if(MZ<0.999){
+    // zoomed out: the page keeps the chosen shape, with smaller type inside
+    sizePage();
+    flow.style.columnCount=b.c;flow.style.fontSize=(b.px*MZ)+'px';
   }else{
     sizePage();
     flow.style.columnCount=b.c;flow.style.fontSize=b.px+'px';
