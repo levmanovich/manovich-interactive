@@ -1145,6 +1145,9 @@ async function useFiles(list,origin){
   loadMsg.textContent=`Reading ${files.length} files…`;
   try{
     const texts=[];for(const f of files)texts.push(await readVersion(f));
+    // a file with no words would stop the comparison with an unclear error: name it instead
+    const empty=files.filter((f,i)=>!toTokens(texts[i]).length).map(f=>f.name);
+    if(empty.length){loadMsg.textContent=empty.length===1?`This file has no text: ${empty[0]}. Remove it from the folder, or check that it was saved correctly.`:`These files have no text: ${empty.join(', ')}. Remove them from the folder, or check that they were saved correctly.`;return}
     loadMsg.textContent='Comparing versions…';await new Promise(r=>setTimeout(r,30));
     const t0=performance.now();
     setData(buildHistory(texts),files.map(f=>new Date(f.lastModified)),
