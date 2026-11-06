@@ -32,6 +32,12 @@ A browser-based interactive tool for exploring **patterns in MoMA exhibitions be
 
 A browser-based tool that shows **how a text changed across its saved versions**. Load two or more versions of the same text (.txt, .md or .docx), and the tool compares them word by word: which version each word was written in, which words were later removed, and which were rewritten. See the result on one page, as one small page per version, or as a 3D stack of pages, and animate it to watch the text being written and revised. Files are read on your own computer and never uploaded. See the [guide](text-time-lapse/README.md).
 
+<p>
+  <img src="text-time-lapse/screenshots/cover.webp" alt="Text Time-lapse: visualize your writing process" width="290">
+  <img src="text-time-lapse/screenshots/changes.webp" alt="What was added, edited and removed in each version" width="290">
+  <img src="text-time-lapse/screenshots/final-text.webp" alt="The final text, colored by the version each word was written in" width="290">
+</p>
+
 ---
 
 ## About

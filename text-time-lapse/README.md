@@ -10,6 +10,12 @@ Nov 4, 2026 · @Lev Manovich
 
 Text Time-lapse shows how a text changed across its saved versions. Load two or more versions of the same text, and the tool compares them word by word. It shows which version each word was written in, which words were later removed, and which were rewritten. You can see the result on one page, as one small page per version or as a 3D stack of pages, and you can animate it to watch the text being written and revised.
 
+<p>
+  <img src="screenshots/cover.webp" alt="Text Time-lapse: visualize your writing process" width="290">
+  <img src="screenshots/changes.webp" alt="What was added, edited and removed in each version" width="290">
+  <img src="screenshots/final-text.webp" alt="The final text, colored by the version each word was written in" width="290">
+</p>
+
 ## Preparing your files
 
 Put the versions of one text in a folder, then choose the folder, choose the files, or drag them onto the page. You need at least two versions.
