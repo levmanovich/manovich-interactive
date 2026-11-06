@@ -28,6 +28,12 @@ A browser-based interactive tool for exploring **patterns in MoMA exhibitions be
 
 ---
 
+### 4. [Text Time-lapse](text-time-lapse/)
+
+A browser-based tool that shows **how a text changed across its saved versions**. Load two or more versions of the same text (.txt, .md or .docx), and the tool compares them word by word: which version each word was written in, which words were later removed, and which were rewritten. See the result on one page, as one small page per version, or as a 3D stack of pages, and animate it to watch the text being written and revised. Files are read on your own computer and never uploaded. See the [guide](text-time-lapse/README.md).
+
+---
+
 ## About
 
 Lev Manovich is Presidential Professor at The Graduate Center, City University of New York, and a leading theorist in **computational media theory**, **software studies**, **cultural analytics**, and **AI media studies**. His books include *The Language of New Media* (MIT Press, 2001), *Software Takes Command* (Bloomsbury, 2013), and *Cultural Analytics* (MIT Press, 2020).
