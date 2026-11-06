@@ -51,7 +51,7 @@ The page starts with a few main controls. More options appear when you choose a 
 | Coloring | Edits same color / Edits darker; Earlier in color / Earlier in gray | Edits darker shows rewritten words in a darker shade of their version's color, and new words a little lighter. Earlier in gray turns earlier versions gray while an animation runs, so the version being added stands out. |
 | Animate | Revisions / Versions / Write | Choose an animation. It starts at once, with a one-line explanation and its own controls (see Animations below). In 3D view, this row also has Spacing and Transparency: the distance between pages and how see-through they are. |
 
-**Above the page,** a line names the text and gives its numbers: versions, dates, words written, words in the final version and words removed. The **Example** button at the start of this line brings back the example the page opens with: ten saved versions of Chapter 4 of *Artificial Aesthetics* by Lev Manovich (summer 2024). Below the line, one button per version shows its color and word count. Click one or more to show only their words. In 3D view, clicking a version builds the stack up to it.
+**Above the page,** a line names the text and gives its numbers: versions, dates, words written, words in the final version and words removed. The **Example** button at the start of this line brings back the example the page opens with: 16 saved versions of *Seven Worlds of Digital Art* by Lev Manovich (August–September 2026). Below the line, one button per version shows its color and word count. Click one or more to show only their words. In 3D view, clicking a version builds the stack up to it.
 
 ### Animations
 
