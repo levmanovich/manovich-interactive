@@ -91,6 +91,8 @@ b.endmark{display:block;height:0;overflow:hidden}
 .mp .l{font-family:var(--f-ui);font-size:11px;font-weight:400;line-height:1.35;font-variant-numeric:tabular-nums}
 #markCtl[hidden]{display:none}
 #olderSeg.idle{opacity:.4}
+#aplay{min-width:5.4em;text-align:center}
+#aplay:disabled,#astart:disabled{opacity:.35}
 .rounds{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;margin-top:2px}
 #note{font-size:11px;font-weight:400}
 .info{display:flex;align-items:center;gap:8px;margin-top:10px}
@@ -219,9 +221,10 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
         <div class="seg" role="group" aria-label="Earlier versions" id="olderSeg"><button type="button" data-pk="older" data-v="color">Earlier in color</button><button type="button" data-pk="older" data-v="gray">Earlier in gray</button></div>
       </div></div>
     <div class="grow" id="animRow"><span class="lab">Animate</span><div class="items">
+      <span class="mid" id="animCtl"><button type="button" class="play" id="aplay" disabled>Play</button><button type="button" class="play" id="astart" disabled title="Back to the beginning">⏮ Start</button></span>
       <div class="seg" role="group" aria-label="Animation" id="animSeg"><button type="button" data-anim="rev" aria-pressed="false">Revisions</button><button type="button" data-anim="ver" aria-pressed="false">Versions</button><button type="button" data-anim="write" aria-pressed="false">Write</button></div>
-      <span class="mid" id="writeCtl"><button type="button" class="play" id="write">Play</button><button type="button" class="play" id="closeup" disabled title="Pause and look closer: a magnifier follows the mouse">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
-      <span class="mid" id="playCtl"><button type="button" class="play" id="play">Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.15" max="3" step="0.05" value="0.9"> <span id="speedv">0.9 s</span></span>
+      <span class="mid" id="writeCtl"><button type="button" class="play" id="write" hidden>Play</button><button type="button" class="play" id="closeup" disabled title="Pause and look closer: a magnifier follows the mouse">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
+      <span class="mid" id="playCtl"><button type="button" class="play" id="play" hidden>Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.15" max="3" step="0.05" value="0.9"> <span id="speedv">0.9 s</span></span>
       <span class="mid" id="gapCtl" hidden><label for="gap">Spacing</label> <input type="range" id="gap" min="0.04" max="0.4" step="0.01" value="0.17"> <label for="transp">Transparency</label> <input type="range" id="transp" min="0" max="1" step="0.01" value="0.28"></span>
       <span class="note" id="animHint">Choose an animation.</span>
     </div></div>
@@ -236,7 +239,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
   <div id="pview" hidden>
     <div class="groups">
       <div class="grow"><span class="lab">Player</span><div class="items">
-        <span class="mid" style="flex-wrap:nowrap"><button type="button" class="play" id="pplay">Play</button><button type="button" class="play" id="pstart" title="Go back to the empty page">⏮ Start</button><button type="button" class="play" id="pprev" aria-label="Previous version">◀</button><button type="button" class="play" id="pnext" aria-label="Next version">▶</button></span>
+        <span class="mid" style="flex-wrap:nowrap"><button type="button" class="play" id="pplay" hidden>Play</button><button type="button" class="play" id="pstart" hidden title="Go back to the empty page">⏮ Start</button><button type="button" class="play" id="pprev" aria-label="Previous version">◀</button><button type="button" class="play" id="pnext" aria-label="Next version">▶</button></span>
         <button type="button" class="play" id="pclose" title="Close the player and go back">Close player</button>
         <input type="range" id="pscrub" min="0" max="1000" value="0" aria-label="Position in the animation">
         <span class="mid"><label for="pspeed">Time per version</label> <input type="range" id="pspeed" min="0.3" max="60" step="0.1" value="2.5" style="width:80px" title="Time per version"> <span id="pspeedv"></span></span>
@@ -782,7 +785,7 @@ stackCv.addEventListener('click',e=>{
 });
 document.getElementById('gap').addEventListener('input',drawStack);
 document.getElementById('transp').addEventListener('input',drawStack);
-let playT=null;const playBtn=document.getElementById('play');
+let playT=null,verAtStart=false;const playBtn=document.getElementById('play');
 const speedEl=document.getElementById('speed');
 function speedMs(){return +speedEl.value*1000}
 speedEl.addEventListener('input',()=>{document.getElementById('speedv').textContent=(+speedEl.value).toFixed(speedEl.value<1?2:1).replace(/0$/,'')+' s'});
@@ -790,8 +793,9 @@ function step(){if(st.view==='stack'){drawRounds();drawStack()}else paint()}
 function stopPlay(){if(playT){clearTimeout(playT);playT=null}playBtn.textContent='Play';playBtn.setAttribute('aria-pressed','false')}
 playBtn.addEventListener('click',()=>{
   if(writing)stopWrite(true);
-  if(playT){stopPlay();return}
-  st.upto=1;step();playBtn.textContent='Stop';playBtn.setAttribute('aria-pressed','true');
+  if(playT){stopPlay();if(st.upto)playBtn.textContent='Resume';return}   // pause: stay on this version
+  if(!(st.upto>0&&st.upto<NR&&!verAtStart))st.upto=1;verAtStart=false;   // resume, or start from v1
+  step();playBtn.textContent='Pause';playBtn.setAttribute('aria-pressed','true');
   const tick=()=>{if(!playT)return;if(st.upto>=NR){stopPlay();if(st.view==='one'){st.upto=0;step()}return}st.upto++;step();playT=setTimeout(tick,speedMs())};
   playT=setTimeout(tick,speedMs());
 });
@@ -1222,6 +1226,23 @@ function showExample(){
 }
 // start from the default settings (browsers may restore slider positions from an earlier visit)
 document.querySelectorAll('input[type=range]').forEach(i=>i.value=i.defaultValue);
+// ---- Animate row: one Play/Pause and one Start for whichever animation is chosen ----
+{
+  const aplay=document.getElementById('aplay'),astart=document.getElementById('astart');
+  const src=()=>animSel==='write'?writeBtn:animSel==='ver'?playBtn:animSel==='rev'?document.getElementById('pplay'):null;
+  const sync=()=>{const b=src();aplay.disabled=astart.disabled=!b;aplay.textContent=b?b.textContent:'Play';
+    aplay.setAttribute('aria-pressed',b?b.getAttribute('aria-pressed')||'false':'false');
+    if(b)document.getElementById('olderSeg').classList.remove('idle')};   // Earlier in gray applies to every animation
+  aplay.addEventListener('click',()=>{const b=src();if(b)b.click();sync()});
+  astart.addEventListener('click',()=>{
+    if(animSel==='write'){stopWrite(true);wRound=0;startWrite();stopWrite(false);writeBtn.textContent='Play';wHeld=null}
+    else if(animSel==='ver'){stopPlay();st.upto=1;verAtStart=true;step()}
+    else if(animSel==='rev')document.getElementById('pstart').click();
+    sync()});
+  const mo=new MutationObserver(sync);
+  ['write','play','pplay'].forEach(id=>mo.observe(document.getElementById(id),{childList:true,characterData:true,subtree:true,attributes:true}));
+  const ua=updateAnim;updateAnim=function(){ua();sync()};
+}
 updateAnim();
 showExample();
 
