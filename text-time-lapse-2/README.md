@@ -36,7 +36,7 @@ Put the versions of one text in a folder, then choose the folder, choose the fil
 
 ## Controls
 
-The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced ⌄** opens all the other settings: Color, Page and Coloring, and, when Revisions is chosen, the Revisions settings. Point at any control to see what it does; when you click one, its explanation also appears in the line just above Advanced.
+The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced ⌄** opens all the other settings: Color, Page and Coloring, and, when Revisions is chosen, the Revisions settings. **Help:** click **?** (top right) to turn on help mode. Then point at any control, or tap it on an iPad or phone, and a short explanation appears next to it; nothing changes while help mode is on. Click **?** again or press Esc to leave. On a laptop, resting the pointer on a control also shows its explanation.
 
 **Screen size:** the page is sized so that all of it fits on your screen. On a laptop, or an iPad held sideways, the controls sit in a column on the left and the page on the right. **Hide controls** (top right) folds the controls into one thin bar with Play / Pause, Start and the three animations, so the page gets almost the whole screen; **Show controls** brings them back. On a phone the controls start hidden.
 

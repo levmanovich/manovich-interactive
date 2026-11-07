@@ -220,6 +220,17 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 body.compact #adv,body.compact #tip{display:none!important}
 @media (min-width:1000px) and (orientation:landscape){body:not(.compact){--labw:66px}}
 .top .eyebrow{align-items:center}
+#tip{display:none!important}
+#helpBtn{min-width:26px;padding:0;margin-right:6px;font-weight:600;letter-spacing:0;text-transform:none}
+#helpBtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+/* help mode: a bubble next to the control under the pointer (or tapped) */
+body.helpmode #side [data-tip],body.helpmode #main [data-tip],body.helpmode .top [data-tip]{cursor:help}
+body.helpmode [data-tip]:hover{outline:2px solid #e2a23b;outline-offset:1px}
+#bubble{position:fixed;z-index:50;max-width:280px;background:#11141b;color:#fff;font:400 12px/1.45 var(--f-ui);padding:8px 10px;border-radius:6px;box-shadow:0 6px 20px -8px rgba(0,0,0,.5);pointer-events:none}
+#bubble[hidden]{display:none}
+#bubble b{font-weight:600}
+#helpBar{position:fixed;z-index:49;left:50%;bottom:14px;transform:translateX(-50%);background:#e2a23b;color:#11141b;font:500 12px var(--f-ui);padding:6px 12px;border-radius:16px;pointer-events:none}
+#helpBar[hidden]{display:none}
 #olderSeg.idle{opacity:1}   /* always black, like the other controls */
 #info{border-top:1px solid var(--line);padding-top:10px}   /* separator above Example */
 @media (min-width:1000px) and (orientation:landscape){body:not(.compact) #info{border-top:0;padding-top:0}}   /* side by side: Example sits right under the header line, one line is enough */
@@ -238,7 +249,7 @@ body.compact #adv,body.compact #tip{display:none!important}
 
 <div class="wrap">
   <div class="top">
-    <p class="eyebrow"><span><b>Text Time-lapse 2</b> · visualize your writing process <span class="sep">|</span> <span class="byname">Lev Manovich</span></span><span class="credit"><button type="button" class="play" id="ctlToggle" aria-pressed="false">Hide controls</button></span></p>
+    <p class="eyebrow"><span><b>Text Time-lapse 2</b> · visualize your writing process <span class="sep">|</span> <span class="byname">Lev Manovich</span></span><span class="credit"><button type="button" class="play" id="helpBtn" aria-pressed="false" aria-label="Help">?</button><button type="button" class="play" id="ctlToggle" aria-pressed="false">Hide controls</button></span></p>
   </div>
   <div class="cols">
   <div id="side">
@@ -285,7 +296,7 @@ body.compact #adv,body.compact #tip{display:none!important}
     </div>
     <p class="note">Click a version bar to play just that version. Gray shows the final text still to come. Zoom in and scroll inside the page to read a passage.</p>
   </div>
-  <p class="tip" id="tip">Point at or click any control to see what it does.</p>
+  <p class="tip" id="tip" hidden></p>
   <div id="adv">
     <button type="button" class="play" id="advBtn" aria-expanded="false">Advanced ⌄</button>
     <div class="groups" id="advRows" hidden>
@@ -1449,10 +1460,31 @@ for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','olde
     '#phold':'How long cut words stay crossed out.','#ppause':'Pause after each version.','#pbySize':'Versions with more changes get more time.'
   };
   for(const [q,t] of Object.entries(T))document.querySelectorAll(q).forEach(el=>{el.title=t;const l=el.closest('label');if(l&&!l.title)l.title=t});
-  const tip=document.getElementById('tip');
-  document.getElementById('side').addEventListener('click',e=>{
-    const a=e.target.closest('[data-anim]');if(a){tip.textContent=ANIM_HINT[a.dataset.anim]();return}
-    const el=e.target.closest('[title]');if(el&&el.title)tip.textContent=el.title});
+
+  // ---- help mode: "?" in the header. Point at (or tap) a control to see what it does; nothing changes while it is on ----
+  const hb=document.getElementById('helpBtn');hb.title='Help: point at or tap any control to see what it does. Click ? again or press Esc to leave.';
+  const bub=document.createElement('div');bub.id='bubble';bub.hidden=true;bub.setAttribute('role','tooltip');document.body.appendChild(bub);
+  const bar=document.createElement('div');bar.id='helpBar';bar.hidden=true;bar.textContent='Help mode: point at or tap any control · Esc or ? to leave';document.body.appendChild(bar);
+  let help=false;
+  const tipOf=el=>el.dataset.anim?ANIM_HINT[el.dataset.anim]():el.dataset.tip;
+  const target=e=>{const el=e.target.closest('[data-tip],[data-anim]');return el&&el!==hb&&!el.closest('#bubble')?el:null};
+  const show=el=>{const t=tipOf(el);if(!t){bub.hidden=true;return}
+    bub.textContent=t;bub.hidden=false;const r=el.getBoundingClientRect(),bw=bub.offsetWidth,bh=bub.offsetHeight;
+    let top=r.bottom+8;if(top+bh>innerHeight-8)top=r.top-bh-8;
+    bub.style.top=Math.max(8,top)+'px';bub.style.left=Math.max(8,Math.min(innerWidth-bw-8,r.left))+'px'};
+  const setHelp=on=>{help=on;document.body.classList.toggle('helpmode',on);hb.setAttribute('aria-pressed',String(on));bar.hidden=!on;bub.hidden=true;
+    // the explanation moves from the browser's own tooltip to the bubble, and back
+    document.querySelectorAll(on?'[title]':'[data-tip]').forEach(el=>{if(el===hb)return;
+      if(on){el.dataset.tip=el.title;el.removeAttribute('title')}else{el.title=el.dataset.tip;delete el.dataset.tip}})};
+  hb.addEventListener('click',()=>setHelp(!help));
+  addEventListener('keydown',e=>{if(help&&e.key==='Escape')setHelp(false)});
+  document.addEventListener('pointerover',e=>{if(!help||e.pointerType==='touch')return;const el=target(e);if(el)show(el)});
+  document.addEventListener('pointerout',e=>{if(!help||e.pointerType==='touch')return;const el=target(e);if(el&&!el.contains(e.relatedTarget))bub.hidden=true});
+  // while help is on, taps and clicks on controls only explain them
+  for(const ev of ['pointerdown','mousedown','click'])document.addEventListener(ev,e=>{if(!help)return;const el=target(e);if(!el)return;
+    e.preventDefault();e.stopPropagation();if(ev==='click')show(el)},true);
+  // version buttons are redrawn often: keep their explanation in the bubble too
+  new MutationObserver(()=>{if(help)document.querySelectorAll('#rounds [title],#prounds [title]').forEach(el=>{el.dataset.tip=el.title;el.removeAttribute('title')})}).observe(document.getElementById('main'),{childList:true,subtree:true});
   // Advanced: Color, Page and Coloring (remembered)
   const ab=document.getElementById('advBtn'),ar=document.getElementById('advRows');
   const setA=o=>{ar.hidden=!o;ab.setAttribute('aria-expanded',String(o));ab.textContent=o?'Advanced ⌃':'Advanced ⌄';try{localStorage.setItem('ttl-adv',o?'1':'0')}catch(e){}};
