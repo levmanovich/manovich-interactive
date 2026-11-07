@@ -564,12 +564,13 @@ function drawRounds(){
    <span class="sw" style="background:${colorK(i+1)}"></span><span class="v">v${i+1} · ${fmt(n)}</span></button>`).join('');
   const t=document.getElementById('rtext');const M=MODES[st.mode];
   if(st.view==='stack'){
-    roundsEl.querySelectorAll('.rb').forEach(b=>b.setAttribute('aria-pressed',!!st.upto&&+b.dataset.r<=st.upto));
+    // like Write: the current version outlined, later ones faded (not all of them 'selected')
+    if(st.upto)roundsEl.querySelectorAll('.rb').forEach(b=>{b.classList.toggle('now',+b.dataset.r===st.upto);b.classList.toggle('future',+b.dataset.r>st.upto)});
     document.getElementById('rclear').hidden=true;
     t.textContent=st.upto?`3D view built up to version ${st.upto} (${dates[st.upto-1]}). Click it again to show all ${NR}.`:'Click a version to build the 3D view up to it, or choose Versions under Animate to build it step by step.';
     return}
   if(st.view==='one'&&st.upto){
-    roundsEl.querySelectorAll('.rb').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.r<=st.upto));
+    roundsEl.querySelectorAll('.rb').forEach(b=>{b.classList.toggle('now',+b.dataset.r===st.upto);b.classList.toggle('future',+b.dataset.r>st.upto)});
     document.getElementById('rclear').hidden=true;
     t.textContent=st.mode==='written'?`Version ${st.upto} (${dates[st.upto-1]}): the text as it stood after this version. Crossed-out words were removed by then.`:`Up to version ${st.upto} (${dates[st.upto-1]}).`;
     return}
