@@ -49,15 +49,15 @@ The page starts with a few main controls. More options appear when you choose a 
 | Color | Palette / Soft hues / Bright hues / Grays | Choose the colors of the versions: a palette that blends from the oldest version to the newest, a calm color for each version, a bright and clearly different color for each version, or grays. With Palette, you can also pick a color set from the menu, set your own three colors, and move the middle color with Mid. |
 | Page | Justified / Left aligned; A4 / 4:5 / Square / 9:16 / 16:9; Line spacing | Set the text alignment, the shape of the page and the space between lines. They apply to every view, including Pages, the 3D view and the player. |
 | Coloring | Edits same color / Edits darker; Earlier in color / Earlier in gray | Edits darker shows rewritten words in a darker shade of their version's color, and new words a little lighter. Earlier in gray turns earlier versions gray while an animation runs, so the version being added stands out. It also works when you click a version button: that version shows in color and the earlier ones in gray. When neither applies, these two buttons appear faded. |
-| Animate | Play / Pause, ⏮ Start; Revisions / Versions / Write | Choose an animation. It starts at once, with a one-line explanation and its own controls (see Animations below). Play / Pause and ⏮ Start (back to the beginning) come first in the row and work for all three animations. In 3D view, this row also has Spacing and Transparency: the distance between pages and how see-through they are. |
+| Animate | Play / Pause, ⏮ Start; Revisions / Versions / Write | Choose an animation. It starts at once, with a one-line explanation, and a Player row with its controls appears below (see Animations below). Play / Pause and ⏮ Start (back to the beginning) come first in the row and work for all three animations. In 3D view, this row also has Spacing and Transparency: the distance between pages and how see-through they are. |
 
 **Above the page,** a line names the text and gives its numbers: versions, dates, words written, words in the final version and words removed. The **Example** button at the start of this line brings back the example the page opens with: 16 saved versions of *Seven Worlds of Digital Art* by Lev Manovich (August–September 2026). Below the line, one button per version shows its color and word count. Click one or more to show only their words. In 3D view, clicking a version builds the stack up to it.
 
 ### Animations
 
 - **Revisions** shows each version's changes in turn: new words are written in, cut words are crossed out and disappear, and rewrites replace the old words. It opens the player, described below.
-- **Versions** shows the chosen text view (for example Final text) one whole version at a time: v1, then v2, and so on. Its own control is Time per version.
-- **Write** shows all text ever written, word by word, version after version, with cut words crossed out. Its own controls are Close-up (pauses and opens a magnifier on the last word written; move the mouse to read other parts) and Words/s.
+- **Versions** shows the chosen text view (for example Final text) one whole version at a time: v1, then v2, and so on. Its Player row has ◀ ▶ (previous or next version) and Time per version.
+- **Write** shows all text ever written, word by word, version after version, with cut words crossed out. Its Player row has ◀ ▶ (jump to the start of the previous or next version), Close-up (pauses and opens a magnifier on the last word written; move the mouse to read other parts) and Words/s.
 
 ### Player
 

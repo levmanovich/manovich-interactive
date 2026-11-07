@@ -223,10 +223,13 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
     <div class="grow" id="animRow"><span class="lab">Animate</span><div class="items">
       <span class="mid" id="animCtl"><button type="button" class="play" id="aplay" disabled>Play</button><button type="button" class="play" id="astart" disabled title="Back to the beginning">⏮ Start</button></span>
       <div class="seg" role="group" aria-label="Animation" id="animSeg"><button type="button" data-anim="rev" aria-pressed="false">Revisions</button><button type="button" data-anim="ver" aria-pressed="false">Versions</button><button type="button" data-anim="write" aria-pressed="false">Write</button></div>
-      <span class="mid" id="writeCtl"><button type="button" class="play" id="write" hidden>Play</button><button type="button" class="play" id="closeup" disabled title="Pause and look closer: a magnifier follows the mouse">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
-      <span class="mid" id="playCtl"><button type="button" class="play" id="play" hidden>Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.15" max="3" step="0.05" value="0.9"> <span id="speedv">0.9 s</span></span>
       <span class="mid" id="gapCtl" hidden><label for="gap">Spacing</label> <input type="range" id="gap" min="0.04" max="0.4" step="0.01" value="0.17"> <label for="transp">Transparency</label> <input type="range" id="transp" min="0" max="1" step="0.01" value="0.28"></span>
       <span class="note" id="animHint">Choose an animation.</span>
+    </div></div>
+    <div class="grow" id="vwRow" hidden><span class="lab">Player</span><div class="items">
+      <span class="mid" style="flex-wrap:nowrap"><button type="button" class="play" id="vwprev" aria-label="Previous version" title="Previous version">◀</button><button type="button" class="play" id="vwnext" aria-label="Next version" title="Next version">▶</button></span>
+      <span class="mid" id="writeCtl"><button type="button" class="play" id="write" hidden>Play</button><button type="button" class="play" id="closeup" disabled title="Pause and look closer: a magnifier follows the mouse">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
+      <span class="mid" id="playCtl"><button type="button" class="play" id="play" hidden>Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.15" max="3" step="0.05" value="0.9"> <span id="speedv">0.9 s</span></span>
     </div></div>
   </div>
   <div class="info" id="info"><button type="button" class="play" id="example" aria-pressed="false" title="Show the example: 16 versions of an essay">Example</button><p class="note" id="note"></p></div>
@@ -673,6 +676,7 @@ function updateAnim(){
   document.querySelectorAll('#animSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.anim===animSel)));
   document.getElementById('writeCtl').hidden=animSel!=='write'||st.view!=='one';
   document.getElementById('playCtl').hidden=animSel!=='ver'||pv||st.view==='ten';
+  document.getElementById('vwRow').hidden=document.getElementById('writeCtl').hidden&&document.getElementById('playCtl').hidden;
   document.getElementById('animHint').textContent=animSel?ANIM_HINT[animSel]():'Choose an animation: Revisions, Versions or Write.';
 }
 document.querySelectorAll('#animSeg button').forEach(b=>b.addEventListener('click',()=>{
@@ -1226,6 +1230,29 @@ function showExample(){
 }
 // start from the default settings (browsers may restore slider positions from an earlier visit)
 document.querySelectorAll('input[type=range]').forEach(i=>i.value=i.defaultValue);
+// ---- Player row for Versions and Write: one version back or forward ----
+function writeSeek(pos){   // show the writing as it was after event pos, paused
+  if(!writing){wRound=0;startWrite()}
+  if(wRAF)stopWrite(false);if(lensOn)lensOff();
+  pos=Math.max(0,Math.min(events.length,pos));
+  flow.innerHTML=wordHTML;wSpans=[...flow.querySelectorAll('span')];
+  for(let i=0;i<pos;i++){const [r,k,cut]=events[i],sp=wSpans[k];if(cut)sp.setAttribute('data-h','1');else sp.classList.remove('w0')}
+  wPos=pos;wAcc=0;wCur=null;wHeld=pos?wSpans[events[pos-1][1]]:null;
+  const r=pos<events.length?events[pos][0]:NR;wRound=r;writeHint();
+  writeBtn.textContent=pos?'Resume':'Play';writeBtn.setAttribute('aria-pressed','false');updateCuBtn();
+}
+function vwStep(d){
+  if(animSel==='ver'){stopPlay();const u=Math.max(1,Math.min(NR,(st.upto||(d>0?0:NR+1))+d));st.upto=u;verAtStart=false;step();playBtn.textContent=u<NR?'Resume':'Play'}
+  else if(animSel==='write'){
+    const cur=writing?(wPos<events.length?events[wPos][0]:NR+1):1;
+    // back: the start of this version, or of the one before if already at its start; forward: the start of the next version
+    let r=d>0?cur+1:(writing&&wPos>rStart[cur]?cur:cur-1);
+    if(r>NR){writeSeek(events.length);return}
+    r=Math.max(1,r);while(r<=NR&&rStart[r]===undefined)r+=d>0?1:-1;
+    writeSeek(r<1?0:rStart[r]??events.length)}
+}
+document.getElementById('vwprev').addEventListener('click',()=>vwStep(-1));
+document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
 // ---- Animate row: one Play/Pause and one Start for whichever animation is chosen ----
 {
   const aplay=document.getElementById('aplay'),astart=document.getElementById('astart');
