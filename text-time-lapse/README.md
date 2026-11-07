@@ -2,7 +2,7 @@
 
 # Guide
 
-Nov 4, 2026 · @Lev Manovich
+Nov 7, 2026 · @Lev Manovich
 
 **Everything runs in your browser. Your files are read on your own computer and are never uploaded anywhere.**
 
@@ -47,7 +47,7 @@ The page starts with a few main controls. More options appear when you choose a 
 | Files | Choose a folder… / Choose files… | Load your versions. You can also drop files or a folder on the page. |
 | Text view | Final text / All written text / Deleted / Edited | Choose which words the page shows: the final text; everything ever written, with cut words crossed out; only what was removed; or only the rewrites. Each button shows its word count. |
 | Modes | Text / Blocks / Pages / 3D view | Show the words as text, as colored bars, as one small page per version, or as a 3D stack of pages. The Pages button shows the number of versions, for example 10 pages. Click a small page to open it. |
-| Zoom | Slider / Large type / Whole page | Text and Blocks only. Whole page shows the entire text in columns, so you see the overall pattern of colors; the page opens this way (1.0×). Large type shows about 10 readable lines on screen, in one long column that you scroll down. The slider sets any size in between, or smaller. |
+| Zoom | Slider / Large type / Whole page | Works in Text and Blocks, and in the Revisions player. Whole page shows the entire text in columns, so you see the overall pattern of colors; the page opens this way (1.0×). Large type shows about 10 readable lines on screen, in one long column that you scroll down. The slider sets any size in between, or smaller. |
 | Color | Palette / Soft hues / Bright hues / Grays | Choose the colors of the versions: a palette that blends from the oldest version to the newest, a calm color for each version, a bright and clearly different color for each version, or grays. With Palette, you can also pick a color set from the menu, set your own three colors, and move the middle color with Mid. |
 | Page | Justified / Left aligned; A4 / 4:5 / Square / 9:16 / 16:9; Line spacing | Set the text alignment, the shape of the page and the space between lines. They apply to every view, including Pages, the 3D view and the player. |
 | Coloring | Rewrites bold; Earlier versions in gray (two checkboxes) | Rewrites bold shows rewritten words in bold, in a darker shade of their version's color, and new words a little lighter. It works for every version at once, each in its own color. Earlier versions in gray turns earlier versions gray while an animation runs, so the version being added stands out. It also works when you click a version button: that version shows in color and the earlier ones in gray. When neither applies, this checkbox appears faded. |

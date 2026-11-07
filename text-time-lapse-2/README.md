@@ -2,7 +2,7 @@
 
 # Guide
 
-Nov 4, 2026 · @Lev Manovich
+Nov 7, 2026 · @Lev Manovich
 
 **Everything runs in your browser. Your files are read on your own computer and are never uploaded anywhere.**
 
@@ -11,9 +11,9 @@ Nov 4, 2026 · @Lev Manovich
 Text Time-lapse shows how a text changed across its saved versions. Load versions of your text you were saving while working, and the tool creates a visualization of your writing process. You can step through versions and see which text parts were added, edited and removed in each. You can see the result on one page, as one small page per version or as a 3D stack of pages, and you can animate it to watch the text being written and revised.
 
 <p>
-  <img src="screenshots/cover.webp" alt="Text Time-lapse: visualize your writing process" width="290">
-  <img src="screenshots/changes.webp" alt="What was added, edited and removed in each version" width="290">
-  <img src="screenshots/final-text.webp" alt="The final text, colored by the version each word was written in" width="290">
+  <img src="../text-time-lapse/screenshots/cover.webp" alt="Text Time-lapse: visualize your writing process" width="290">
+  <img src="../text-time-lapse/screenshots/changes.webp" alt="What was added, edited and removed in each version" width="290">
+  <img src="../text-time-lapse/screenshots/final-text.webp" alt="The final text, colored by the version each word was written in" width="290">
 </p>
 
 ## Preparing your files
@@ -36,9 +36,9 @@ Put the versions of one text in a folder, then choose the folder, choose the fil
 
 ## Controls
 
-The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced ⌄** opens three more: Color, Page and Coloring. Point at any control to see what it does; when you click one, its explanation also appears in the line above the version buttons.
+The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced ⌄** opens three more: Color, Page and Coloring. Point at any control to see what it does; when you click one, its explanation also appears in the line at the top of the page side.
 
-**Screen size:** the page is sized so that all of it fits on your screen. On a laptop, or an iPad held sideways, the controls sit in a column on the left and the page on the right. **Hide controls** (top right) folds the controls into one thin bar with Play / Pause and Start, so the page gets almost the whole screen; **Show controls** brings them back. On a phone the controls start hidden.
+**Screen size:** the page is sized so that all of it fits on your screen. On a laptop, or an iPad held sideways, the controls sit in a column on the left and the page on the right. **Hide controls** (top right) folds the controls into one thin bar with Play / Pause, Start and the three animations, so the page gets almost the whole screen; **Show controls** brings them back. On a phone the controls start hidden.
 
 ### Main controls
 
@@ -47,11 +47,11 @@ The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced
 | Files | Choose a folder… / Choose files… | Load your versions. You can also drop files or a folder on the page. |
 | Text view | Final text / All written / Deleted / Edited | Choose which words the page shows: the final text; everything ever written, with cut words crossed out; only what was removed; or only the rewrites. Each button shows its word count. |
 | Modes | Text / Blocks / Pages / 3D view | Show the words as text, as colored bars, as one small page per version, or as a 3D stack of pages. The Pages button shows the number of versions, for example 10 pages. Click a small page to open it. |
-| Zoom | Slider / Large type / Whole page | Text and Blocks only. Whole page shows the entire text in columns, so you see the overall pattern of colors; the page opens this way (1.0×). Large type shows about 10 readable lines on screen, in one long column that you scroll down. The slider sets any size in between, or smaller. |
+| Zoom | Slider / Large type / Whole page | Works in Text and Blocks, and in the Revisions player. Whole page shows the entire text in columns, so you see the overall pattern of colors; the page opens this way (1.0×). Large type shows about 10 readable lines on screen, in one long column that you scroll down. The slider sets any size in between, or smaller. |
 | Color (Advanced) | Palette / Soft hues / Bright hues / Grays | Choose the colors of the versions: a palette that blends from the oldest version to the newest, a calm color for each version, a bright and clearly different color for each version, or grays. With Palette, you can also pick a color set from the menu, set your own three colors, and move the middle color with Mid. |
 | Page (Advanced) | Justified / Left aligned; A4 / 4:5 / Square / 9:16 / 16:9; Line spacing | Set the text alignment, the shape of the page and the space between lines. They apply to every view, including Pages, the 3D view and the player. |
 | Coloring (Advanced) | Rewrites bold; Earlier versions in gray (two checkboxes) | Rewrites bold shows rewritten words in bold, in a darker shade of their version's color, and new words a little lighter. It works for every version at once, each in its own color. Earlier versions in gray turns earlier versions gray while an animation runs, so the version being added stands out. It also works when you click a version button: that version shows in color and the earlier ones in gray. When neither applies, this checkbox appears faded. |
-| Animate | Play / Pause, ⏮ Start; Revisions / Versions / Write | Revisions is chosen when the page opens, so you only need to press Play. Choose another animation and it starts at once, with a one-line explanation, and a Player row with its controls appears below (see Animations below). Play / Pause and ⏮ Start (back to the beginning) come first in the row and work for all three animations. In 3D view, this row also has Spacing and Transparency: the distance between pages and how see-through they are. |
+| Animate | Play / Pause, ⏮ Start; Revisions / Versions / Write | Revisions is chosen when the page opens, so you only need to press Play. Choose another animation and it starts at once; a Player row with its controls appears below (see Animations below). Play / Pause and ⏮ Start (back to the beginning) come first in the row and work for all three animations. In 3D view, this row also has Spacing and Transparency: the distance between pages and how see-through they are. |
 
 **Above the page,** a line names the text and gives its numbers: versions, dates, words written, words in the final version and words removed. The **Example** button at the start of this line brings back the example the page opens with: 16 saved versions of *Seven Worlds of Digital Art* by Lev Manovich (August–September 2026). Below the line, one button per version shows its color and word count. Click one or more to show only their words. In 3D view, clicking a version builds the stack up to it.
 
@@ -63,7 +63,7 @@ The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced
 
 ### Player
 
-Choosing **Revisions** opens the player. It starts playing at once, from an empty page; **Close player** takes you back. The Text view row is faded in the player. The Zoom row and Text / Blocks in Modes work in the player too: zoom in and scroll inside the page to read a passage. Play / Pause and ⏮ Start (back to the empty page) are in the Animate row. The **Player** row holds ◀ ▶ (previous or next version), a position slider and Time per version (shared with Versions). Click a version button to play just that version; the space bar also plays and pauses. **More options…** opens the rest:
+Pressing **Play** with Revisions chosen (or clicking Revisions) opens the player and plays it from an empty page; **Close player** takes you back. The Text view row is faded in the player. The Zoom row and Text / Blocks in Modes work in the player too: zoom in and scroll inside the page to read a passage. Play / Pause and ⏮ Start (back to the empty page) are in the Animate row. The **Player** row holds ◀ ▶ (previous or next version), a position slider and Time per version (shared with Versions). Click a version button to play just that version; the space bar also plays and pauses. **More options…** opens the rest:
 
 - **Timing:** Crossed out sets how long removed words stay visible, Pause how long the player stops after each version, and Big versions longer gives versions with more changes more time.
 - **Changes:** All at once, Reading order or Scattered; Final text in gray (fixed layout) or Text grows (the real length of each version); Cuts disappear or Cuts stay.
