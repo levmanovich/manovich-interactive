@@ -217,6 +217,8 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 #loadmsg:empty{display:none}
 body.compact #adv,body.compact #tip{display:none!important}
 .top .eyebrow{align-items:center}
+.byname{text-transform:none;letter-spacing:.02em;font-size:12px}
+.sep{color:var(--lab);margin:0 2px}
 @media (min-width:1000px) and (orientation:landscape){
   body:not(.compact) #side{flex-basis:490px}
   body:not(.compact) .grow{grid-template-columns:66px minmax(0,1fr)}
@@ -225,7 +227,7 @@ body.compact #adv,body.compact #tip{display:none!important}
 
 <div class="wrap">
   <div class="top">
-    <p class="eyebrow"><span><b>Text Time-lapse 2</b> · Lev Manovich · see how a text changed across its saved versions</span><span class="credit"><button type="button" class="play" id="ctlToggle" aria-pressed="false">Hide controls</button></span></p>
+    <p class="eyebrow"><span><b>Text Time-lapse 2</b> · visualize your writing process <span class="sep">|</span> <span class="byname">Lev Manovich</span></span><span class="credit"><button type="button" class="play" id="ctlToggle" aria-pressed="false">Hide controls</button></span></p>
   </div>
   <div class="cols">
   <div id="side">
