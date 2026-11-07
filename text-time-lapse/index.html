@@ -146,11 +146,12 @@ b.endmark{display:block;height:0;overflow:hidden}
 #pside{display:flex;flex-direction:column;gap:6px;margin-top:-6px}
 #pside[hidden]{display:none}
 #pside .groups>.grow:first-child{border-top:0}
-#side,#main{display:flex;flex-direction:column;gap:6px;min-width:0}
-#ctlToggle{margin-right:8px;letter-spacing:0;text-transform:none;padding:1px 7px}
+.cols,#side,#main{display:flex;flex-direction:column;gap:6px;min-width:0}
+#ctlToggle{margin-right:8px;letter-spacing:0;text-transform:none;padding:1px 7px;min-width:8.6em;text-align:center}
 /* wide screens held sideways (laptop, iPad in landscape): controls in a column on the left, the page on the right */
 @media (min-width:1000px) and (orientation:landscape){
-  body:not(.compact) .wrap{max-width:1700px;flex-direction:row;align-items:flex-start;gap:28px}
+  .wrap{max-width:1700px}   /* the same width with the controls shown or hidden, so the header does not move */
+  body:not(.compact) .cols{flex-direction:row;align-items:flex-start;gap:28px}
   body:not(.compact) #side{flex:0 0 390px;position:sticky;top:0;max-height:100vh;overflow-y:auto;padding:0 4px 12px 0}
   body:not(.compact) #main{flex:1 1 auto;padding-top:4px}
   body:not(.compact) .grow{grid-template-columns:74px minmax(0,1fr)}
@@ -162,7 +163,7 @@ b.endmark{display:block;height:0;overflow:hidden}
 body.compact .groups>.grow:not(#animRow),body.compact #animHint,body.compact #gapCtl,body.compact #pside,
 body.compact #info,body.compact #rounds,body.compact #rhint,body.compact #prounds,body.compact #prtext{display:none!important}
 body.compact #animRow{min-height:0}
-body.compact .top .eyebrow>span:first-child{font-size:10px}
+
 #ppage{align-self:center}
 .rb .sw{display:flex;overflow:hidden}
 .rb .sw i{display:block;height:100%}
@@ -195,10 +196,11 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 </style>
 
 <div class="wrap">
-  <div id="side">
   <div class="top">
     <p class="eyebrow"><span><b>Text Time-lapse</b> · see how a text changed across its saved versions</span><span class="credit"><button type="button" class="play" id="ctlToggle" aria-pressed="false">Hide controls</button> Lev Manovich</span></p>
   </div>
+  <div class="cols">
+  <div id="side">
   <div class="groups">
     <div class="grow" id="drop"><span class="lab">Files</span><div class="items">
       <label class="play" for="folder">Choose a folder…<input type="file" id="folder" webkitdirectory multiple></label>
@@ -298,6 +300,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
     <div class="rounds" id="prounds"></div>
     <div class="rhint" id="prtext"></div>
     <div class="page" id="ppage"><div class="flow" id="pflow"></div></div>
+  </div>
   </div>
   </div>
 </div>
