@@ -222,6 +222,7 @@ body.compact #adv,body.compact #tip{display:none!important}
 .top .eyebrow{align-items:center}
 #olderSeg.idle{opacity:1}   /* always black, like the other controls */
 #info{border-top:1px solid var(--line);padding-top:10px}   /* separator above Example */
+@media (min-width:1000px) and (orientation:landscape){body:not(.compact) #info{border-top:0;padding-top:0}}   /* side by side: Example sits right under the header line, one line is enough */
 /* the Player row has the same height for Revisions, Versions and Write, so nothing below it moves */
 @media (min-width:1000px) and (orientation:landscape){
   body:not(.compact) #vwRow,body:not(.compact) #pside .groups>.grow:first-child{min-height:72px;align-items:start}
