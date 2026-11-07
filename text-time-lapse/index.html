@@ -229,7 +229,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
     <div class="grow" id="vwRow" hidden><span class="lab">Player</span><div class="items">
       <span class="mid" style="flex-wrap:nowrap"><button type="button" class="play" id="vwprev" aria-label="Previous version" title="Previous version">◀</button><button type="button" class="play" id="vwnext" aria-label="Next version" title="Next version">▶</button></span>
       <span class="mid" id="writeCtl"><button type="button" class="play" id="write" hidden>Play</button><button type="button" class="play" id="closeup" disabled title="Pause and look closer: a magnifier follows the mouse">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
-      <span class="mid" id="playCtl"><button type="button" class="play" id="play" hidden>Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.15" max="3" step="0.05" value="0.9"> <span id="speedv">0.9 s</span></span>
+      <span class="mid" id="playCtl"><button type="button" class="play" id="play" hidden>Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.2" max="10" step="0.1" value="2"> <span id="speedv">2 s</span></span>
     </div></div>
   </div>
   <div class="info" id="info"><button type="button" class="play" id="example" aria-pressed="false" title="Show the example: 16 versions of an essay">Example</button><p class="note" id="note"></p></div>
@@ -245,8 +245,8 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
         <span class="mid" style="flex-wrap:nowrap"><button type="button" class="play" id="pplay" hidden>Play</button><button type="button" class="play" id="pstart" hidden title="Go back to the empty page">⏮ Start</button><button type="button" class="play" id="pprev" aria-label="Previous version">◀</button><button type="button" class="play" id="pnext" aria-label="Next version">▶</button></span>
         <button type="button" class="play" id="pclose" title="Close the player and go back">Close player</button>
         <input type="range" id="pscrub" min="0" max="1000" value="0" aria-label="Position in the animation">
-        <span class="mid"><label for="pspeed">Time per version</label> <input type="range" id="pspeed" min="0.3" max="60" step="0.1" value="2.5" style="width:80px" title="Time per version"> <span id="pspeedv"></span></span>
-        <span class="mid"><label for="pzoom">Zoom</label> <input type="range" id="pzoom" min="1" max="8" step="0.1" value="1"> <span id="pzoomv">1.0×</span></span>
+        <span class="mid"><label for="pspeed">Time per version</label> <input type="range" id="pspeed" min="0.2" max="10" step="0.1" value="2" style="width:80px" title="Time per version"> <span id="pspeedv"></span></span>
+        <span class="mid" hidden><label for="pzoom">Zoom</label> <input type="range" id="pzoom" min="1" max="8" step="0.1" value="1"> <span id="pzoomv">1.0×</span></span>
         <button type="button" class="play" id="pmore" aria-expanded="false" aria-controls="pmoreRows">More options…</button>
       </div></div>
       <div id="pmoreRows" hidden>
@@ -260,7 +260,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
         <div class="seg" role="group" aria-label="Text shape"><button type="button" data-pk="layout" data-v="fixed">Final text in gray</button><button type="button" data-pk="layout" data-v="grow">Text grows</button></div>
         <div class="seg" role="group" aria-label="Removed words"><button type="button" data-pk="removed" data-v="vanish">Cuts disappear</button><button type="button" data-pk="removed" data-v="stay">Cuts stay</button></div>
       </div></div>
-      <div class="grow"><span class="lab">Show as</span><div class="items">
+      <div class="grow" hidden><span class="lab">Show as</span><div class="items">
         <div class="seg" role="group" aria-label="Words as"><button type="button" data-pk="view" data-v="text">Text</button><button type="button" data-pk="view" data-v="blocks">Blocks</button></div>
       </div></div>
       <div class="grow" id="pblocksRow"><span class="lab">Blocks</span><div class="items">
@@ -690,7 +690,7 @@ document.getElementById('pclose').addEventListener('click',()=>setView(lastView)
 function setView(v){
   if(v==='player'&&typeof writing!=='undefined'&&writing)stopWrite(true);
   st.view=v;
-  document.querySelectorAll('.seg button[data-k="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===(v==='one'?st.mark:v)));
+  document.querySelectorAll('.seg button[data-k="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===(v==='one'||v==='player'?st.mark:v)));
   pageEl.hidden=v!=='one';multi.hidden=v!=='ten';stackWrap.hidden=v!=='stack';
   const pv=v==='player';document.getElementById('pview').hidden=!pv;
   {const n=document.getElementById('info'),r=document.getElementById(pv?'prounds':'rounds');r.parentNode.insertBefore(n,r)}
@@ -698,16 +698,16 @@ function setView(v){
   // rows that do not apply stay in place, faded, so the controls do not jump
   {const tv=document.getElementById('textViewRow');tv.classList.toggle('na',pv);tv.inert=pv}
   if(!pv)lastView=v;
-  {const zr=document.getElementById('zoomRow');zr.classList.toggle('na',v!=='one');zr.inert=v!=='one'}if(v!=='one')mainZoom(1);
+  {const zr=document.getElementById('zoomRow'),on=v==='one'||pv;zr.classList.toggle('na',!on);zr.inert=!on}if(v!=='one')mainZoom(1);
   if(!pv){Player.hide();document.querySelector('.wrap').style.maxWidth=''}
   document.getElementById('gapCtl').hidden=v!=='stack';
   if(typeof updateAnim==='function')updateAnim();
   if(v==='stack'){sel.clear()}else{if(typeof stopPlay==='function')stopPlay();st.upto=0}
-  if(v==='one'){render();fit()}
+  if(v==='one'){render();fit();if(typeof MZ!=='undefined')mainZoom(MZ)}   // the Zoom row shows the page's own zoom again
   // the player lays out the whole text before it starts (can take a moment for a long text):
   // show the change at once, then do the layout in the next frame
   if(pv){const t=document.getElementById('prtext');if(t)t.textContent='Preparing the player…';
-    requestAnimationFrame(()=>setTimeout(()=>{if(st.view==='player'){Player.show();Player.start()}},0))}
+    requestAnimationFrame(()=>setTimeout(()=>{if(st.view==='player'){playerMark(true);Player.show();Player.start()}},0))}
 }
 // ---- reading size on the main page: above 1x the chapter is set as one long column in larger type (no sideways scrolling) ----
 let MZ=1;
@@ -737,9 +737,20 @@ function readingView(){
   const want=visH/(14*1.32);  // 14 line slots: about 9-10 lines of body text once titles and paragraph gaps are counted
   mainZoom(want/b.px);
 }
-document.getElementById('mzoom').addEventListener('input',e=>mainZoom(+e.target.value));
-document.getElementById('mzcol').addEventListener('click',readingView);
-document.getElementById('mzfit').addEventListener('click',()=>mainZoom(1));
+document.getElementById('mzoom').addEventListener('input',e=>st.view==='player'?playerZoom(+e.target.value):mainZoom(+e.target.value));
+document.getElementById('mzcol').addEventListener('click',()=>{if(st.view==='player'){const f=document.getElementById('pflow');playerZoom(16/(f._px||parseFloat(f.style.fontSize)||8))}else readingView()});
+document.getElementById('mzfit').addEventListener('click',()=>st.view==='player'?playerZoom(1):mainZoom(1));
+// the player uses the same Zoom row (from 1x, the whole page, up to 8x) and the same Text / Blocks choice
+function playerZoom(z){
+  z=Math.max(1,Math.min(8,z));const pz=document.getElementById('pzoom');pz.value=z;pz.dispatchEvent(new Event('input'));
+  document.getElementById('mzoom').value=z;document.getElementById('mzoomv').textContent=z.toFixed(1)+'×';
+}
+function playerMark(quiet){
+  const v=st.mark==='blocks'?'blocks':'text',b=document.querySelector(`#pview [data-pk="view"][data-v="${v}"]`);
+  if(Player.opt.view!==v&&b)b.click();
+  if(!quiet)document.querySelectorAll('.seg button[data-k="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===st.mark));
+  playerZoom(+document.getElementById('pzoom').value||1);
+}
 // ---- stack: the ten pages in axonometry, v1 at the bottom ----
 const stackCv=document.getElementById('stack'), stackWrap=document.getElementById('stackwrap');
 const AX=[1,0.36], BY=[-0.56,0.33];   // where the page's width and height axes point on screen
@@ -919,6 +930,8 @@ function midLabel(){const m=+document.getElementById('mid').value;
   document.getElementById('midv').textContent='v'+(1+m*Math.max(1,NR-1)).toFixed(1).replace(/\.0$/,'')}
 document.getElementById('mid').addEventListener('input',()=>{midLabel();paint()});
 document.querySelectorAll('.seg button[data-k]').forEach(b=>b.addEventListener('click',()=>{
+  // Text / Blocks while the player is open: switch the player's words, keep the player
+  if(b.dataset.k==='view'&&st.view==='player'&&(b.dataset.v==='text'||b.dataset.v==='blocks')){st.mark=b.dataset.v;playerMark();return}
   st[b.dataset.k]=b.dataset.v;
   document.querySelectorAll(`.seg button[data-k="${b.dataset.k}"]`).forEach(x=>x.setAttribute('aria-pressed',x===b));
   if(writing)stopWrite(true);
@@ -951,7 +964,7 @@ window.onPageOpt=function(k){
 // ===================== Versions player: plays the versions one after another =====================
 const Player=(function(){
 const $=id=>document.getElementById(id);
-const opt={speed:2.5,bySize:true,hold:0.6,pause:1,order:'all',removed:'vanish',view:'text',align:'justify',bl:0.42,bs:0.72,bh:0.56,wg:0,lh:1.32,layout:'fixed',shape:'a4',split:'same',older:'color'};
+const opt={speed:2,bySize:true,hold:0.6,pause:1,order:'all',removed:'vanish',view:'text',align:'justify',bl:0.42,bs:0.72,bh:0.56,wg:0,lh:1.32,layout:'fixed',shape:'a4',split:'same',older:'color'};
 try{const s=JSON.parse(localStorage.getItem('poa-player')||'null');if(s)Object.assign(opt,s)}catch(e){}
 const save=()=>{try{localStorage.setItem('poa-player',JSON.stringify(opt))}catch(e){}};
 const flow=$('pflow'),pageEl=$('ppage');
@@ -1229,6 +1242,12 @@ function showExample(){
 }
 // start from the default settings (browsers may restore slider positions from an earlier visit)
 document.querySelectorAll('input[type=range]').forEach(i=>i.value=i.defaultValue);
+// ---- one Time per version for Versions and Revisions ----
+{const a=document.getElementById('speed'),b=document.getElementById('pspeed');
+  const link=(x,y)=>x.addEventListener('input',()=>{if(y.value!==x.value){y.value=x.value;y.dispatchEvent(new Event('input'))}});
+  link(a,b);link(b,a);
+  if(+b.value>10||+b.value<0.2){b.value=2;b.dispatchEvent(new Event('input'))}   // a time saved from the old, longer range
+  a.value=b.value;a.dispatchEvent(new Event('input'))}
 // ---- Player row for Versions and Write: one version back or forward ----
 function writeSeek(pos){   // show the writing as it was after event pos, paused
   if(!writing){wRound=0;startWrite()}

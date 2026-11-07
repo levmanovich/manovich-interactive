@@ -61,9 +61,8 @@ The page starts with a few main controls. More options appear when you choose a 
 
 ### Player
 
-Choosing **Revisions** opens the player. It starts playing at once, from an empty page; **Close player** takes you back. The Text view and Zoom rows are faded in the player, since it has its own. Play / Pause and ⏮ Start (back to the empty page) are in the Animate row. The **Player** row holds ◀ ▶ (previous or next version), a position slider, Time per version, and Zoom (when zoomed in, scroll inside the page to read a passage). Click a version button to play just that version; the space bar also plays and pauses. **More options…** opens the rest:
+Choosing **Revisions** opens the player. It starts playing at once, from an empty page; **Close player** takes you back. The Text view row is faded in the player. The Zoom row and Text / Blocks in Modes work in the player too: zoom in and scroll inside the page to read a passage. Play / Pause and ⏮ Start (back to the empty page) are in the Animate row. The **Player** row holds ◀ ▶ (previous or next version), a position slider and Time per version (shared with Versions). Click a version button to play just that version; the space bar also plays and pauses. **More options…** opens the rest:
 
 - **Timing:** Crossed out sets how long removed words stay visible, Pause how long the player stops after each version, and Big versions longer gives versions with more changes more time.
 - **Changes:** All at once, Reading order or Scattered; Final text in gray (fixed layout) or Text grows (the real length of each version); Cuts disappear or Cuts stay.
-- **Show as:** Text or Blocks, for the player's page only.
-- **Blocks** (only with Blocks): Lightness, Saturation, Bar height and Word gap shape the colored bars.
+- **Blocks** (when Blocks is chosen in Modes): Lightness, Saturation, Bar height and Word gap shape the colored bars.
