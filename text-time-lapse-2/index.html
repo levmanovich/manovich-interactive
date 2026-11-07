@@ -212,6 +212,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 #aplay,#aplay[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:500}
 #animHint,#pside>.note{display:none!important}
 .tip{margin:2px 0 0;font-size:11.5px;font-weight:400;line-height:1.45;color:#5f6670;height:2.9em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.grow.na .items,#pside.na .items{opacity:.35}
 .advsub{margin:8px 0 0;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--lab);font-weight:600}
 #adv{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 #advBtn{align-self:flex-start;margin-left:0}
@@ -985,7 +986,8 @@ function lensOff(){lensOn=false;lensSpans=null;lens.hidden=true;pageEl.classList
 let colW=100, colGap=10, nCols=1;
 function lensAt(x,y){ // x,y: point inside the flow, in CSS pixels
   const ci=Math.max(0,Math.min(nCols-1,Math.floor(x/(colW+colGap))));
-  x=ci*(colW+colGap)+colW/2;
+  // the whole column fits in the magnifier: center on the column; otherwise follow the word across
+  if(colW*lensZ<=lens.clientWidth)x=ci*(colW+colGap)+colW/2;
   const lw=lens.clientWidth, lh=lens.clientHeight, fr=flow.getBoundingClientRect(), pr=pageEl.getBoundingClientRect();
   let lx=(fr.left-pr.left)+x-lw/2, ly=(fr.top-pr.top)+y-lh/2;
   lx=Math.max(4,Math.min(pr.width-lw-4,lx)); ly=Math.max(4,Math.min(pr.height-lh-4,ly));
@@ -999,8 +1001,8 @@ function lensStart(){
   const fs=parseFloat(getComputedStyle(flow).fontSize)/kOf(flow);
   nCols=+flow.style.columnCount||1;colGap=2.2*fs;colW=(flow.clientWidth/kOf(flow)-colGap*(nCols-1))/nCols;
   const pw=pageEl.clientWidth;
-  lensZ=Math.min(16/fs,(pw-24)/(colW+2*fs));
-  lens.style.width=Math.round((colW+2*fs)*lensZ)+'px';   // one full column plus a small margin
+  lensZ=Math.max(2,Math.min(16/fs,(pw-24)/(colW+2*fs)));   // always at least 2x larger than the page
+  lens.style.width=Math.round(Math.min((colW+2*fs)*lensZ,pw-24))+'px';   // one full column plus a small margin, or the page width
   lens.style.height=Math.round(fs*1.32*lensZ*6.5)+'px';  // about six lines
   lensOn=true;lens.hidden=false;pageEl.classList.add('lensing');cuBtn.setAttribute('aria-pressed','true');
   // open on the last word written; without one, on the middle of the part of the page that is on screen
@@ -1378,7 +1380,8 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
     sync()});
   const mo=new MutationObserver(sync);
   ['write','play','pplay'].forEach(id=>mo.observe(document.getElementById(id),{childList:true,characterData:true,subtree:true,attributes:true}));
-  const ua=updateAnim;updateAnim=function(){ua();sync();document.getElementById('revSet').hidden=animSel!=='rev';requestAnimationFrame(()=>{if(st.view==='one')fit()})};   // rows may have changed: fit the page to the space again
+  const ua=updateAnim;updateAnim=function(){ua();sync();document.getElementById('revSet').hidden=animSel!=='rev';
+    {const ps=document.getElementById('pside'),wait=animSel==='rev'&&st.view!=='player';if(wait)ps.hidden=false;ps.classList.toggle('na',wait);ps.inert=wait}   // Revisions chosen, player not open yet: its Player row shows, fadedrequestAnimationFrame(()=>{if(st.view==='one')fit()})};   // rows may have changed: fit the page to the space again
 }
 // ---- Hide / Show controls (phones start with the controls hidden) ----
 {
