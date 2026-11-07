@@ -162,7 +162,7 @@ body.rbold .flow span[data-x],body.rbold #pflow span[data-ed]{font-weight:700}
   body:not(.compact) #main{flex:1 1 auto;padding-top:4px}
   body:not(.compact) .grow{grid-template-columns:72px minmax(0,1fr)}
   body:not(.compact) #animRow{min-height:0}
-  body:not(.compact) #side .seg{flex-wrap:wrap}
+  body:not(.compact) #side .seg{flex-wrap:nowrap}
   body:not(.compact) #side .seg button{white-space:nowrap}
 }
 /* Hide controls: one thin bar with Play/Pause and Start, the page gets the screen */
@@ -226,7 +226,13 @@ body.compact #adv,body.compact #tip{display:none!important}
 #palCtl.custom input[type=color]{display:inline-block}
 .mid.pair{flex-wrap:nowrap;gap:5px}
 #advRows .grow{min-height:38px}
-#plh{width:200px}   /* as long as the Zoom slider */   /* slider rows as tall as button rows: even spacing */
+#plh{width:200px}
+/* joined buttons stay on one line; with little room they get a bit narrower */
+@media (min-width:430px){
+#side .seg{flex-wrap:nowrap;max-width:100%}
+#side .seg button{white-space:nowrap;flex:0 1 auto;min-width:0;padding:0 clamp(5px,1.2vw,9px)}
+}
+@media (max-width:429px){#side .seg{flex-wrap:wrap}}   /* small phones: joined buttons may take two lines */   /* as long as the Zoom slider */   /* slider rows as tall as button rows: even spacing */
 /* on/off settings: toggle buttons like Close-up (black when on), no checkboxes */
 .tog[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 #advRows label:has(> input[type=checkbox]){display:none}
@@ -267,7 +273,7 @@ body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid
 .byname{text-transform:none;letter-spacing:.02em;font-size:12px}
 .sep{color:var(--lab);margin:0 2px}
 @media (min-width:1000px) and (orientation:landscape){
-  body:not(.compact) #side{flex-basis:490px}
+  body:not(.compact) #side{flex-basis:520px}
   body:not(.compact) .grow{grid-template-columns:66px minmax(0,1fr)}
 }
 </style>
