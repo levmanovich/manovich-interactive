@@ -220,15 +220,17 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 body.compact #adv,body.compact #tip{display:none!important}
 @media (min-width:1000px) and (orientation:landscape){body:not(.compact){--labw:66px}}
 .top .eyebrow{align-items:center}
-#colorSel{font:inherit;font-size:12px;height:26px;color:var(--ink);background:var(--bg);border:1px solid var(--btn);border-radius:6px;padding:0 6px}
+#colorSel{font:inherit;font-size:12px;font-weight:400;height:26px;color:var(--ink);background:var(--bg);border:1px solid var(--btn);border-radius:6px;padding:0 6px}
 #palCtl>*:not(#preset){display:none}
 #palCtl.custom>*:not(#preset){display:inline-flex}
 #palCtl.custom input[type=color]{display:inline-block}
-#advRows .grow{padding:5px 0}
-.mid.pair{flex-wrap:nowrap;gap:14px}
+.mid.pair{flex-wrap:nowrap;gap:5px}
+/* on/off settings: toggle buttons like Close-up (black when on), no checkboxes */
+.tog[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#advRows label:has(> input[type=checkbox]){display:none}
 .mid.pair>.mid{font-size:12px;min-width:0}
 .mid.pair>.mid>label{font-size:12px}
-#pageRow,#coloringRow,#pblocksRow,#revSet{margin-top:6px}
+
 /* Example line and a thin strip of version colors, in the control column (the page gets the right side) */
 #legend{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
 #legend .info{margin-top:0;align-items:flex-start}
@@ -346,7 +348,8 @@ body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid
       <div class="grow" id="pageRow"><span class="lab">Page</span><div class="items">
         <div class="seg" role="group" aria-label="Alignment" hidden><button type="button" data-pk="align" data-v="justify">Justified</button><button type="button" data-pk="align" data-v="left">Left aligned</button></div>
         <div class="seg" role="group" aria-label="Proportions"><button type="button" data-pk="shape" data-v="a4">A4</button><button type="button" data-pk="shape" data-v="45">4:5</button><button type="button" data-pk="shape" data-v="11">Square</button><button type="button" data-pk="shape" data-v="916">9:16</button><button type="button" data-pk="shape" data-v="169">16:9</button></div>
-        <span class="mid pair"><label><input type="checkbox" id="cbLeft">Left aligned</label><span class="mid"><label for="plh">Line spacing</label> <input type="range" id="plh" min="1" max="2.4" step="0.02" value="1.32"> <span id="plhv"></span></span></span>
+        <span class="mid"><label><input type="checkbox" id="cbLeft">Left aligned</label></span>
+        <span class="mid"><label for="plh">Line spacing</label> <input type="range" id="plh" min="1" max="2.4" step="0.02" value="1.32"> <span id="plhv"></span></span>
       </div></div>
       <div class="grow" id="coloringRow"><span class="lab">Coloring</span><div class="items">
         <span class="mid"><label title="Rewritten words in bold, in a darker shade of their version's color; new words a little lighter"><input type="checkbox" id="cbSplit">Rewrites bold</label></span>
@@ -1463,7 +1466,7 @@ document.body.classList.toggle('rbold',PO().split==='darker');
 for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','older','gray','color'],['cbLeft','align','left','justify'],['cbGrow','layout','grow','fixed'],['cbStay','removed','stay','vanish']]){
   const box=document.getElementById(cb),btn=v=>document.querySelector(`button[data-pk="${k}"][data-v="${v}"]`);
   box.addEventListener('change',()=>btn(box.checked?on:off).click());
-  const syncBox=()=>{box.checked=btn(on).getAttribute('aria-pressed')==='true'};
+  const syncBox=()=>{box.checked=btn(on).getAttribute('aria-pressed')==='true';if(window.syncToggles)syncToggles()};
   new MutationObserver(syncBox).observe(btn(on),{attributes:true,attributeFilter:['aria-pressed']});syncBox();
 }
 // ---- tooltips (hover) and the hint line (click): the explanations that used to sit in the panel ----
@@ -1540,6 +1543,17 @@ for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','olde
   const setA=o=>{ar.hidden=!o;ab.setAttribute('aria-expanded',String(o));ab.textContent=o?'Advanced ⌃':'Advanced ⌄';try{localStorage.setItem('ttl-adv',o?'1':'0')}catch(e){}};
   let sa=null;try{sa=localStorage.getItem('ttl-adv')}catch(e){}
   setA(sa==='1');ab.addEventListener('click',()=>{setA(ar.hidden);requestAnimationFrame(()=>dispatchEvent(new Event('resize')))});
+}
+// ---- Advanced: on/off settings as toggle buttons (same look as the upper controls) ----
+{
+  const syncs=[];
+  for(const box of document.querySelectorAll('#advRows input[type=checkbox]')){
+    const lab=box.closest('label');const t=document.createElement('button');t.type='button';t.className='play tog';
+    t.textContent=lab.textContent.trim();t.title=lab.title||box.title||'';lab.after(t);
+    const sync=()=>t.setAttribute('aria-pressed',String(box.checked));
+    t.addEventListener('click',()=>{box.click();sync()});box.addEventListener('change',sync);sync();syncs.push(sync);
+  }
+  window.syncToggles=()=>syncs.forEach(f=>f());
 }
 updateAnim();
 showExample();
