@@ -220,6 +220,15 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 body.compact #adv,body.compact #tip{display:none!important}
 @media (min-width:1000px) and (orientation:landscape){body:not(.compact){--labw:66px}}
 .top .eyebrow{align-items:center}
+#colorSel{font:inherit;font-size:12px;height:26px;color:var(--ink);background:var(--bg);border:1px solid var(--btn);border-radius:6px;padding:0 6px}
+#palCtl>*:not(#preset){display:none}
+#palCtl.custom>*:not(#preset){display:inline-flex}
+#palCtl.custom input[type=color]{display:inline-block}
+#advRows .grow{padding:5px 0}
+.mid.pair{flex-wrap:nowrap;gap:14px}
+.mid.pair>.mid{font-size:12px;min-width:0}
+.mid.pair>.mid>label{font-size:12px}
+#pageRow,#coloringRow,#pblocksRow,#revSet{margin-top:6px}
 /* Example line and a thin strip of version colors, in the control column (the page gets the right side) */
 #legend{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
 #legend .info{margin-top:0;align-items:flex-start}
@@ -320,9 +329,10 @@ body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid
     <button type="button" class="play" id="advBtn" aria-expanded="false">Advanced ⌄</button>
     <div class="groups" id="advRows" hidden>
     <div class="grow"><span class="lab">Color</span><div class="items">
-      <div class="seg" role="group" aria-label="Palette: color ramp"><button type="button" data-k="pal" data-v="hue" aria-pressed="true">Palette</button></div>
+      <select id="colorSel" aria-label="Colors"></select>
+      <div class="seg" role="group" aria-label="Palette: color ramp" hidden><button type="button" data-k="pal" data-v="hue" aria-pressed="true">Palette</button></div>
       <div class="pal" id="palCtl">
-        <select id="preset" aria-label="Color set">
+        <select id="preset" aria-label="Color set" hidden>
           <option value="#0c2c84,#d0157a,#f59a1b">Navy–magenta–orange</option>
           <option value="#1e88c7,#7a3fb5,#e2462f">Sky–violet–vermilion</option>
         </select>
@@ -331,12 +341,12 @@ body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid
         <input type="color" id="c2" value="#f59a1b" aria-label="Newest color">
         <label class="mid" for="mid" title="Midpoint: where the middle color sits">Mid <input type="range" id="mid" min="0.1" max="0.9" step="0.01" value="0.5"> <span id="midv">v2.5</span></label>
       </div>
-      <div class="seg" role="group" aria-label="Palette: other"><button type="button" data-k="pal" data-v="soft" aria-pressed="false">Soft hues</button><button type="button" data-k="pal" data-v="distinct" aria-pressed="false">Bright hues</button><button type="button" data-k="pal" data-v="gray" aria-pressed="false">Grays</button></div>
+      <div class="seg" role="group" aria-label="Palette: other" hidden><button type="button" data-k="pal" data-v="soft" aria-pressed="false">Soft hues</button><button type="button" data-k="pal" data-v="distinct" aria-pressed="false">Bright hues</button><button type="button" data-k="pal" data-v="gray" aria-pressed="false">Grays</button></div>
     </div></div>
       <div class="grow" id="pageRow"><span class="lab">Page</span><div class="items">
-        <div class="seg" role="group" aria-label="Alignment"><button type="button" data-pk="align" data-v="justify">Justified</button><button type="button" data-pk="align" data-v="left">Left aligned</button></div>
+        <div class="seg" role="group" aria-label="Alignment" hidden><button type="button" data-pk="align" data-v="justify">Justified</button><button type="button" data-pk="align" data-v="left">Left aligned</button></div>
         <div class="seg" role="group" aria-label="Proportions"><button type="button" data-pk="shape" data-v="a4">A4</button><button type="button" data-pk="shape" data-v="45">4:5</button><button type="button" data-pk="shape" data-v="11">Square</button><button type="button" data-pk="shape" data-v="916">9:16</button><button type="button" data-pk="shape" data-v="169">16:9</button></div>
-        <span class="mid"><label for="plh">Line spacing</label> <input type="range" id="plh" min="1" max="2.4" step="0.02" value="1.32"> <span id="plhv"></span></span>
+        <span class="mid pair"><label><input type="checkbox" id="cbLeft">Left aligned</label><span class="mid"><label for="plh">Line spacing</label> <input type="range" id="plh" min="1" max="2.4" step="0.02" value="1.32"> <span id="plhv"></span></span></span>
       </div></div>
       <div class="grow" id="coloringRow"><span class="lab">Coloring</span><div class="items">
         <span class="mid"><label title="Rewritten words in bold, in a darker shade of their version's color; new words a little lighter"><input type="checkbox" id="cbSplit">Rewrites bold</label></span>
@@ -352,8 +362,9 @@ body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid
       </div></div>
       <div class="grow"><span class="lab">Changes</span><div class="items">
         <div class="seg" role="group" aria-label="Order of changes"><button type="button" data-pk="order" data-v="all">All at once</button><button type="button" data-pk="order" data-v="reading">Reading order</button><button type="button" data-pk="order" data-v="scattered">Scattered</button></div>
-        <div class="seg" role="group" aria-label="Text shape"><button type="button" data-pk="layout" data-v="fixed">Final text in gray</button><button type="button" data-pk="layout" data-v="grow">Text grows</button></div>
-        <div class="seg" role="group" aria-label="Removed words"><button type="button" data-pk="removed" data-v="vanish">Cuts disappear</button><button type="button" data-pk="removed" data-v="stay">Cuts stay</button></div>
+        <span class="mid pair"><label><input type="checkbox" id="cbGrow">Text grows</label><label><input type="checkbox" id="cbStay">Keep cuts</label></span>
+        <div class="seg" role="group" aria-label="Text shape" hidden><button type="button" data-pk="layout" data-v="fixed">Final text in gray</button><button type="button" data-pk="layout" data-v="grow">Text grows</button></div>
+        <div class="seg" role="group" aria-label="Removed words" hidden><button type="button" data-pk="removed" data-v="vanish">Cuts disappear</button><button type="button" data-pk="removed" data-v="stay">Cuts stay</button></div>
       </div></div>
       <div class="grow" hidden><span class="lab">Show as</span><div class="items">
         <div class="seg" role="group" aria-label="Words as"><button type="button" data-pk="view" data-v="text">Text</button><button type="button" data-pk="view" data-v="blocks">Blocks</button></div>
@@ -1430,7 +1441,26 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
 }
 document.body.classList.toggle('rbold',PO().split==='darker');
 // ---- Coloring checkboxes: each one drives a pair of the old buttons ----
-for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','older','gray','color']]){
+// ---- one Colors menu: the color sets, Soft / Bright / Grays, and Custom (your own three colors and Mid) ----
+{
+  const cs=document.getElementById('colorSel'),pre=document.getElementById('preset'),palCtl=document.getElementById('palCtl');
+  cs.innerHTML=[...pre.options].map(o=>`<option value="set:${o.value}">${o.text}</option>`).join('')+
+    '<option value="soft">Soft hues</option><option value="distinct">Bright hues</option><option value="gray">Grays</option><option value="custom">Custom…</option>';
+  const pal=v=>document.querySelector(`button[data-k="pal"][data-v="${v}"]`);
+  const cur=()=>['c0','c1','c2'].map(id=>document.getElementById(id).value.toLowerCase()).join(',');
+  const showCustom=on=>palCtl.classList.toggle('custom',on);
+  let custom=false;
+  const syncSel=()=>{if(st.pal!=='hue'){cs.value=st.pal;showCustom(false);return}
+    const m=!custom&&[...pre.options].find(o=>o.value.toLowerCase()===cur());cs.value=m?'set:'+m.value:'custom';showCustom(!m)};
+  cs.addEventListener('change',()=>{const v=cs.value;custom=v==='custom';
+    if(v.startsWith('set:')){if(st.pal!=='hue')pal('hue').click();pre.value=v.slice(4);pre.dispatchEvent(new Event('change'))}
+    else if(v==='custom'){if(st.pal!=='hue')pal('hue').click()}
+    else pal(v).click();
+    syncSel()});
+  ['c0','c1','c2'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{custom=true;syncSel()}));
+  syncSel();
+}
+for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','older','gray','color'],['cbLeft','align','left','justify'],['cbGrow','layout','grow','fixed'],['cbStay','removed','stay','vanish']]){
   const box=document.getElementById(cb),btn=v=>document.querySelector(`button[data-pk="${k}"][data-v="${v}"]`);
   box.addEventListener('change',()=>btn(box.checked?on:off).click());
   const syncBox=()=>{box.checked=btn(on).getAttribute('aria-pressed')==='true'};
@@ -1465,7 +1495,7 @@ for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','olde
     '[data-k=pal][data-v=soft]':'A calm color for each version.',
     '[data-k=pal][data-v=distinct]':'A bright, clearly different color for each version.',
     '[data-k=pal][data-v=gray]':'All versions in shades of gray.',
-    '#preset':'Color set: oldest, middle and newest version.',
+    '#preset':'Color set: oldest, middle and newest version.','#colorSel':'Colors of the versions: a color set that blends from the oldest version to the newest, a calm or bright color for each version, grays, or your own three colors (Custom).','#cbLeft':'Text aligned on the left (otherwise on both sides).','#cbGrow':'Revisions: the text has the real length of each version (otherwise the final text stays in place, in gray).','#cbStay':'Revisions: cut words stay, crossed out (otherwise they disappear).',
     '#c0':'Color of the oldest version.','#c1':'Color of the middle version.','#c2':'Color of the newest version.',
     '[data-pk=align][data-v=justify]':'Text aligned on both sides.',
     '[data-pk=align][data-v=left]':'Text aligned on the left.',
