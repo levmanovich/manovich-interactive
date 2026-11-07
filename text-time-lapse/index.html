@@ -146,15 +146,17 @@ b.endmark{display:block;height:0;overflow:hidden}
 #pside{display:flex;flex-direction:column;gap:6px;margin-top:-6px}
 #pside[hidden]{display:none}
 #pside .groups>.grow:first-child{border-top:0}
+#side>.groups>.grow:first-child{border-top:0}
 .cols,#side,#main{display:flex;flex-direction:column;gap:6px;min-width:0}
+#palCtl label.mid{flex-wrap:nowrap;white-space:nowrap}
 #ctlToggle{margin-right:8px;letter-spacing:0;text-transform:none;padding:1px 7px;min-width:8.6em;text-align:center}
 /* wide screens held sideways (laptop, iPad in landscape): controls in a column on the left, the page on the right */
 @media (min-width:1000px) and (orientation:landscape){
   .wrap{max-width:1700px}   /* the same width with the controls shown or hidden, so the header does not move */
   body:not(.compact) .cols{flex-direction:row;align-items:flex-start;gap:28px}
-  body:not(.compact) #side{flex:0 0 390px;position:sticky;top:0;max-height:100vh;overflow-y:auto;padding:0 4px 12px 0}
+  body:not(.compact) #side{flex:0 0 440px;position:sticky;top:0;max-height:100vh;overflow-y:auto;padding:0 4px 12px 0}
   body:not(.compact) #main{flex:1 1 auto;padding-top:4px}
-  body:not(.compact) .grow{grid-template-columns:74px minmax(0,1fr)}
+  body:not(.compact) .grow{grid-template-columns:72px minmax(0,1fr)}
   body:not(.compact) #animRow{min-height:0}
   body:not(.compact) #side .seg{flex-wrap:wrap}
   body:not(.compact) #side .seg button{white-space:nowrap}
@@ -162,7 +164,7 @@ b.endmark{display:block;height:0;overflow:hidden}
 /* Hide controls: one thin bar with Play/Pause and Start, the page gets the screen */
 body.compact .groups>.grow:not(#animRow),body.compact #animHint,body.compact #gapCtl,body.compact #pside,
 body.compact #info,body.compact #rounds,body.compact #rhint,body.compact #prounds,body.compact #prtext{display:none!important}
-body.compact #animRow{min-height:0}
+body.compact #animRow{min-height:0;border-top:0}
 
 #ppage{align-self:center}
 .rb .sw{display:flex;overflow:hidden}
@@ -238,8 +240,10 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
         <span class="mid"><label for="plh">Line spacing</label> <input type="range" id="plh" min="1" max="2.4" step="0.02" value="1.32"> <span id="plhv"></span></span>
       </div></div>
       <div class="grow" id="coloringRow"><span class="lab">Coloring</span><div class="items">
-        <div class="seg" role="group" aria-label="Edits"><button type="button" data-pk="split" data-v="same">Edits same color</button><button type="button" data-pk="split" data-v="darker">Edits darker</button></div>
-        <div class="seg" role="group" aria-label="Earlier versions" id="olderSeg"><button type="button" data-pk="older" data-v="color">Earlier in color</button><button type="button" data-pk="older" data-v="gray">Earlier in gray</button></div>
+        <span class="mid"><label title="Rewritten words in a darker shade of their version's color, new words a little lighter"><input type="checkbox" id="cbSplit">Edits darker</label></span>
+        <div class="seg" role="group" aria-label="Edits" hidden><button type="button" data-pk="split" data-v="same">Edits same color</button><button type="button" data-pk="split" data-v="darker">Edits darker</button></div>
+        <span class="mid" id="olderSeg"><label title="During animations, or when you pick a version: earlier versions in gray"><input type="checkbox" id="cbOlder">Earlier versions in gray</label></span>
+        <div class="seg" role="group" aria-label="Earlier versions" hidden><button type="button" data-pk="older" data-v="color">Earlier in color</button><button type="button" data-pk="older" data-v="gray">Earlier in gray</button></div>
       </div></div>
     <div class="grow" id="animRow"><span class="lab">Animate</span><div class="items">
       <span class="mid" id="animCtl"><button type="button" class="play" id="aplay" disabled>Play</button><button type="button" class="play" id="astart" disabled title="Back to the beginning">⏮ Start</button></span>
@@ -1332,6 +1336,13 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
   let saved=null;try{saved=localStorage.getItem('ttl-compact')}catch(e){}
   set(saved===null?innerWidth<700:saved==='1');
   tb.addEventListener('click',()=>set(!document.body.classList.contains('compact')));
+}
+// ---- Coloring checkboxes: each one drives a pair of the old buttons ----
+for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','older','gray','color']]){
+  const box=document.getElementById(cb),btn=v=>document.querySelector(`button[data-pk="${k}"][data-v="${v}"]`);
+  box.addEventListener('change',()=>btn(box.checked?on:off).click());
+  const syncBox=()=>{box.checked=btn(on).getAttribute('aria-pressed')==='true'};
+  new MutationObserver(syncBox).observe(btn(on),{attributes:true,attributeFilter:['aria-pressed']});syncBox();
 }
 updateAnim();
 showExample();
