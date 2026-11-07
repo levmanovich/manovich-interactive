@@ -150,6 +150,8 @@ b.endmark{display:block;height:0;overflow:hidden}
 .cols,#side,#main{display:flex;flex-direction:column;gap:6px;min-width:0}
 /* Rewrites bold: rewritten words in bold (and their darker shade); new words stay regular */
 body.rbold .flow span[data-x],body.rbold #pflow span[data-ed]{font-weight:700}
+.zbtns{flex-wrap:nowrap;gap:5px}
+.zbtns .play{margin-right:0}
 #palCtl label.mid{flex-wrap:nowrap;white-space:nowrap}
 #ctlToggle{margin-right:8px;letter-spacing:0;text-transform:none;padding:1px 7px;min-width:8.6em;text-align:center}
 /* wide screens held sideways (laptop, iPad in landscape): controls in a column on the left, the page on the right */
@@ -219,7 +221,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
     </div></div>
     <div class="grow" id="zoomRow"><span class="lab">Zoom</span><div class="items">
       <span class="mid"><input type="range" id="mzoom" min="0.2" max="8" step="0.05" value="1" autocomplete="off" aria-label="Type size"> <span id="mzoomv">1.0×</span></span>
-      <button type="button" class="play" id="mzcol" title="Set the type so about 10 lines fit on screen">Large type</button><button type="button" class="play" id="mzfit">Whole page</button>
+      <span class="mid zbtns"><button type="button" class="play" id="mzcol" title="Set the type so about 10 lines fit on screen">Large type</button><button type="button" class="play" id="mzfit">Whole page</button></span>
       <span class="note">Large type: one column of readable text; scroll to read.</span>
     </div></div>
     <div class="grow"><span class="lab">Color</span><div class="items">
