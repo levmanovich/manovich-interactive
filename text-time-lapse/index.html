@@ -148,6 +148,8 @@ b.endmark{display:block;height:0;overflow:hidden}
 #pside .groups>.grow:first-child{border-top:0}
 #side>.groups>.grow:first-child{border-top:0}
 .cols,#side,#main{display:flex;flex-direction:column;gap:6px;min-width:0}
+/* Rewrites bold: rewritten words in bold (and their darker shade); new words stay regular */
+body.rbold .flow span[data-x],body.rbold #pflow span[data-ed]{font-weight:700}
 #palCtl label.mid{flex-wrap:nowrap;white-space:nowrap}
 #ctlToggle{margin-right:8px;letter-spacing:0;text-transform:none;padding:1px 7px;min-width:8.6em;text-align:center}
 /* wide screens held sideways (laptop, iPad in landscape): controls in a column on the left, the page on the right */
@@ -240,7 +242,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
         <span class="mid"><label for="plh">Line spacing</label> <input type="range" id="plh" min="1" max="2.4" step="0.02" value="1.32"> <span id="plhv"></span></span>
       </div></div>
       <div class="grow" id="coloringRow"><span class="lab">Coloring</span><div class="items">
-        <span class="mid"><label title="Rewritten words in a darker shade of their version's color, new words a little lighter"><input type="checkbox" id="cbSplit">Edits darker</label></span>
+        <span class="mid"><label title="Rewritten words in bold, in a darker shade of their version's color; new words a little lighter"><input type="checkbox" id="cbSplit">Rewrites bold</label></span>
         <div class="seg" role="group" aria-label="Edits" hidden><button type="button" data-pk="split" data-v="same">Edits same color</button><button type="button" data-pk="split" data-v="darker">Edits darker</button></div>
         <span class="mid" id="olderSeg"><label title="During animations, or when you pick a version: earlier versions in gray"><input type="checkbox" id="cbOlder">Earlier versions in gray</label></span>
         <div class="seg" role="group" aria-label="Earlier versions" hidden><button type="button" data-pk="older" data-v="color">Earlier in color</button><button type="button" data-pk="older" data-v="gray">Earlier in gray</button></div>
@@ -646,7 +648,7 @@ const SHAPES={a4:[1,1.414,900],'45':[4,5,900],'11':[1,1,900],'916':[9,16,560],'1
 const PO=()=>(typeof Player!=='undefined'&&Player.opt)||{shape:'a4',align:'justify',lh:1.32,split:'same',older:'color'};
 const shp=()=>SHAPES[PO().shape]||SHAPES.a4;
 const PR=()=>shp()[1]/shp()[0];           // page height / width
-const pkey=()=>{const o=PO();return o.shape+'|'+o.align+'|'+o.lh};
+const pkey=()=>{const o=PO();return o.shape+'|'+o.align+'|'+o.lh+'|'+o.split};
 // page width: as wide as the column allows, but short enough that the whole page fits on the screen
 function pageFitW(el){
   const s=shp(),r=s[1]/s[0],cw=el.parentElement.clientWidth||900,vh=innerHeight;
@@ -995,7 +997,8 @@ document.fonts&&document.fonts.ready.then(()=>{for(const k in fitCache)delete fi
 
 // ---- Page and Coloring rows (shared with the player) changed ----
 window.onPageOpt=function(k){
-  if(k==='shape'||k==='align'||k==='lh'){if(st.view==='one'){fit();if(Math.abs(MZ-1)>0.001)mainZoom(MZ)}}
+  document.body.classList.toggle('rbold',PO().split==='darker');
+  if(k==='shape'||k==='align'||k==='lh'||k==='split'){if(st.view==='one'){fit();if(Math.abs(MZ-1)>0.001)mainZoom(MZ)}}
   paint();
 };
 
@@ -1120,7 +1123,7 @@ function fit(){
   if(!N)return;
   pageEl.style.width=pageFitW(pageEl)+'px';
   {const pw=pageEl.offsetWidth;pageEl.style.padding=`${0.07*pw}px ${0.08*pw}px`}   // the same margins as the other viewspx ${Math.round(m*0.065)}px`}
-  const Wp=flow.clientWidth/kOf(flow),Hp=flow.clientHeight/kOf(flow),key=[Math.round(Wp),Math.round(Hp),opt.removed,opt.layout,opt.lh,opt.align,opt.shape,N].join('|');
+  const Wp=flow.clientWidth/kOf(flow),Hp=flow.clientHeight/kOf(flow),key=[Math.round(Wp),Math.round(Hp),opt.removed,opt.layout,opt.lh,opt.align,opt.shape,opt.split,N].join('|');
   if(key===fitKey||!Wp)return;fitKey=key;
   let peak=1,best=-1;
   for(let r=1;r<=NR;r++){let n=0;for(let k=0;k<N;k++)if(born[k]<=r&&(opt.removed==='stay'||!died[k]||died[k]>=r))n++;if(n>best){best=n;peak=r}}
@@ -1179,7 +1182,7 @@ document.querySelectorAll('.seg button[data-pk]').forEach(b=>b.addEventListener(
   const k=b.dataset.pk;opt[k]=b.dataset.v;syncUI();save();
   if(window.onPageOpt&&['align','shape','split','older'].includes(k))onPageOpt(k);
   if(k==='order')retime();
-  paint();if(k==='removed'||k==='shape'||k==='layout'||k==='align'){fitKey='';fit()}
+  paint();if(k==='removed'||k==='shape'||k==='layout'||k==='align'||k==='split'){fitKey='';fit()}
   state.fill(-1);apply(false)}));
 let rt=null;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!$('pview').hidden)fit()},150)});
 
@@ -1337,6 +1340,7 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
   set(saved===null?innerWidth<700:saved==='1');
   tb.addEventListener('click',()=>set(!document.body.classList.contains('compact')));
 }
+document.body.classList.toggle('rbold',PO().split==='darker');
 // ---- Coloring checkboxes: each one drives a pair of the old buttons ----
 for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','older','gray','color']]){
   const box=document.getElementById(cb),btn=v=>document.querySelector(`button[data-pk="${k}"][data-v="${v}"]`);
