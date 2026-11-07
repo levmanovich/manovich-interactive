@@ -59,7 +59,7 @@ The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced
 
 - **Revisions** shows each version's changes in turn: new words are written in, cut words are crossed out and disappear, and rewrites replace the old words. It opens the player, described below.
 - **Versions** shows the chosen text view (for example Final text) one whole version at a time: v1, then v2, and so on. Its Player row has ◀ ▶ (previous or next version) and Time per version.
-- **Write** shows all text ever written, word by word, version after version, with cut words crossed out. Its Player row has ◀ ▶ (jump to the start of the previous or next version), Close-up (pauses and opens a magnifier on the last word written; move the mouse to read other parts) and Words/s.
+- **Write** shows all text ever written, word by word, version after version, with cut words crossed out. Its Player row has ◀ ▶ (jump to the start of the previous or next version), Close-up (a magnifier that follows the word being written while the animation plays; pause, then move the mouse to read other parts) and Words/s.
 
 ### Player
 

@@ -258,7 +258,7 @@ body.compact #adv,body.compact #tip{display:none!important}
     </div></div>
     <div class="grow" id="vwRow" hidden><span class="lab">Player</span><div class="items">
       <span class="mid" style="flex-wrap:nowrap"><button type="button" class="play" id="vwprev" aria-label="Previous version" title="Previous version">◀</button><button type="button" class="play" id="vwnext" aria-label="Next version" title="Next version">▶</button></span>
-      <span class="mid" id="writeCtl"><button type="button" class="play" id="write" hidden>Play</button><button type="button" class="play" id="closeup" disabled title="Pause and look closer: a magnifier follows the mouse">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
+      <span class="mid" id="writeCtl"><button type="button" class="play" id="write" hidden>Play</button><button type="button" class="play" id="closeup" disabled title="A magnifier that follows the word being written. Pause, then move the mouse to read other parts.">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
       <span class="mid" id="playCtl"><button type="button" class="play" id="play" hidden>Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.2" max="10" step="0.1" value="2"> <span id="speedv">2 s</span></span>
     </div></div>
   </div>
@@ -944,7 +944,7 @@ function startWrite(){
     writing=true;wPos=0;paint();
   }
   writeBtn.textContent='Pause';writeBtn.setAttribute('aria-pressed','true');
-  if(lensOn)lensOff();updateCuBtn();
+  updateCuBtn();   // the close-up stays open while writing goes on
   wAcc=0;wLast=performance.now();wRAF=requestAnimationFrame(frame);
 }
 function frame(t){
@@ -953,9 +953,11 @@ function frame(t){
   while(n-->0&&wPos<events.length){
     const [r,k,cut]=events[wPos++], sp=wSpans[k];
     if(cut)sp.setAttribute('data-h','1');else sp.classList.remove('w0');
+    if(lensSpans){const ls=lensSpans[k];if(ls){if(cut)ls.setAttribute('data-h','1');else ls.classList.remove('w0')}}
     if(wCur)wCur.classList.remove('cur');wCur=sp;sp.classList.add('cur');
     if(r!==wRound){wRound=r;writeHint()}
   }
+  if(lensOn&&wCur&&wCur.getClientRects().length){const fr=flow.getBoundingClientRect(),r=wCur.getBoundingClientRect();lensAt(r.left-fr.left+r.width/2,r.top-fr.top+r.height/2)}
   if(wRound){const sw=roundsEl.querySelector('.rb.now .sw');if(sw){const c=colorK(wRound),q=Math.min(100,Math.round((wPos-rStart[wRound])/Math.max(1,rEnd[wRound]-rStart[wRound])*100));
     sw.style.background=`linear-gradient(90deg,${c} ${q}%,${FADE} ${q}%)`}}
   if(wPos>=events.length){if(wCur)wCur.classList.remove('cur');wCur=null;writeBtn.textContent='Play';writeBtn.setAttribute('aria-pressed','false');wRAF=null;
@@ -972,10 +974,10 @@ function writeHint(){
 writeBtn.addEventListener('click',()=>{if(wRAF){stopWrite(false)}else{if(!writing){wRound=0}startWrite()}});
 // ---- close-up lens: magnifies the paused page as readable text ----
 const lens=document.getElementById('lens'), lensIn=document.getElementById('lensIn'), cuBtn=document.getElementById('closeup');
-let lensOn=false, lensCopy=null, lensZ=3;
+let lensOn=false, lensCopy=null, lensSpans=null, lensZ=3;
 function canCloseup(){return writing&&st.view==='one'}
 function updateCuBtn(){cuBtn.disabled=!canCloseup();if(cuBtn.disabled&&lensOn)lensOff()}
-function lensOff(){lensOn=false;lens.hidden=true;pageEl.classList.remove('lensing');cuBtn.setAttribute('aria-pressed','false');lensIn.innerHTML=''}
+function lensOff(){lensOn=false;lensSpans=null;lens.hidden=true;pageEl.classList.remove('lensing');cuBtn.setAttribute('aria-pressed','false');lensIn.innerHTML=''}
 let colW=100, colGap=10, nCols=1;
 function lensAt(x,y){ // x,y: point inside the flow, in CSS pixels
   const ci=Math.max(0,Math.min(nCols-1,Math.floor(x/(colW+colGap))));
@@ -989,7 +991,7 @@ function lensAt(x,y){ // x,y: point inside the flow, in CSS pixels
 function lensStart(){
   lensCopy=flow.cloneNode(true);lensCopy.id='flowLens';lensCopy.classList.remove('blocks');
   lensCopy.style.width=flow.clientWidth+'px';lensCopy.style.height=flow.clientHeight+'px';
-  lensIn.innerHTML='';lensIn.appendChild(lensCopy);
+  lensIn.innerHTML='';lensIn.appendChild(lensCopy);lensSpans=[...lensCopy.querySelectorAll('span')];
   const fs=parseFloat(getComputedStyle(flow).fontSize)/kOf(flow);
   nCols=+flow.style.columnCount||1;colGap=2.2*fs;colW=(flow.clientWidth/kOf(flow)-colGap*(nCols-1))/nCols;
   const pw=pageEl.clientWidth;
@@ -1004,8 +1006,8 @@ function lensStart(){
   lensAt(x,y);
   lens.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
-cuBtn.addEventListener('click',()=>{if(!canCloseup())return;if(lensOn){lensOff();return}if(wRAF)stopWrite(false);lensStart()});   // while writing: pause, then look closer
-pageEl.addEventListener('mousemove',e=>{if(!lensOn)return;const fr=flow.getBoundingClientRect();lensAt(e.clientX-fr.left,e.clientY-fr.top)});
+cuBtn.addEventListener('click',()=>{if(!canCloseup())return;lensOn?lensOff():lensStart()});   // the magnifier follows the writing; when paused, the mouse moves it
+pageEl.addEventListener('mousemove',e=>{if(!lensOn||wRAF)return;const fr=flow.getBoundingClientRect();lensAt(e.clientX-fr.left,e.clientY-fr.top)});
 setStops();
 document.getElementById('preset').addEventListener('change',e=>{const c=e.target.value.split(',');['c0','c1','c2'].forEach((id,i)=>document.getElementById(id).value=c[i]);setStops();paint()});
 ['c0','c1','c2'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{setStops();paint()}));
