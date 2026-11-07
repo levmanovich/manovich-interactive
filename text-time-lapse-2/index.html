@@ -612,7 +612,7 @@ function paint(){
     const bc=faded||old?c:lighten(c);
     css+=`#flow ${q}{color:${c}}#flow.blocks ${q}{background:${bc}}`;
     if(darker&&!faded&&!old){const e=Player.darkCol(k);css+=`#flow ${q}[data-x]{color:${e}}#flow.blocks ${q}[data-x]{background:${lighten(e)}}`}
-    if(!faded)css+=`#flow ${q}[data-h]{text-decoration:line-through}#flow.blocks ${q}[data-h]{background:transparent;color:transparent;text-decoration:none;box-shadow:inset 0 0 0 1px ${bc}}`;
+    if(!faded)css+=`#flow ${q}[data-h]{text-decoration:line-through}#flow.blocks ${q}[data-h]{text-decoration:none;background:color-mix(in srgb,${bc} 32%,#fff)}`;
   }
   if(st.view==='one'&&st.upto){
     const k=st.upto, hide='{color:transparent!important;background:transparent!important;box-shadow:none!important;text-decoration:none!important}';
@@ -741,7 +741,7 @@ function drawMulti(){
     for(let i=0;i<R.length;i+=6)if(R[i+4]!==k)g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.86);
     const c=colorK(k);g.fillStyle=c;g.strokeStyle=c;g.lineWidth=0.7/w;
     for(let i=0;i<R.length;i+=6)if(R[i+4]===k){
-      if(R[i+5])g.strokeRect(R[i],R[i+1],R[i+2],R[i+3]*0.86);else g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.86);
+      g.globalAlpha=R[i+5]?0.32:1;g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.86);g.globalAlpha=1;   // removed words: a pale bar
     }
   });
 }
@@ -866,7 +866,7 @@ function drawStack(){
     for(let i=0;i<R.length;i+=6)if(R[i+4]!==k)g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.8);
     g.globalAlpha=1;
     if(on){const c=colorK(k);g.fillStyle=c;g.strokeStyle=c;g.lineWidth=1.2/sc;
-      for(let i=0;i<R.length;i+=6)if(R[i+4]===k){if(R[i+5])g.strokeRect(R[i],R[i+1],R[i+2],R[i+3]*0.8);else g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.8)}}
+      for(let i=0;i<R.length;i+=6)if(R[i+4]===k){g.globalAlpha=R[i+5]?0.32:1;g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.8)}g.globalAlpha=1}   // removed words: a pale bar
     // outline drawn in screen space so every edge is an even 1px
     g.setTransform(dpr,0,0,dpr,0,0);
     const P=(u,v)=>[ox+(AX[0]*u+BY[0]*v)*sc, oy+(AX[1]*u+BY[1]*v)*sc];
