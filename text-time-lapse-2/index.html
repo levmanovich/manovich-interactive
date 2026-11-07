@@ -219,6 +219,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 #loadmsg:empty{display:none}
 body.compact #adv,body.compact #tip{display:none!important}
 .top .eyebrow{align-items:center}
+#info{border-top:1px solid var(--line);padding-top:10px}   /* separator above Example */
 /* the Player row has the same height for Revisions, Versions and Write, so nothing below it moves */
 #vwRow,#pside .groups>.grow:first-child{min-height:72px;align-items:start}
 #vwRow>.lab,#pside .groups>.grow:first-child>.lab{padding-top:7px}
@@ -1381,7 +1382,7 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
   const mo=new MutationObserver(sync);
   ['write','play','pplay'].forEach(id=>mo.observe(document.getElementById(id),{childList:true,characterData:true,subtree:true,attributes:true}));
   const ua=updateAnim;updateAnim=function(){ua();sync();document.getElementById('revSet').hidden=animSel!=='rev';
-    {const ps=document.getElementById('pside'),wait=animSel==='rev'&&st.view!=='player';if(wait)ps.hidden=false;ps.classList.toggle('na',wait);ps.inert=wait}   // Revisions chosen, player not open yet: its Player row shows, fadedrequestAnimationFrame(()=>{if(st.view==='one')fit()})};   // rows may have changed: fit the page to the space again
+    {const ps=document.getElementById('pside'),wait=animSel==='rev'&&st.view!=='player';ps.hidden=!(wait||st.view==='player');ps.classList.toggle('na',wait);ps.inert=wait}requestAnimationFrame(()=>{if(st.view==='one')fit()})};   // rows may have changed: fit the page to the space again   // Revisions chosen, player not open yet: its Player row shows, faded; rows may have changed: fit the page again
 }
 // ---- Hide / Show controls (phones start with the controls hidden) ----
 {
