@@ -831,13 +831,13 @@ function drawStack(){
   const gap=+document.getElementById('gap').value, PH=PR();
   const W=stackWrap.clientWidth||900;
   const xs=[0,AX[0],BY[0]*PH,AX[0]+BY[0]*PH], minX=Math.min(...xs), spanX=Math.max(...xs)-minX;
-  const labelW=0;
-  const sc=(W*0.7-8)/spanX;
+  const labelW=38;   // room on the left for the version numbers
+  const sc=Math.min((W*0.7-8)/spanX,(W-labelW-12)/spanX);
   const pageH=(AX[1]+BY[1]*PH)*sc, step=gap*sc, topPad=14, H=Math.round(pageH+(NR-1)*step+topPad+12);
   const dpr=Math.min(2,window.devicePixelRatio||1);
   stackCv.style.height=H+'px';stackCv.width=Math.round(W*dpr);stackCv.height=Math.round(H*dpr);
   const g=stackCv.getContext('2d');
-  const ox=-minX*sc+4+(W-spanX*sc-8)/2;
+  const ox=Math.max(labelW+6,(W-spanX*sc)/2)-minX*sc;
   stackGeom={sc,ox,step,topPad,PH};
   g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
   const cn=countCache;
@@ -859,6 +859,16 @@ function drawStack(){
     const P=(u,v)=>[ox+(AX[0]*u+BY[0]*v)*sc, oy+(AX[1]*u+BY[1]*v)*sc];
     const c4=[P(0,0),P(1,0),P(1,PH),P(0,PH)];
     g.beginPath();g.moveTo(...c4[0]);for(let i=1;i<4;i++)g.lineTo(...c4[i]);g.closePath();
+  }
+  // version numbers on the left, next to each page's left corner (every 2nd or 3rd one when the pages are close)
+  g.setTransform(dpr,0,0,dpr,0,0);
+  const every=Math.max(1,Math.ceil(13/Math.max(1,step)));
+  g.font='500 11px "IBM Plex Sans",system-ui,sans-serif';g.textAlign='right';g.textBaseline='middle';
+  for(let k=1;k<=last;k++){
+    if((k-1)%every&&k!==last)continue;
+    const oy=topPad+(NR-k)*step, x=ox+(minX)*sc, y=oy+(AX[1]*0+BY[1]*PH)*sc;
+    g.fillStyle=(!sel.size||sel.has(k))?colorK(k):'#b8bec7';
+    g.fillText('v'+k,x-8,y);
   }
 }
 stackCv.addEventListener('click',e=>{
