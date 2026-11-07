@@ -225,11 +225,11 @@ body.compact #adv,body.compact #tip{display:none!important}
 #helpBtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 /* help mode: a bubble next to the control under the pointer (or tapped) */
 body.helpmode #side [data-tip],body.helpmode #main [data-tip],body.helpmode .top [data-tip]{cursor:help}
-body.helpmode [data-tip]:hover{outline:2px solid #e2a23b;outline-offset:1px}
+body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid #8b929c;outline-offset:2px}
 #bubble{position:fixed;z-index:50;max-width:280px;background:#11141b;color:#fff;font:400 12px/1.45 var(--f-ui);padding:8px 10px;border-radius:6px;box-shadow:0 6px 20px -8px rgba(0,0,0,.5);pointer-events:none}
 #bubble[hidden]{display:none}
 #bubble b{font-weight:600}
-#helpBar{position:fixed;z-index:49;left:50%;bottom:14px;transform:translateX(-50%);background:#e2a23b;color:#11141b;font:500 12px var(--f-ui);padding:6px 12px;border-radius:16px;pointer-events:none}
+#helpBar{position:fixed;z-index:49;left:50%;bottom:14px;transform:translateX(-50%);background:#11141b;color:#fff;font:500 12px var(--f-ui);padding:6px 12px;border-radius:16px;pointer-events:none}
 #helpBar[hidden]{display:none}
 #olderSeg.idle{opacity:1}   /* always black, like the other controls */
 #info{border-top:1px solid var(--line);padding-top:10px}   /* separator above Example */
