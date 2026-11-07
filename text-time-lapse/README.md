@@ -38,6 +38,8 @@ Put the versions of one text in a folder, then choose the folder, choose the fil
 
 The page starts with a few main controls. More options appear when you choose a view or setting that uses them.
 
+**Screen size:** the page is sized so that all of it fits on your screen. On a laptop, or an iPad held sideways, the controls sit in a column on the left and the page on the right. **Hide controls** (top right) folds the controls into one thin bar with Play / Pause and Start, so the page gets almost the whole screen; **Show controls** brings them back. On a phone the controls start hidden.
+
 ### Main controls
 
 | Row | Controls | What they do |

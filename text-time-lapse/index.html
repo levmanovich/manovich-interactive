@@ -143,8 +143,26 @@ b.endmark{display:block;height:0;overflow:hidden}
 #pview .ctrls{width:100%}
 #pscrub{flex:1 1 200px;min-width:140px}
 #pmoreRows[hidden]{display:none}
-#pview{margin-top:-6px}
-#pview .groups>.grow:first-child{border-top:0}
+#pside{display:flex;flex-direction:column;gap:6px;margin-top:-6px}
+#pside[hidden]{display:none}
+#pside .groups>.grow:first-child{border-top:0}
+#side,#main{display:flex;flex-direction:column;gap:6px;min-width:0}
+#ctlToggle{margin-right:8px;letter-spacing:0;text-transform:none;padding:1px 7px}
+/* wide screens held sideways (laptop, iPad in landscape): controls in a column on the left, the page on the right */
+@media (min-width:1000px) and (orientation:landscape){
+  body:not(.compact) .wrap{max-width:1700px;flex-direction:row;align-items:flex-start;gap:28px}
+  body:not(.compact) #side{flex:0 0 390px;position:sticky;top:0;max-height:100vh;overflow-y:auto;padding:0 4px 12px 0}
+  body:not(.compact) #main{flex:1 1 auto;padding-top:4px}
+  body:not(.compact) .grow{grid-template-columns:74px minmax(0,1fr)}
+  body:not(.compact) #animRow{min-height:0}
+  body:not(.compact) #side .seg{flex-wrap:wrap}
+  body:not(.compact) #side .seg button{white-space:nowrap}
+}
+/* Hide controls: one thin bar with Play/Pause and Start, the page gets the screen */
+body.compact .groups>.grow:not(#animRow),body.compact #animHint,body.compact #gapCtl,body.compact #pside,
+body.compact #info,body.compact #rounds,body.compact #rhint,body.compact #prounds,body.compact #prtext{display:none!important}
+body.compact #animRow{min-height:0}
+body.compact .top .eyebrow>span:first-child{font-size:10px}
 #ppage{align-self:center}
 .rb .sw{display:flex;overflow:hidden}
 .rb .sw i{display:block;height:100%}
@@ -177,8 +195,9 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 </style>
 
 <div class="wrap">
+  <div id="side">
   <div class="top">
-    <p class="eyebrow"><span><b>Text Time-lapse</b> · see how a text changed across its saved versions</span><span class="credit">Lev Manovich</span></p>
+    <p class="eyebrow"><span><b>Text Time-lapse</b> · see how a text changed across its saved versions</span><span class="credit"><button type="button" class="play" id="ctlToggle" aria-pressed="false">Hide controls</button> Lev Manovich</span></p>
   </div>
   <div class="groups">
     <div class="grow" id="drop"><span class="lab">Files</span><div class="items">
@@ -232,14 +251,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
       <span class="mid" id="playCtl"><button type="button" class="play" id="play" hidden>Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.2" max="10" step="0.1" value="2"> <span id="speedv">2 s</span></span>
     </div></div>
   </div>
-  <div class="info" id="info"><button type="button" class="play" id="example" aria-pressed="false" title="Show the example: 16 versions of an essay">Example</button><p class="note" id="note"></p></div>
-  <div class="rounds" id="rounds"></div>
-  <div class="rhint" id="rhint"><span id="rtext"></span><button type="button" id="rclear" hidden>Show all rounds</button></div>
-  <div class="page" id="page"><div class="flow" id="flow"></div><div id="wlabel" hidden></div><div id="lens" hidden><div id="lensIn"></div></div></div>
-  <div class="multi" id="multi" hidden></div>
-  <div class="stackwrap" id="stackwrap" hidden><canvas id="stack" aria-label="The versions as stacked pages, first version at the bottom"></canvas></div>
-
-  <div id="pview" hidden>
+  <div id="pside" hidden>
     <div class="groups">
       <div class="grow"><span class="lab">Player</span><div class="items">
         <span class="mid" style="flex-wrap:nowrap"><button type="button" class="play" id="pplay" hidden>Play</button><button type="button" class="play" id="pstart" hidden title="Go back to the empty page">⏮ Start</button><button type="button" class="play" id="pprev" aria-label="Previous version">◀</button><button type="button" class="play" id="pnext" aria-label="Next version">▶</button></span>
@@ -272,9 +284,21 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
       </div>
     </div>
     <p class="note">Click a version bar to play just that version. Gray shows the final text still to come. Zoom in and scroll inside the page to read a passage.</p>
+  </div>
+  </div>
+  <div id="main">
+  <div class="info" id="info"><button type="button" class="play" id="example" aria-pressed="false" title="Show the example: 16 versions of an essay">Example</button><p class="note" id="note"></p></div>
+  <div class="rounds" id="rounds"></div>
+  <div class="rhint" id="rhint"><span id="rtext"></span><button type="button" id="rclear" hidden>Show all rounds</button></div>
+  <div class="page" id="page"><div class="flow" id="flow"></div><div id="wlabel" hidden></div><div id="lens" hidden><div id="lensIn"></div></div></div>
+  <div class="multi" id="multi" hidden></div>
+  <div class="stackwrap" id="stackwrap" hidden><canvas id="stack" aria-label="The versions as stacked pages, first version at the bottom"></canvas></div>
+
+  <div id="pview" hidden>
     <div class="rounds" id="prounds"></div>
     <div class="rhint" id="prtext"></div>
     <div class="page" id="ppage"><div class="flow" id="pflow"></div></div>
+  </div>
   </div>
 </div>
 <script>
@@ -616,8 +640,15 @@ const PO=()=>(typeof Player!=='undefined'&&Player.opt)||{shape:'a4',align:'justi
 const shp=()=>SHAPES[PO().shape]||SHAPES.a4;
 const PR=()=>shp()[1]/shp()[0];           // page height / width
 const pkey=()=>{const o=PO();return o.shape+'|'+o.align+'|'+o.lh};
+// page width: as wide as the column allows, but short enough that the whole page fits on the screen
+function pageFitW(el){
+  const s=shp(),r=s[1]/s[0],cw=el.parentElement.clientWidth||900,vh=innerHeight;
+  let h=vh-(el.getBoundingClientRect().top+scrollY)-16;
+  if(h<0.55*vh)h=vh-24;   // the controls fill most of the screen: fit the page to one whole screen instead
+  return Math.max(Math.min(260,cw),Math.min(cw,h/r,1400));
+}
 function textStyle(el){const o=PO();el.style.lineHeight=o.lh;el.style.textAlign=o.align==='left'?'left':'justify';el.style.hyphens=o.align==='left'?'manual':'auto'}
-function sizePage(){pageEl.style.width=`min(100%,${shp()[2]}px)`;pageEl.style.alignSelf='center';const w=pageEl.getBoundingClientRect().width||pageW();pageEl.style.aspectRatio='auto';pageEl.style.padding=`${0.07*w}px ${0.08*w}px`;pageEl.style.height=(w*PR())+'px';setH(flow,w*PR()-2*0.07*w-2);textStyle(flow)}
+function sizePage(){pageEl.style.width=pageFitW(pageEl)+'px';pageEl.style.alignSelf='center';const w=pageEl.getBoundingClientRect().width||pageW();pageEl.style.aspectRatio='auto';pageEl.style.padding=`${0.07*w}px ${0.08*w}px`;pageEl.style.height=(w*PR())+'px';setH(flow,w*PR()-2*0.07*w-2);textStyle(flow)}
 function fit(){if(st.view!=='one')return;sizePage();const b=solve(st.mode);flow.style.columnCount=b.c;setFS(flow,b.px);if(typeof MZ!=='undefined'&&Math.abs(MZ-1)>0.001)mainZoom(MZ)}
 function prefetch(){const left=Object.keys(MODES).filter(m=>!fitCache[m+'|'+Math.round(pageW())+'|'+pkey()]);if(!left.length)return;
   setTimeout(()=>{solve(left[0]);prefetch()},30)}
@@ -692,7 +723,7 @@ function setView(v){
   st.view=v;
   document.querySelectorAll('.seg button[data-k="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===(v==='one'||v==='player'?st.mark:v)));
   pageEl.hidden=v!=='one';multi.hidden=v!=='ten';stackWrap.hidden=v!=='stack';
-  const pv=v==='player';document.getElementById('pview').hidden=!pv;
+  const pv=v==='player';document.getElementById('pview').hidden=!pv;document.getElementById('pside').hidden=!pv;
   {const n=document.getElementById('info'),r=document.getElementById(pv?'prounds':'rounds');r.parentNode.insertBefore(n,r)}
   ['rounds','rhint'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=pv});
   // rows that do not apply stay in place, faded, so the controls do not jump
@@ -746,7 +777,7 @@ function playerZoom(z){
   document.getElementById('mzoom').value=z;document.getElementById('mzoomv').textContent=z.toFixed(1)+'×';
 }
 function playerMark(quiet){
-  const v=st.mark==='blocks'?'blocks':'text',b=document.querySelector(`#pview [data-pk="view"][data-v="${v}"]`);
+  const v=st.mark==='blocks'?'blocks':'text',b=document.querySelector(`#pside [data-pk="view"][data-v="${v}"]`);
   if(Player.opt.view!==v&&b)b.click();
   if(!quiet)document.querySelectorAll('.seg button[data-k="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===st.mark));
   playerZoom(+document.getElementById('pzoom').value||1);
@@ -1068,7 +1099,7 @@ function paint(){
   flow.classList.toggle('blocks',opt.view==='blocks');
   flow.style.textAlign=opt.align==='left'?'left':'justify';flow.style.hyphens=opt.align==='left'?'manual':'auto';
   const SH=SHAPES[opt.shape]||SHAPES.a4;   // the same page sizes as the other views, so the layout does not change
-  pageEl.style.aspectRatio=SH[0]+'/'+SH[1];pageEl.style.width=`min(100%,${SH[2]}px)`;
+  pageEl.style.aspectRatio=SH[0]+'/'+SH[1];if(!pageEl.closest('[hidden]'))pageEl.style.width=pageFitW(pageEl)+'px';
   $('prounds').innerHTML=[...Array(NR)].map((_,i)=>{const r=i+1,c=CNT[r],tot=c.add+c.ed||1;
     const sw=opt.split==='darker'?`<i style="width:${c.add/tot*100}%;background:${newCol(r)}"></i><i style="width:${c.ed/tot*100}%;background:${darkCol(r)}"></i>`:`<i style="width:100%;background:${baseCol(r)}"></i>`;
     return `<button type="button" class="rb" data-r="${r}" title="Version ${r} · ${dates[i]} ${years[i]} · ${fmt(c.add)} added, ${fmt(c.ed)} edited, ${fmt(c.rem)} removed"><span class="sw">${sw}</span><span class="v">v${r} · ${fmt(c.add+c.ed)}</span></button>`}).join('');
@@ -1080,6 +1111,7 @@ function paint(){
 const charW=0.5;let fitKey='';
 function fit(){
   if(!N)return;
+  pageEl.style.width=pageFitW(pageEl)+'px';
   {const pw=pageEl.offsetWidth;pageEl.style.padding=`${0.07*pw}px ${0.08*pw}px`}   // the same margins as the other viewspx ${Math.round(m*0.065)}px`}
   const Wp=flow.clientWidth/kOf(flow),Hp=flow.clientHeight/kOf(flow),key=[Math.round(Wp),Math.round(Hp),opt.removed,opt.layout,opt.lh,opt.align,opt.shape,N].join('|');
   if(key===fitKey||!Wp)return;fitKey=key;
@@ -1287,6 +1319,16 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
   const mo=new MutationObserver(sync);
   ['write','play','pplay'].forEach(id=>mo.observe(document.getElementById(id),{childList:true,characterData:true,subtree:true,attributes:true}));
   const ua=updateAnim;updateAnim=function(){ua();sync()};
+}
+// ---- Hide / Show controls (phones start with the controls hidden) ----
+{
+  const tb=document.getElementById('ctlToggle');
+  const set=on=>{document.body.classList.toggle('compact',on);tb.textContent=on?'Show controls':'Hide controls';tb.setAttribute('aria-pressed',String(on));
+    try{localStorage.setItem('ttl-compact',on?'1':'0')}catch(e){}
+    requestAnimationFrame(()=>dispatchEvent(new Event('resize')))};   // the page is fitted again to the space it now has
+  let saved=null;try{saved=localStorage.getItem('ttl-compact')}catch(e){}
+  set(saved===null?innerWidth<700:saved==='1');
+  tb.addEventListener('click',()=>set(!document.body.classList.contains('compact')));
 }
 updateAnim();
 showExample();
