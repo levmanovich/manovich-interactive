@@ -153,7 +153,7 @@ body.rbold .flow span[data-x],body.rbold #pflow span[data-ed]{font-weight:700}
 .zbtns{flex-wrap:nowrap;gap:5px}
 .zbtns .play{margin-right:0}
 #palCtl label.mid{flex-wrap:nowrap;white-space:nowrap}
-#ctlToggle{margin-right:8px;letter-spacing:0;text-transform:none;padding:1px 7px;min-width:8.6em;text-align:center}
+#ctlToggle{margin-right:0;letter-spacing:0;text-transform:none;padding:1px 7px;min-width:8.6em;text-align:center}
 /* wide screens held sideways (laptop, iPad in landscape): controls in a column on the left, the page on the right */
 @media (min-width:1000px) and (orientation:landscape){
   .wrap{max-width:1700px}   /* the same width with the controls shown or hidden, so the header does not move */
@@ -216,6 +216,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 #advBtn{align-self:flex-start;margin-left:0}
 #loadmsg:empty{display:none}
 body.compact #adv,body.compact #tip{display:none!important}
+.top .eyebrow{align-items:center}
 @media (min-width:1000px) and (orientation:landscape){
   body:not(.compact) #side{flex-basis:490px}
   body:not(.compact) .grow{grid-template-columns:66px minmax(0,1fr)}
@@ -224,7 +225,7 @@ body.compact #adv,body.compact #tip{display:none!important}
 
 <div class="wrap">
   <div class="top">
-    <p class="eyebrow"><span><b>Text Time-lapse 2</b> · see how a text changed across its saved versions</span><span class="credit"><button type="button" class="play" id="ctlToggle" aria-pressed="false">Hide controls</button> Lev Manovich</span></p>
+    <p class="eyebrow"><span><b>Text Time-lapse 2</b> · Lev Manovich · see how a text changed across its saved versions</span><span class="credit"><button type="button" class="play" id="ctlToggle" aria-pressed="false">Hide controls</button></span></p>
   </div>
   <div class="cols">
   <div id="side">
