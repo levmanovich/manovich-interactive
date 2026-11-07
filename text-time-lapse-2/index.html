@@ -211,7 +211,8 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 .mid{font-size:12px}
 #aplay,#aplay[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:500}
 #animHint,#pside>.note{display:none!important}
-.tip{margin:0;min-height:1.6em;font-size:11.5px;font-weight:400;color:#5f6670}
+.tip{margin:2px 0 0;font-size:11.5px;font-weight:400;line-height:1.45;color:#5f6670;height:2.9em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.advsub{margin:8px 0 0;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--lab);font-weight:600}
 #adv{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 #advBtn{align-self:flex-start;margin-left:0}
 #loadmsg:empty{display:none}
@@ -270,32 +271,14 @@ body.compact #adv,body.compact #tip{display:none!important}
         <input type="range" id="pscrub" min="0" max="1000" value="0" aria-label="Position in the animation">
         <span class="mid"><label for="pspeed">Time per version</label> <input type="range" id="pspeed" min="0.2" max="10" step="0.1" value="2" style="width:80px" title="Time per version"> <span id="pspeedv"></span></span>
         <span class="mid" hidden><label for="pzoom">Zoom</label> <input type="range" id="pzoom" min="1" max="8" step="0.1" value="1"> <span id="pzoomv">1.0×</span></span>
-        <button type="button" class="play" id="pmore" aria-expanded="false" aria-controls="pmoreRows">More options…</button>
+        <button type="button" class="play" id="pmore" hidden aria-expanded="false" aria-controls="pmoreRows">More options…</button>
       </div></div>
       <div id="pmoreRows" hidden>
-      <div class="grow"><span class="lab">Timing</span><div class="items">
-        <span class="mid"><label for="phold">Crossed out</label> <input type="range" id="phold" min="0" max="3" step="0.1" value="0.6"> <span id="pholdv"></span></span>
-        <span class="mid"><label for="ppause">Pause</label> <input type="range" id="ppause" min="0" max="4" step="0.1" value="1"> <span id="ppausev"></span></span>
-        <span class="mid"><label><input type="checkbox" id="pbySize" checked>Big versions longer</label></span>
-      </div></div>
-      <div class="grow"><span class="lab">Changes</span><div class="items">
-        <div class="seg" role="group" aria-label="Order of changes"><button type="button" data-pk="order" data-v="all">All at once</button><button type="button" data-pk="order" data-v="reading">Reading order</button><button type="button" data-pk="order" data-v="scattered">Scattered</button></div>
-        <div class="seg" role="group" aria-label="Text shape"><button type="button" data-pk="layout" data-v="fixed">Final text in gray</button><button type="button" data-pk="layout" data-v="grow">Text grows</button></div>
-        <div class="seg" role="group" aria-label="Removed words"><button type="button" data-pk="removed" data-v="vanish">Cuts disappear</button><button type="button" data-pk="removed" data-v="stay">Cuts stay</button></div>
-      </div></div>
-      <div class="grow" hidden><span class="lab">Show as</span><div class="items">
-        <div class="seg" role="group" aria-label="Words as"><button type="button" data-pk="view" data-v="text">Text</button><button type="button" data-pk="view" data-v="blocks">Blocks</button></div>
-      </div></div>
-      <div class="grow" id="pblocksRow"><span class="lab">Blocks</span><div class="items">
-        <span class="mid"><label for="pbl">Lightness</label> <input type="range" id="pbl" min="0" max="0.85" step="0.01" value="0.42"> <span id="pblv"></span></span>
-        <span class="mid"><label for="pbs">Saturation</label> <input type="range" id="pbs" min="0" max="1.3" step="0.01" value="0.72"> <span id="pbsv"></span></span>
-        <span class="mid"><label for="pbh">Bar height</label> <input type="range" id="pbh" min="0.1" max="1" step="0.01" value="0.56"> <span id="pbhv"></span></span>
-        <span class="mid"><label for="pwg">Word gap</label> <input type="range" id="pwg" min="0" max="0.5" step="0.01" value="0"> <span id="pwgv"></span></span>
-      </div></div>
       </div>
     </div>
     <p class="note">Click a version bar to play just that version. Gray shows the final text still to come. Zoom in and scroll inside the page to read a passage.</p>
   </div>
+  <p class="tip" id="tip">Point at or click any control to see what it does.</p>
   <div id="adv">
     <button type="button" class="play" id="advBtn" aria-expanded="false">Advanced ⌄</button>
     <div class="groups" id="advRows" hidden>
@@ -324,11 +307,32 @@ body.compact #adv,body.compact #tip{display:none!important}
         <span class="mid" id="olderSeg"><label title="During animations, or when you pick a version: earlier versions in gray"><input type="checkbox" id="cbOlder">Earlier versions in gray</label></span>
         <div class="seg" role="group" aria-label="Earlier versions" hidden><button type="button" data-pk="older" data-v="color">Earlier in color</button><button type="button" data-pk="older" data-v="gray">Earlier in gray</button></div>
       </div></div>
+      <div id="revSet" hidden>
+        <p class="advsub">Revisions</p>
+      <div class="grow"><span class="lab">Timing</span><div class="items">
+        <span class="mid"><label for="phold">Crossed out</label> <input type="range" id="phold" min="0" max="3" step="0.1" value="0.6"> <span id="pholdv"></span></span>
+        <span class="mid"><label for="ppause">Pause</label> <input type="range" id="ppause" min="0" max="4" step="0.1" value="1"> <span id="ppausev"></span></span>
+        <span class="mid"><label><input type="checkbox" id="pbySize" checked>Big versions longer</label></span>
+      </div></div>
+      <div class="grow"><span class="lab">Changes</span><div class="items">
+        <div class="seg" role="group" aria-label="Order of changes"><button type="button" data-pk="order" data-v="all">All at once</button><button type="button" data-pk="order" data-v="reading">Reading order</button><button type="button" data-pk="order" data-v="scattered">Scattered</button></div>
+        <div class="seg" role="group" aria-label="Text shape"><button type="button" data-pk="layout" data-v="fixed">Final text in gray</button><button type="button" data-pk="layout" data-v="grow">Text grows</button></div>
+        <div class="seg" role="group" aria-label="Removed words"><button type="button" data-pk="removed" data-v="vanish">Cuts disappear</button><button type="button" data-pk="removed" data-v="stay">Cuts stay</button></div>
+      </div></div>
+      <div class="grow" hidden><span class="lab">Show as</span><div class="items">
+        <div class="seg" role="group" aria-label="Words as"><button type="button" data-pk="view" data-v="text">Text</button><button type="button" data-pk="view" data-v="blocks">Blocks</button></div>
+      </div></div>
+      <div class="grow" id="pblocksRow"><span class="lab">Blocks</span><div class="items">
+        <span class="mid"><label for="pbl">Lightness</label> <input type="range" id="pbl" min="0" max="0.85" step="0.01" value="0.42"> <span id="pblv"></span></span>
+        <span class="mid"><label for="pbs">Saturation</label> <input type="range" id="pbs" min="0" max="1.3" step="0.01" value="0.72"> <span id="pbsv"></span></span>
+        <span class="mid"><label for="pbh">Bar height</label> <input type="range" id="pbh" min="0.1" max="1" step="0.01" value="0.56"> <span id="pbhv"></span></span>
+        <span class="mid"><label for="pwg">Word gap</label> <input type="range" id="pwg" min="0" max="0.5" step="0.01" value="0"> <span id="pwgv"></span></span>
+      </div></div>
+      </div>
     </div>
   </div>
   </div>
   <div id="main">
-  <p class="tip" id="tip">Point at or click any control to see what it does.</p>
   <div class="info" id="info"><button type="button" class="play" id="example" aria-pressed="false" title="Show the example: 16 versions of an essay">Example</button><p class="note" id="note"></p></div>
   <div class="rounds" id="rounds"></div>
   <div class="rhint" id="rhint"><span id="rtext"></span><button type="button" id="rclear" hidden>Show all rounds</button></div>
@@ -819,7 +823,7 @@ function playerZoom(z){
   document.getElementById('mzoom').value=z;document.getElementById('mzoomv').textContent=z.toFixed(1)+'×';
 }
 function playerMark(quiet){
-  const v=st.mark==='blocks'?'blocks':'text',b=document.querySelector(`#pside [data-pk="view"][data-v="${v}"]`);
+  const v=st.mark==='blocks'?'blocks':'text',b=document.querySelector(`button[data-pk="view"][data-v="${v}"]`);
   if(Player.opt.view!==v&&b)b.click();
   if(!quiet)document.querySelectorAll('.seg button[data-k="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===st.mark));
   playerZoom(+document.getElementById('pzoom').value||1);
@@ -1374,7 +1378,7 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
     sync()});
   const mo=new MutationObserver(sync);
   ['write','play','pplay'].forEach(id=>mo.observe(document.getElementById(id),{childList:true,characterData:true,subtree:true,attributes:true}));
-  const ua=updateAnim;updateAnim=function(){ua();sync();requestAnimationFrame(()=>{if(st.view==='one')fit()})};   // rows may have changed: fit the page to the space again
+  const ua=updateAnim;updateAnim=function(){ua();sync();document.getElementById('revSet').hidden=animSel!=='rev';requestAnimationFrame(()=>{if(st.view==='one')fit()})};   // rows may have changed: fit the page to the space again
 }
 // ---- Hide / Show controls (phones start with the controls hidden) ----
 {
@@ -1417,7 +1421,7 @@ for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','olde
     '#pscrub':'Position in the animation: drag to move.',
     '#pspeed':'Time per version (shared with Versions).',
     '#pmore':'Timing, order of changes and other settings for Revisions.',
-    '#advBtn':'Color, page and coloring settings.',
+    '#advBtn':'All settings: color, page and coloring, and the Revisions settings when Revisions is chosen.',
     '#ctlToggle':'Hide or show the controls.',
     '[data-k=pal][data-v=hue]':'Colors blend from the oldest version to the newest.',
     '[data-k=pal][data-v=soft]':'A calm color for each version.',

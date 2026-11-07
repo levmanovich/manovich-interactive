@@ -36,7 +36,7 @@ Put the versions of one text in a folder, then choose the folder, choose the fil
 
 ## Controls
 
-The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced ⌄** opens three more: Color, Page and Coloring. Point at any control to see what it does; when you click one, its explanation also appears in the line at the top of the page side.
+The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced ⌄** opens all the other settings: Color, Page and Coloring, and, when Revisions is chosen, the Revisions settings. Point at any control to see what it does; when you click one, its explanation also appears in the line just above Advanced.
 
 **Screen size:** the page is sized so that all of it fits on your screen. On a laptop, or an iPad held sideways, the controls sit in a column on the left and the page on the right. **Hide controls** (top right) folds the controls into one thin bar with Play / Pause, Start and the three animations, so the page gets almost the whole screen; **Show controls** brings them back. On a phone the controls start hidden.
 
@@ -63,7 +63,7 @@ The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced
 
 ### Player
 
-Pressing **Play** with Revisions chosen (or clicking Revisions) opens the player and plays it from an empty page; **Close player** takes you back. The Text view row is faded in the player. The Zoom row and Text / Blocks in Modes work in the player too: zoom in and scroll inside the page to read a passage. Play / Pause and ⏮ Start (back to the empty page) are in the Animate row. The **Player** row holds ◀ ▶ (previous or next version), a position slider and Time per version (shared with Versions). Click a version button to play just that version; the space bar also plays and pauses. **More options…** opens the rest:
+Pressing **Play** with Revisions chosen (or clicking Revisions) opens the player and plays it from an empty page; **Close player** takes you back. The Text view row is faded in the player. The Zoom row and Text / Blocks in Modes work in the player too: zoom in and scroll inside the page to read a passage. Play / Pause and ⏮ Start (back to the empty page) are in the Animate row. The **Player** row holds ◀ ▶ (previous or next version), a position slider and Time per version (shared with Versions). Click a version button to play just that version; the space bar also plays and pauses. Its other settings are in **Advanced**, under **Revisions**:
 
 - **Timing:** Crossed out sets how long removed words stay visible, Pause how long the player stops after each version, and Big versions longer gives versions with more changes more time.
 - **Changes:** All at once, Reading order or Scattered; Final text in gray (fixed layout) or Text grows (the real length of each version); Cuts disappear or Cuts stay.
