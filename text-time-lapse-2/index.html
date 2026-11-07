@@ -531,7 +531,7 @@ const DIST=['#4269d0','#efb118','#ff725c','#6cc5b0','#3ca951','#ff8ab7','#a463f2
 // Soft hues: same lightness and strength, the hue turning step by step from blue around the color wheel
 function softHue(k){const h=(265+(NR>1?(k-1)/(NR-1):0)*325)*Math.PI/180;return `rgb(${fromLab([68,38*Math.cos(h),38*Math.sin(h)])})`}
 // lighter version of a color for Blocks (same hue): lighter and a little less saturated
-function lighten(c){const m=c.match(/\d+(\.\d+)?/g).slice(0,3).map(Number);const [L,C,h]=toLch(toLab(m));const r=h*Math.PI/180,L2=L+(96-L)*0.42,C2=C*0.72;return `rgb(${fromLab([L2,C2*Math.cos(r),C2*Math.sin(r)])})`}
+function lighten(c){const m=c.match(/\d+(\.\d+)?/g).slice(0,3).map(Number);const [L,C,h]=toLch(toLab(m));const o=(typeof Player!=='undefined'&&Player.opt)||{bl:0.42,bs:0.72};const r=h*Math.PI/180,L2=L+(96-L)*o.bl,C2=C*o.bs;return `rgb(${fromLab([L2,C2*Math.cos(r),C2*Math.sin(r)])})`}
 function colorK(k){if(st.pal==='soft')return softHue(k);if(st.pal==='distinct'){const c=hex2rgb(DIST[(k-1)%DIST.length]);return `rgb(${c})`}return color(pos(k))}
 const esc=s=>s.replace(/[\u0000-\u001f\u007f\ufffc\ufffd]/g,'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const flow=document.getElementById('flow');
@@ -625,7 +625,7 @@ function paint(){
   if(typeof midLabel==='function')midLabel();
   flow.classList.toggle('blocks',st.mark==='blocks');
   drawRounds();
-  let css=`#flow span{color:${FADE}}#flow.blocks span{background:${FADE}}`;
+  let css=`#flow span{color:${FADE}}#flow.blocks span{background:linear-gradient(${FADE},${FADE}) no-repeat 0 55%/calc(100% - var(--wg,0em)) var(--bh,56%);color:transparent!important}`;
   // Coloring row: edits darker (new words a little lighter), and earlier versions in gray while Versions or Write runs
   const po=PO(),darker=po.split==='darker'&&typeof Player!=='undefined';
   const cur=po.older==='gray'?(writing?wRound:(st.view==='one'&&st.upto?st.upto:0)):0;
@@ -636,15 +636,15 @@ function paint(){
   for(let k=1;k<=NR;k++){
     const faded=sel.size&&!sel.has(k)&&!(grayEarlier&&k<selMax), old=(cur>1&&k<cur)||(grayEarlier&&!sel.has(k)&&k<selMax), c=faded?FADE:old?'#c9ced6':darker?Player.newCol(k):colorK(k), q=`span[data-e="${k}"]`;
     const bc=faded||old?c:lighten(c);
-    css+=`#flow ${q}{color:${c}}#flow.blocks ${q}{background:${bc}}`;
-    if(darker&&!faded&&!old){const e=Player.darkCol(k);css+=`#flow ${q}[data-x]{color:${e}}#flow.blocks ${q}[data-x]{background:${lighten(e)}}`}
-    if(!faded)css+=`#flow ${q}[data-h]{text-decoration:line-through}#flow.blocks ${q}[data-h]{text-decoration:none;background:color-mix(in srgb,${bc} 32%,#fff)}`;
+    css+=`#flow ${q}{color:${c}}#flow.blocks ${q}{background:linear-gradient(${bc},${bc}) no-repeat 0 55%/calc(100% - var(--wg,0em)) var(--bh,56%)}`;
+    if(darker&&!faded&&!old){const e=Player.darkCol(k);css+=`#flow ${q}[data-x]{color:${e}}#flow.blocks ${q}[data-x]{background:linear-gradient(${lighten(e)},${lighten(e)}) no-repeat 0 55%/calc(100% - var(--wg,0em)) var(--bh,56%)}`}
+    if(!faded)css+=`#flow ${q}[data-h]{text-decoration:line-through}#flow.blocks ${q}[data-h]{text-decoration:none;background:linear-gradient(color-mix(in srgb,${bc} 32%,#fff),color-mix(in srgb,${bc} 32%,#fff)) no-repeat 0 55%/calc(100% - var(--wg,0em)) var(--bh,56%)}`;
   }
   if(st.view==='one'&&st.upto){
     const k=st.upto, hide='{color:transparent!important;background:transparent!important;box-shadow:none!important;text-decoration:none!important}';
     for(let j=k+1;j<=NR;j++)css+=`#flow span[data-e="${j}"]${hide}`;
     if(st.mode==='written')for(let e=1;e<=k;e++){const c=(sel.size&&!sel.has(e))?FADE:colorK(e);
-      for(let d=k+1;d<=NR;d++)css+=`#flow span[data-e="${e}"][data-d="${d}"]{text-decoration:none!important}#flow.blocks span[data-e="${e}"][data-d="${d}"]{background:${c}!important;color:${c}!important;box-shadow:none!important}`}
+      for(let d=k+1;d<=NR;d++)css+=`#flow span[data-e="${e}"][data-d="${d}"]{text-decoration:none!important}#flow.blocks span[data-e="${e}"][data-d="${d}"]{background:linear-gradient(${c},${c}) no-repeat 0 55%/calc(100% - var(--wg,0em)) var(--bh,56%)!important;color:transparent!important;box-shadow:none!important}`}
   }
   css+=css.replace(/#flow(?![A-Za-z])/g,'#flowLens');
   dyn.textContent=css;
@@ -1252,12 +1252,13 @@ function syncUI(){
   ['bl','bs','bh'].forEach(id=>{$('p'+id).value=opt[id];$('p'+id+'v').textContent=Math.round(opt[id]*100)+'%'});
   $('pwg').value=opt.wg;$('pwgv').textContent=opt.wg.toFixed(2)+' em';$('plh').value=opt.lh;$('plhv').textContent=(+opt.lh).toFixed(2);
   flow.style.setProperty('--bh',Math.round(opt.bh*100)+'%');flow.style.setProperty('--wg',opt.wg+'em');flow.style.lineHeight=opt.lh;
+  for(const id of ['flow','flowLens']){const f=document.getElementById(id);if(f){f.style.setProperty('--bh',Math.round(opt.bh*100)+'%');f.style.setProperty('--wg',opt.wg+'em')}}
   $('pbySize').checked=opt.bySize;
-  $('pblocksRow').hidden=opt.view!=='blocks';
+  $('pblocksRow').hidden=!(typeof st!=='undefined'&&st.mark==='blocks');
   document.querySelectorAll('.seg button[data-pk]').forEach(b=>b.setAttribute('aria-pressed',String(opt[b.dataset.pk]===b.dataset.v)));
 }
 ['speed','hold','pause'].forEach(id=>$('p'+id).addEventListener('input',e=>{opt[id]=+e.target.value;retime();syncUI();save();apply(false)}));
-['bl','bs'].forEach(id=>$('p'+id).addEventListener('input',e=>{opt[id]=+e.target.value;syncUI();save();paint()}));
+['bl','bs'].forEach(id=>$('p'+id).addEventListener('input',e=>{opt[id]=+e.target.value;syncUI();save();paint();if(window.onPageOpt)onPageOpt('blocks')}));
 ['bh','wg'].forEach(id=>$('p'+id).addEventListener('input',e=>{opt[id]=+e.target.value;syncUI();save()}));
 let lt=null;$('plh').addEventListener('input',e=>{opt.lh=+e.target.value;syncUI();save();clearTimeout(lt);lt=setTimeout(()=>{fit();if(window.onPageOpt)onPageOpt('lh')},120)});
 $('pbySize').addEventListener('change',e=>{opt.bySize=e.target.checked;retime();save();apply(false)});
@@ -1472,7 +1473,7 @@ for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','olde
     '[data-pk=order][data-v=all]':'All changes of a version at once.','[data-pk=order][data-v=reading]':'Changes one by one, in reading order.','[data-pk=order][data-v=scattered]':'Changes one by one, in random order.',
     '[data-pk=layout][data-v=fixed]':'The final text stays in place, in gray, and fills in.','[data-pk=layout][data-v=grow]':'The text has the real length of each version.',
     '[data-pk=removed][data-v=vanish]':'Cut words disappear after being crossed out.','[data-pk=removed][data-v=stay]':'Cut words stay, crossed out.',
-    '#phold':'How long cut words stay crossed out.','#ppause':'Pause after each version.','#pbySize':'Versions with more changes get more time.'
+    '#pbl':'Blocks: how light the colored bars are.','#pbs':'Blocks: how strong the colors are.','#pbh':'Blocks: height of the bars.','#pwg':'Blocks: space between words.','#phold':'How long cut words stay crossed out.','#ppause':'Pause after each version.','#pbySize':'Versions with more changes get more time.'
   };
   for(const [q,t] of Object.entries(T))document.querySelectorAll(q).forEach(el=>{el.title=t;const l=el.closest('label');if(l&&!l.title)l.title=t});
 
@@ -1500,6 +1501,8 @@ for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','olde
     e.preventDefault();e.stopPropagation();if(ev==='click')show(el)},true);
   // version buttons are redrawn often: keep their explanation in the bubble too
   new MutationObserver(()=>{if(help)document.querySelectorAll('#rounds [title],#prounds [title]').forEach(el=>{el.dataset.tip=el.title;el.removeAttribute('title')})}).observe(document.getElementById('main'),{childList:true,subtree:true});
+  {const br=document.getElementById('pblocksRow');document.getElementById('advRows').insertBefore(br,document.getElementById('revSet'));
+   document.querySelectorAll('[data-k=view]').forEach(x=>x.addEventListener('click',()=>{br.hidden=st.mark!=='blocks'}));br.hidden=st.mark!=='blocks'}
   // Advanced: Color, Page and Coloring (remembered)
   const ab=document.getElementById('advBtn'),ar=document.getElementById('advRows');
   const setA=o=>{ar.hidden=!o;ab.setAttribute('aria-expanded',String(o));ab.textContent=o?'Advanced ⌃':'Advanced ⌄';try{localStorage.setItem('ttl-adv',o?'1':'0')}catch(e){}};
