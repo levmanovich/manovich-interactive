@@ -798,10 +798,13 @@ document.querySelectorAll('#animSeg button').forEach(b=>b.addEventListener('clic
 document.getElementById('pclose').addEventListener('click',()=>setView(lastView));
 function setView(v){
   if(v==='player'&&typeof writing!=='undefined'&&writing)stopWrite(true);
-  st.view=v;
+  const prevView=st.view;st.view=v;
   document.querySelectorAll('.seg button[data-k="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===(v==='one'||v==='player'?st.mark:v)));
   pageEl.hidden=v!=='one';multi.hidden=v!=='ten';stackWrap.hidden=v!=='stack';
-  const pv=v==='player';document.getElementById('pview').hidden=!pv;document.getElementById('pside').hidden=!pv;
+  const pv=v==='player';
+  // the player always opens at the whole page (no left-over close-up from an earlier visit)
+  if(pv!==(prevView==='player')){const pz=document.getElementById('pzoom');if(pz&&+pz.value!==1){pz.value=1;pz.dispatchEvent(new Event('input'))}}
+  document.getElementById('pview').hidden=!pv;document.getElementById('pside').hidden=!pv;
   {const n=document.getElementById('info'),r=document.getElementById(pv?'prounds':'rounds');r.parentNode.insertBefore(n,r)}
   ['rounds','rhint'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=pv});
   ['prounds','prtext'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=!pv});
@@ -859,7 +862,6 @@ function playerMark(quiet){
   const v=st.mark==='blocks'?'blocks':'text',b=document.querySelector(`button[data-pk="view"][data-v="${v}"]`);
   if(Player.opt.view!==v&&b)b.click();
   if(!quiet)document.querySelectorAll('.seg button[data-k="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===st.mark));
-  playerZoom(+document.getElementById('pzoom').value||1);
 }
 // ---- stack: the ten pages in axonometry, v1 at the bottom ----
 const stackCv=document.getElementById('stack'), stackWrap=document.getElementById('stackwrap');
