@@ -733,14 +733,13 @@ multi.addEventListener('click',e=>{const b=e.target.closest('.mp');if(!b)return;
   sel.clear();sel.add(+b.dataset.k);st.mark='blocks';setView('one');paint();});
 let lastView='one';
 // ---- Animate row: three animations; choosing one starts it and explains it ----
-let animSel=null;
+let animSel='rev';   // chosen at the start: Play opens the Revisions player
 const MODE_NAME={final:'Final text',written:'All written text',deleted:'Deleted',edited:'Edited'};
 const ANIM_HINT={rev:()=>'Each version\'s changes in turn: new words are written in, cuts are crossed out, rewrites replace old words.',
   ver:()=>`Shows the chosen text view (now ${MODE_NAME[st.mode]}) one whole version at a time: v1, then v2, and so on.`,
   write:()=>'Shows all text ever written, word by word, version after version; cut words are crossed out.'};
 function updateAnim(){
   const pv=st.view==='player';
-  if(!pv&&animSel==='rev')animSel=null;
   document.querySelectorAll('#animSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.anim===animSel)));
   document.getElementById('writeCtl').hidden=animSel!=='write'||st.view!=='one';
   document.getElementById('playCtl').hidden=animSel!=='ver'||pv||st.view==='ten';
@@ -1345,10 +1344,11 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
 {
   const aplay=document.getElementById('aplay'),astart=document.getElementById('astart');
   const src=()=>animSel==='write'?writeBtn:animSel==='ver'?playBtn:animSel==='rev'?document.getElementById('pplay'):null;
-  const sync=()=>{const b=src();aplay.disabled=astart.disabled=!b;aplay.textContent=b?b.textContent:'Play';
-    aplay.setAttribute('aria-pressed',b?b.getAttribute('aria-pressed')||'false':'false');
-    if(b)document.getElementById('olderSeg').classList.remove('idle')};   // Earlier in gray applies to every animation
-  aplay.addEventListener('click',()=>{const b=src();if(b)b.click();sync()});
+  const sync=()=>{const b=src(),w=animSel==='rev'&&st.view!=='player';aplay.disabled=!b;astart.disabled=!b||w;
+    aplay.textContent=w?'Play':b?b.textContent:'Play';aplay.setAttribute('aria-pressed',!w&&b?b.getAttribute('aria-pressed')||'false':'false');
+    if(b&&!w)document.getElementById('olderSeg').classList.remove('idle')};   // Earlier in gray applies to every animation
+  const revWaiting=()=>animSel==='rev'&&st.view!=='player';
+  aplay.addEventListener('click',()=>{if(revWaiting()){document.querySelector('[data-anim=rev]').click();sync();return}const b=src();if(b)b.click();sync()});
   astart.addEventListener('click',()=>{
     if(animSel==='write'){stopWrite(true);wRound=0;startWrite();stopWrite(false);writeBtn.textContent='Play';wHeld=null}
     else if(animSel==='ver'){stopPlay();st.upto=1;verAtStart=true;step()}
