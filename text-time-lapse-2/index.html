@@ -220,6 +220,20 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 body.compact #adv,body.compact #tip{display:none!important}
 @media (min-width:1000px) and (orientation:landscape){body:not(.compact){--labw:66px}}
 .top .eyebrow{align-items:center}
+/* Example line and a thin strip of version colors, in the control column (the page gets the right side) */
+#legend{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+#legend .info{margin-top:0;align-items:flex-start}
+#legend .info .note{font-size:11px;line-height:1.4}
+#legend .rounds{grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;margin-top:0}
+#legend .rb{padding:3px 4px 2px;gap:1px;min-height:0;height:27px;box-sizing:border-box;justify-content:flex-start;overflow:hidden}
+#legend .rb .sw{flex:none}
+#legend .rb .sw{height:6px}
+#legend .rb .v{font-size:10px}
+#legend .rb .cnt2{display:none}
+#legend .rhint{min-height:0}
+#legend #rhint:has(#rclear[hidden]){display:none}   /* the line shows only with its 'Show all rounds' link */
+#rtext,#prtext{display:none!important}
+#rclear:not([hidden]){display:inline}
 #tip{display:none!important}
 #helpBtn{min-width:26px;padding:0;margin-right:6px;font-weight:600;letter-spacing:0;text-transform:none}
 #helpBtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -232,8 +246,6 @@ body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid
 #helpBar{position:fixed;z-index:49;left:50%;bottom:14px;transform:translateX(-50%);background:#11141b;color:#fff;font:500 12px var(--f-ui);padding:6px 12px;border-radius:16px;pointer-events:none}
 #helpBar[hidden]{display:none}
 #olderSeg.idle{opacity:1}   /* always black, like the other controls */
-#info{border-top:1px solid var(--line);padding-top:10px}   /* separator above Example */
-@media (min-width:1000px) and (orientation:landscape){body:not(.compact) #info{border-top:0;padding-top:0}}   /* side by side: Example sits right under the header line, one line is enough */
 /* the Player row has the same height for Revisions, Versions and Write, so nothing below it moves */
 @media (min-width:1000px) and (orientation:landscape){
   body:not(.compact) #vwRow,body:not(.compact) #pside .groups>.grow:first-child{min-height:72px;align-items:start}
@@ -297,6 +309,13 @@ body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid
     <p class="note">Click a version bar to play just that version. Gray shows the final text still to come. Zoom in and scroll inside the page to read a passage.</p>
   </div>
   <p class="tip" id="tip" hidden></p>
+  <div id="legend">
+  <div class="info" id="info"><button type="button" class="play" id="example" aria-pressed="false" title="Show the example: 16 versions of an essay">Example</button><p class="note" id="note"></p></div>
+  <div class="rounds" id="rounds"></div>
+  <div class="rhint" id="rhint"><span id="rtext"></span><button type="button" id="rclear" hidden>Show all rounds</button></div>
+    <div class="rounds" id="prounds" hidden></div>
+    <div class="rhint" id="prtext" hidden></div>
+  </div>
   <div id="adv">
     <button type="button" class="play" id="advBtn" aria-expanded="false">Advanced ⌄</button>
     <div class="groups" id="advRows" hidden>
@@ -350,16 +369,11 @@ body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid
   </div>
   </div>
   <div id="main">
-  <div class="info" id="info"><button type="button" class="play" id="example" aria-pressed="false" title="Show the example: 16 versions of an essay">Example</button><p class="note" id="note"></p></div>
-  <div class="rounds" id="rounds"></div>
-  <div class="rhint" id="rhint"><span id="rtext"></span><button type="button" id="rclear" hidden>Show all rounds</button></div>
   <div class="page" id="page"><div class="flow" id="flow"></div><div id="wlabel" hidden></div><div id="lens" hidden><div id="lensIn"></div></div></div>
   <div class="multi" id="multi" hidden></div>
   <div class="stackwrap" id="stackwrap" hidden><canvas id="stack" aria-label="The versions as stacked pages, first version at the bottom"></canvas></div>
 
   <div id="pview" hidden>
-    <div class="rounds" id="prounds"></div>
-    <div class="rhint" id="prtext"></div>
     <div class="page" id="ppage"><div class="flow" id="pflow"></div></div>
   </div>
   </div>
@@ -572,9 +586,9 @@ const roundsEl=document.getElementById('rounds');
 const fmt=n=>n.toLocaleString('en-US');
 function drawRounds(){
   if(writing){roundsEl.innerHTML=counts.map((n,i)=>{const r=i+1,cl=r<wRound?'past':r===wRound?'now':'future';
-    return `<button type="button" class="rb ${cl}" data-r="${r}" aria-pressed="false" title="Version ${r} · ${dates[i]} ${years[i]}"><span class="sw" style="background:${colorK(r)}"></span><span class="v">v${r} · ${fmt(n)}</span></button>`}).join('');return}
+    return `<button type="button" class="rb ${cl}" data-r="${r}" aria-pressed="false" title="Version ${r} · ${dates[i]} ${years[i]}"><span class="sw" style="background:${colorK(r)}"></span><span class="v">v${r}<span class="cnt2"> · ${fmt(n)}</span></span></button>`}).join('');return}
   roundsEl.innerHTML=counts.map((n,i)=>`<button type="button" class="rb" data-r="${i+1}" aria-pressed="${sel.has(i+1)}" title="Version ${i+1} · ${dates[i]} ${years[i]} · ${fmt(n)} words">
-   <span class="sw" style="background:${colorK(i+1)}"></span><span class="v">v${i+1} · ${fmt(n)}</span></button>`).join('');
+   <span class="sw" style="background:${colorK(i+1)}"></span><span class="v">v${i+1}<span class="cnt2"> · ${fmt(n)}</span></span></button>`).join('');
   const t=document.getElementById('rtext');const M=MODES[st.mode];
   if(st.view==='stack'){
     // like Write: the current version outlined, later ones faded (not all of them 'selected')
@@ -790,6 +804,7 @@ function setView(v){
   const pv=v==='player';document.getElementById('pview').hidden=!pv;document.getElementById('pside').hidden=!pv;
   {const n=document.getElementById('info'),r=document.getElementById(pv?'prounds':'rounds');r.parentNode.insertBefore(n,r)}
   ['rounds','rhint'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=pv});
+  ['prounds','prtext'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=!pv});
   // rows that do not apply stay in place, faded, so the controls do not jump
   {const tv=document.getElementById('textViewRow');tv.classList.toggle('na',pv);tv.inert=pv}
   if(!pv)lastView=v;
@@ -1180,7 +1195,7 @@ function paint(){
   pageEl.style.aspectRatio=SH[0]+'/'+SH[1];if(!pageEl.closest('[hidden]'))pageEl.style.width=pageFitW(pageEl)+'px';
   $('prounds').innerHTML=[...Array(NR)].map((_,i)=>{const r=i+1,c=CNT[r],tot=c.add+c.ed||1;
     const sw=opt.split==='darker'?`<i style="width:${c.add/tot*100}%;background:${newCol(r)}"></i><i style="width:${c.ed/tot*100}%;background:${darkCol(r)}"></i>`:`<i style="width:100%;background:${baseCol(r)}"></i>`;
-    return `<button type="button" class="rb" data-r="${r}" title="Version ${r} · ${dates[i]} ${years[i]} · ${fmt(c.add)} added, ${fmt(c.ed)} edited, ${fmt(c.rem)} removed"><span class="sw">${sw}</span><span class="v">v${r} · ${fmt(c.add+c.ed)}</span></button>`}).join('');
+    return `<button type="button" class="rb" data-r="${r}" title="Version ${r} · ${dates[i]} ${years[i]} · ${fmt(c.add)} added, ${fmt(c.ed)} edited, ${fmt(c.rem)} removed"><span class="sw">${sw}</span><span class="v">v${r}<span class="cnt2"> · ${fmt(c.add+c.ed)}</span></span></button>`}).join('');
   $('prounds').querySelectorAll('.rb').forEach(b=>b.onclick=()=>{const s=TL[+b.dataset.r-1];stop();T=s.t0+0.02;apply(false);follow(true);stopAt=s.t0+s.w+s.hold+s.pause;play(true)});
   lastR=0;
 }
