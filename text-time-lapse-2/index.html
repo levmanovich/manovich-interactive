@@ -225,6 +225,8 @@ body.compact #adv,body.compact #tip{display:none!important}
 #palCtl.custom>*:not(#preset){display:inline-flex}
 #palCtl.custom input[type=color]{display:inline-block}
 .mid.pair{flex-wrap:nowrap;gap:5px}
+#advRows .grow{min-height:38px}
+#plh{width:200px}   /* as long as the Zoom slider */   /* slider rows as tall as button rows: even spacing */
 /* on/off settings: toggle buttons like Close-up (black when on), no checkboxes */
 .tog[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 #advRows label:has(> input[type=checkbox]){display:none}
@@ -1554,6 +1556,30 @@ for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','olde
     t.addEventListener('click',()=>{box.click();sync()});box.addEventListener('change',sync);sync();syncs.push(sync);
   }
   window.syncToggles=()=>syncs.forEach(f=>f());
+}
+// ---- Advanced: one kind of control per row, like the upper controls ----
+{
+  const mk=(label,id)=>{const g=document.createElement('div');g.className='grow';if(id)g.id=id;g.innerHTML=`<span class="lab">${label}</span><div class="items"></div>`;return g};
+  const rowOf=el=>el.closest('.grow');
+  const move=(els,g)=>{const it=g.querySelector('.items');els.forEach(e=>e&&it.appendChild(e));return g};
+  const lab=(g,t)=>{g.querySelector('.lab').textContent=t};
+  const span=id=>document.getElementById(id).closest('span.mid');
+  // Page -> Shape / Text / Spacing
+  const page=document.getElementById('pageRow');lab(page,'Shape');
+  const tText=move([span('cbLeft')],mk('Text','textRow'));
+  const sp=span('plh');sp.querySelector('label').hidden=true;document.getElementById('plh').setAttribute('aria-label','Line spacing');
+  const tSp=move([sp],mk('Spacing','spacingRow'));
+  page.after(tText);tText.after(tSp);
+  // Blocks -> Blocks (Lightness, Saturation) / Bars (Bar height, Word gap); both show only with Blocks
+  const bl=document.getElementById('pblocksRow');
+  const bars=move([span('pbh'),span('pwg')],mk('Bars','pbarsRow'));bl.after(bars);
+  const mirror=()=>{bars.hidden=bl.hidden};new MutationObserver(mirror).observe(bl,{attributes:true,attributeFilter:['hidden']});mirror();
+  // Timing -> Timing (Crossed out, Pause) / Pacing (Big versions longer)
+  const tim=rowOf(document.getElementById('phold'));
+  const pac=move([span('pbySize')],mk('Pacing','pacingRow'));tim.after(pac);
+  // Changes -> Order / Changes (Text grows, Keep cuts)
+  const ch=rowOf(document.querySelector('button[data-pk="order"]'));lab(ch,'Order');
+  const chg=move([span('cbGrow')],mk('Changes','changesRow'));ch.after(chg);
 }
 updateAnim();
 showExample();
