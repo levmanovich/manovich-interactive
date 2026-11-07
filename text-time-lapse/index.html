@@ -1054,8 +1054,7 @@ function paint(){
   dyn.textContent=css;
   flow.classList.toggle('blocks',opt.view==='blocks');
   flow.style.textAlign=opt.align==='left'?'left':'justify';flow.style.hyphens=opt.align==='left'?'manual':'auto';
-  const SH={a4:[1,1.414,900],'45':[4,5,900],'11':[1,1,900],'916':[9,16,560],'169':[16,9,1300]}[opt.shape]||[1,1.414,900];
-  if(!pageEl.closest('[hidden]'))document.querySelector('.wrap').style.maxWidth=SH[2]>900?SH[2]+'px':'900px';
+  const SH=SHAPES[opt.shape]||SHAPES.a4;   // the same page sizes as the other views, so the layout does not change
   pageEl.style.aspectRatio=SH[0]+'/'+SH[1];pageEl.style.width=`min(100%,${SH[2]}px)`;
   $('prounds').innerHTML=[...Array(NR)].map((_,i)=>{const r=i+1,c=CNT[r],tot=c.add+c.ed||1;
     const sw=opt.split==='darker'?`<i style="width:${c.add/tot*100}%;background:${newCol(r)}"></i><i style="width:${c.ed/tot*100}%;background:${darkCol(r)}"></i>`:`<i style="width:100%;background:${baseCol(r)}"></i>`;
@@ -1068,7 +1067,7 @@ function paint(){
 const charW=0.5;let fitKey='';
 function fit(){
   if(!N)return;
-  {const pw=pageEl.offsetWidth,ph=pageEl.offsetHeight,m=Math.min(pw,ph);pageEl.style.padding=`${Math.round(m*0.06)}px ${Math.round(m*0.065)}px`}
+  {const pw=pageEl.offsetWidth;pageEl.style.padding=`${0.07*pw}px ${0.08*pw}px`}   // the same margins as the other viewspx ${Math.round(m*0.065)}px`}
   const Wp=flow.clientWidth/kOf(flow),Hp=flow.clientHeight/kOf(flow),key=[Math.round(Wp),Math.round(Hp),opt.removed,opt.layout,opt.lh,opt.align,opt.shape,N].join('|');
   if(key===fitKey||!Wp)return;fitKey=key;
   let peak=1,best=-1;
