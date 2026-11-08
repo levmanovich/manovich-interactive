@@ -220,6 +220,10 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
 body.compact #adv,body.compact #tip{display:none!important}
 @media (min-width:1000px) and (orientation:landscape){body:not(.compact){--labw:66px}}
 .top .eyebrow{align-items:center}
+/* Paragraphs: Line between = no indent, an empty line between paragraphs */
+body.pspace .flow p{text-indent:0;margin-bottom:1.1em}
+body.pspace #pflow i.ind{width:0}
+body.pspace #pflow i.pb{height:1.1em}
 #colorSel{font:inherit;font-size:12px;font-weight:400;height:26px;color:var(--ink);background:var(--bg);border:1px solid var(--btn);border-radius:6px;padding:0 6px}
 #palCtl>*:not(#preset){display:none}
 #palCtl.custom>*:not(#preset){display:inline-flex}
@@ -355,6 +359,7 @@ body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid
     </div></div>
       <div class="grow" id="pageRow"><span class="lab">Page</span><div class="items">
         <div class="seg" role="group" aria-label="Alignment" hidden><button type="button" data-pk="align" data-v="justify">Justified</button><button type="button" data-pk="align" data-v="left">Left aligned</button></div>
+        <div class="seg" role="group" aria-label="Paragraphs" id="paraSeg"><button type="button" data-pk="para" data-v="indent">Indent</button><button type="button" data-pk="para" data-v="space">Line between</button></div>
         <div class="seg" role="group" aria-label="Proportions"><button type="button" data-pk="shape" data-v="a4">A4</button><button type="button" data-pk="shape" data-v="45">4:5</button><button type="button" data-pk="shape" data-v="11">Square</button><button type="button" data-pk="shape" data-v="916">9:16</button><button type="button" data-pk="shape" data-v="169">16:9</button></div>
         <span class="mid"><label><input type="checkbox" id="cbLeft">Left aligned</label></span>
         <span class="mid"><label for="plh">Line spacing</label> <input type="range" id="plh" min="1" max="2.4" step="0.02" value="1.32"> <span id="plhv"></span></span>
@@ -737,10 +742,10 @@ function solve(mode){
 }
 // page settings shared with the player (Page row): proportions, alignment, line spacing
 const SHAPES={a4:[1,1.414,900],'45':[4,5,900],'11':[1,1,900],'916':[9,16,560],'169':[16,9,900]};
-const PO=()=>(typeof Player!=='undefined'&&Player.opt)||{shape:'a4',align:'justify',lh:1.32,split:'same',older:'color'};
+const PO=()=>(typeof Player!=='undefined'&&Player.opt)||{shape:'a4',align:'justify',lh:1.32,split:'same',older:'color',para:'indent'};
 const shp=()=>SHAPES[PO().shape]||SHAPES.a4;
 const PR=()=>shp()[1]/shp()[0];           // page height / width
-const pkey=()=>{const o=PO();return o.shape+'|'+o.align+'|'+o.lh+'|'+o.split};
+const pkey=()=>{const o=PO();return o.shape+'|'+o.align+'|'+o.lh+'|'+o.split+'|'+o.para};
 // page width: as wide as the column allows, but short enough that the whole page fits on the screen
 function pageFitW(el){
   const s=shp(),r=s[1]/s[0],cw=el.parentElement.clientWidth||900,vh=innerHeight;
@@ -1105,14 +1110,15 @@ document.fonts&&document.fonts.ready.then(()=>{for(const k in fitCache)delete fi
 // ---- Page and Coloring rows (shared with the player) changed ----
 window.onPageOpt=function(k){
   document.body.classList.toggle('rbold',PO().split==='darker');
-  if(k==='shape'||k==='align'||k==='lh'||k==='split'){if(st.view==='one'){fit();if(Math.abs(MZ-1)>0.001)mainZoom(MZ)}}
+  document.body.classList.toggle('pspace',PO().para==='space');
+  if(k==='shape'||k==='align'||k==='lh'||k==='split'||k==='para'){if(st.view==='one'){fit();if(Math.abs(MZ-1)>0.001)mainZoom(MZ)}}
   paint();
 };
 
 // ===================== Versions player: plays the versions one after another =====================
 const Player=(function(){
 const $=id=>document.getElementById(id);
-const opt={speed:2,bySize:true,hold:0.6,pause:1,order:'all',removed:'vanish',view:'text',align:'justify',bl:0.42,bs:0.72,bh:0.56,wg:0,lh:1.32,layout:'fixed',shape:'a4',split:'same',older:'color'};
+const opt={para:'indent',speed:2,bySize:true,hold:0.6,pause:1,order:'all',removed:'vanish',view:'text',align:'justify',bl:0.42,bs:0.72,bh:0.56,wg:0,lh:1.32,layout:'fixed',shape:'a4',split:'same',older:'color'};
 try{const s=JSON.parse(localStorage.getItem('poa-player')||'null');if(s)Object.assign(opt,s)}catch(e){}
 const save=()=>{try{localStorage.setItem('poa-player',JSON.stringify(opt))}catch(e){}};
 const flow=$('pflow'),pageEl=$('ppage');
@@ -1230,7 +1236,7 @@ function fit(){
   if(!N)return;
   pageEl.style.width=pageFitW(pageEl)+'px';
   {const pw=pageEl.offsetWidth;pageEl.style.padding=`${0.07*pw}px ${0.08*pw}px`}   // the same margins as the other viewspx ${Math.round(m*0.065)}px`}
-  const Wp=flow.clientWidth/kOf(flow),Hp=flow.clientHeight/kOf(flow),key=[Math.round(Wp),Math.round(Hp),opt.removed,opt.layout,opt.lh,opt.align,opt.shape,opt.split,N].join('|');
+  const Wp=flow.clientWidth/kOf(flow),Hp=flow.clientHeight/kOf(flow),key=[Math.round(Wp),Math.round(Hp),opt.removed,opt.layout,opt.lh,opt.align,opt.shape,opt.split,opt.para,N].join('|');
   if(key===fitKey||!Wp)return;fitKey=key;
   let peak=1,best=-1;
   for(let r=1;r<=NR;r++){let n=0;for(let k=0;k<N;k++)if(born[k]<=r&&(opt.removed==='stay'||!died[k]||died[k]>=r))n++;if(n>best){best=n;peak=r}}
@@ -1288,9 +1294,9 @@ let lt=null;$('plh').addEventListener('input',e=>{opt.lh=+e.target.value;syncUI(
 $('pbySize').addEventListener('change',e=>{opt.bySize=e.target.checked;retime();save();apply(false)});
 document.querySelectorAll('.seg button[data-pk]').forEach(b=>b.addEventListener('click',()=>{
   const k=b.dataset.pk;opt[k]=b.dataset.v;syncUI();save();
-  if(window.onPageOpt&&['align','shape','split','older'].includes(k))onPageOpt(k);
+  if(window.onPageOpt&&['align','shape','split','older','para'].includes(k))onPageOpt(k);
   if(k==='order')retime();
-  paint();if(k==='removed'||k==='shape'||k==='layout'||k==='align'||k==='split'){fitKey='';fit()}
+  paint();if(k==='removed'||k==='shape'||k==='layout'||k==='align'||k==='split'||k==='para'){fitKey='';fit()}
   state.fill(-1);apply(false)}));
 let rt=null;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!$('pview').hidden)fit()},150)});
 
@@ -1451,6 +1457,7 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
   tb.addEventListener('click',()=>set(!document.body.classList.contains('compact')));
 }
 document.body.classList.toggle('rbold',PO().split==='darker');
+document.body.classList.toggle('pspace',PO().para==='space');
 // ---- Coloring checkboxes: each one drives a pair of the old buttons ----
 // ---- one Colors menu: the color sets, Soft / Bright / Grays, and Custom (your own three colors and Mid) ----
 {
@@ -1506,7 +1513,7 @@ for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','olde
     '[data-k=pal][data-v=soft]':'A calm color for each version.',
     '[data-k=pal][data-v=distinct]':'A bright, clearly different color for each version.',
     '[data-k=pal][data-v=gray]':'All versions in shades of gray.',
-    '#preset':'Color set: oldest, middle and newest version.','#colorSel':'Colors of the versions: a color set that blends from the oldest version to the newest, a calm or bright color for each version, grays, or your own three colors (Custom).','#cbLeft':'Text aligned on the left (otherwise on both sides).','#cbGrow':'Revisions: the text has the real length of each version (otherwise the final text stays in place, in gray).','#cbStay':'Revisions: cut words stay, crossed out (otherwise they disappear).',
+    '#preset':'Color set: oldest, middle and newest version.','#colorSel':'Colors of the versions: a color set that blends from the oldest version to the newest, a calm or bright color for each version, grays, or your own three colors (Custom).','#cbLeft':'Text aligned on the left (otherwise on both sides).','[data-pk=para][data-v=indent]':'Paragraphs: the first line indented, a small gap between paragraphs.','[data-pk=para][data-v=space]':'Paragraphs: no indent, an empty line between paragraphs.','#cbGrow':'Revisions: the text has the real length of each version (otherwise the final text stays in place, in gray).','#cbStay':'Revisions: cut words stay, crossed out (otherwise they disappear).',
     '#c0':'Color of the oldest version.','#c1':'Color of the middle version.','#c2':'Color of the newest version.',
     '[data-pk=align][data-v=justify]':'Text aligned on both sides.',
     '[data-pk=align][data-v=left]':'Text aligned on the left.',
@@ -1575,7 +1582,8 @@ for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','olde
   const tText=move([span('cbLeft')],mk('Text','textRow'));
   const sp=span('plh');sp.querySelector('label').hidden=true;document.getElementById('plh').setAttribute('aria-label','Line spacing');
   const tSp=move([sp],mk('Spacing','spacingRow'));
-  page.after(tText);tText.after(tSp);
+  const tPara=move([document.getElementById('paraSeg')],mk('Paragraphs','paraRow'));
+  page.after(tText);tText.after(tPara);tPara.after(tSp);
   // Blocks -> Blocks (Lightness, Saturation) / Bars (Bar height, Word gap); both show only with Blocks
   const bl=document.getElementById('pblocksRow');
   const bars=move([span('pbh'),span('pwg')],mk('Bars','pbarsRow'));bl.after(bars);
