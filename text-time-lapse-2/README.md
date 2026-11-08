@@ -59,12 +59,12 @@ The panel shows five rows: Files, Text view, Modes, Zoom and Animate. **Advanced
 ### Animations
 
 - **Revisions** shows each version's changes in turn: new words are written in, cut words are crossed out and disappear, and rewrites replace the old words. It opens the player, described below.
-- **Versions** shows the chosen text view (for example Final text) one whole version at a time: v1, then v2, and so on. Its Player row has ◀ ▶ (previous or next version) and Time per version.
+- **Versions** shows the chosen text view (for example Final text) one whole version at a time: v1, then v2, and so on. Its Player row has ◀ ▶ (previous or next version), Close-up (a magnifier you move with the mouse) and Time per version.
 - **Write** shows all text ever written, word by word, version after version, with cut words crossed out. Its Player row has ◀ ▶ (jump to the start of the previous or next version), Close-up (a magnifier that follows the word being written while the animation plays; pause, then move the mouse to read other parts) and Words/s.
 
 ### Player
 
-Pressing **Play** with Revisions chosen (or clicking Revisions) opens the player and plays it from an empty page; **Close player** takes you back. The Text view row is faded in the player. The Zoom row and Text / Blocks in Modes work in the player too: zoom in and scroll inside the page to read a passage. Play / Pause and ⏮ Start (back to the empty page) are in the Animate row. The **Player** row holds ◀ ▶ (previous or next version), a position slider and Time per version (shared with Versions). Click a version button to play just that version; the space bar also plays and pauses. Its other settings are in **Advanced** (they appear there only when Revisions is chosen):
+Pressing **Play** with Revisions chosen (or clicking Revisions) opens the player and plays it from an empty page; **Close player** takes you back. The Text view row is faded in the player. The Zoom row and Text / Blocks in Modes work in the player too: zoom in and scroll inside the page to read a passage. Play / Pause and ⏮ Start (back to the empty page) are in the Animate row. The **Player** row holds ◀ ▶ (previous or next version), Close-up (a magnifier you move with the mouse; it updates as the text changes), a position slider and Time per version (shared with Versions). Click a version button to play just that version; the space bar also plays and pauses. Its other settings are in **Advanced** (they appear there only when Revisions is chosen):
 
 - **Timing:** Crossed out sets how long removed words stay visible, Pause how long the player stops after each version. **Pacing:** Big versions longer gives versions with more changes more time.
 - **Order:** All at once, Reading order or Scattered. **Changes:** Text grows (the real length of each version; otherwise the final text stays in place, in gray); Keep cuts (cut words stay, crossed out; otherwise they disappear).

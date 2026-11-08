@@ -312,7 +312,7 @@ body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid
     </div></div>
     <div class="grow" id="vwRow" hidden><span class="lab">Player</span><div class="items">
       <span class="mid" style="flex-wrap:nowrap"><button type="button" class="play" id="vwprev" aria-label="Previous version" title="Previous version">◀</button><button type="button" class="play" id="vwnext" aria-label="Next version" title="Next version">▶</button></span>
-      <span class="mid" id="writeCtl"><button type="button" class="play" id="write" hidden>Play</button><button type="button" class="play" id="closeup" disabled title="A magnifier that follows the word being written. Pause, then move the mouse to read other parts.">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
+      <span class="mid" id="writeCtl"><button type="button" class="play" id="write" hidden>Play</button><button type="button" class="play" id="closeup" disabled title="A magnifier over the page. In Write it follows the word being written; otherwise, or when paused, move the mouse to read any part.">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
       <span class="mid" id="playCtl"><button type="button" class="play" id="play" hidden>Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.2" max="10" step="0.1" value="2"> <span id="speedv">2 s</span></span>
     </div></div>
   </div>
@@ -1040,41 +1040,46 @@ function writeHint(){
 writeBtn.addEventListener('click',()=>{if(wRAF){stopWrite(false)}else{if(!writing){wRound=0}startWrite()}});
 // ---- close-up lens: magnifies the paused page as readable text ----
 const lens=document.getElementById('lens'), lensIn=document.getElementById('lensIn'), cuBtn=document.getElementById('closeup');
-let lensOn=false, lensCopy=null, lensSpans=null, lensZ=3;
-function canCloseup(){return writing&&st.view==='one'}
+let lensOn=false, lensCopy=null, lensSpans=null, lensZ=3, LP=pageEl, LF=flow, lensT=null;
+function canCloseup(){return (animSel==='write'&&writing&&st.view==='one')||(animSel==='ver'&&st.view==='one')||(animSel==='rev'&&st.view==='player')}
 function updateCuBtn(){cuBtn.disabled=!canCloseup();if(cuBtn.disabled&&lensOn)lensOff()}
-function lensOff(){lensOn=false;lensSpans=null;lens.hidden=true;pageEl.classList.remove('lensing');cuBtn.setAttribute('aria-pressed','false');lensIn.innerHTML=''}
+function lensOff(){lensOn=false;lensSpans=null;clearInterval(lensT);lensT=null;lens.hidden=true;LP.classList.remove('lensing');cuBtn.setAttribute('aria-pressed','false');lensIn.innerHTML=''}
 let colW=100, colGap=10, nCols=1;
 function lensAt(x,y){ // x,y: point inside the flow, in CSS pixels
   const ci=Math.max(0,Math.min(nCols-1,Math.floor(x/(colW+colGap))));
   // the whole column fits in the magnifier: center on the column; otherwise follow the word across
   if(colW*lensZ<=lens.clientWidth)x=ci*(colW+colGap)+colW/2;
-  const lw=lens.clientWidth, lh=lens.clientHeight, fr=flow.getBoundingClientRect(), pr=pageEl.getBoundingClientRect();
+  const lw=lens.clientWidth, lh=lens.clientHeight, fr=LF.getBoundingClientRect(), pr=LP.getBoundingClientRect();
   let lx=(fr.left-pr.left)+x-lw/2, ly=(fr.top-pr.top)+y-lh/2;
   lx=Math.max(4,Math.min(pr.width-lw-4,lx)); ly=Math.max(4,Math.min(pr.height-lh-4,ly));
   lens.style.left=lx+'px';lens.style.top=ly+'px';
   lensIn.style.transform=`translate(${lw/2-x*lensZ}px,${lh/2-y*lensZ}px) scale(${lensZ})`;
 }
 function lensStart(){
-  lensCopy=flow.cloneNode(true);lensCopy.id='flowLens';lensCopy.classList.remove('blocks');
-  lensCopy.style.width=flow.clientWidth+'px';lensCopy.style.height=flow.clientHeight+'px';
-  lensIn.innerHTML='';lensIn.appendChild(lensCopy);lensSpans=[...lensCopy.querySelectorAll('span')];
-  const fs=parseFloat(getComputedStyle(flow).fontSize)/kOf(flow);
-  nCols=+flow.style.columnCount||1;colGap=2.2*fs;colW=(flow.clientWidth/kOf(flow)-colGap*(nCols-1))/nCols;
-  const pw=pageEl.clientWidth;
+  const pv=st.view==='player';LP=pv?document.getElementById('ppage'):pageEl;LF=pv?document.getElementById('pflow'):flow;
+  if(lens.parentElement!==LP)LP.appendChild(lens);
+  // the player's colors are styled by its id: the copy keeps it (the real page comes first, so lookups still find it)
+  lensCopy=LF.cloneNode(true);lensCopy.id=pv?'pflow':'flowLens';lensCopy.classList.remove('blocks');lensCopy.style.transform='';
+  lensCopy.style.width=LF.clientWidth+'px';lensCopy.style.height=LF.clientHeight+'px';
+  lensIn.innerHTML='';lensIn.appendChild(lensCopy);lensSpans=pv?null:[...lensCopy.querySelectorAll('span')];
+  // Revisions changes many words at once: refresh the magnified copy a few times a second
+  if(pv)lensT=setInterval(()=>{if(lensOn&&lensCopy)lensCopy.innerHTML=LF.innerHTML},250);
+  const fs=parseFloat(getComputedStyle(LF).fontSize)/kOf(LF);
+  nCols=+LF.style.columnCount||1;colGap=2.2*fs;colW=(LF.clientWidth/kOf(LF)-colGap*(nCols-1))/nCols;
+  const pw=LP.clientWidth;
   lensZ=Math.max(2,Math.min(16/fs,(pw-24)/(colW+2*fs)));   // always at least 2x larger than the page
   lens.style.width=Math.round(Math.min((colW+2*fs)*lensZ,pw-24))+'px';   // one full column plus a small margin, or the page width
   lens.style.height=Math.round(fs*1.32*lensZ*6.5)+'px';  // about six lines
-  lensOn=true;lens.hidden=false;pageEl.classList.add('lensing');cuBtn.setAttribute('aria-pressed','true');
+  lensOn=true;lens.hidden=false;LP.classList.add('lensing');cuBtn.setAttribute('aria-pressed','true');
   // open on the last word written; without one, on the middle of the part of the page that is on screen
-  const fr=flow.getBoundingClientRect(),w=wCur||wHeld;
+  const fr=LF.getBoundingClientRect(),w=pv?null:(wCur||wHeld);
   let x=fr.width/2,y=Math.max(0,Math.min(fr.height,innerHeight/2-fr.top));
   if(w&&w.getClientRects().length){const r=w.getBoundingClientRect();x=r.left-fr.left+r.width/2;y=r.top-fr.top+r.height/2}
   lensAt(x,y);
   lens.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 cuBtn.addEventListener('click',()=>{if(!canCloseup())return;lensOn?lensOff():lensStart()});   // the magnifier follows the writing; when paused, the mouse moves it
-pageEl.addEventListener('mousemove',e=>{if(!lensOn||wRAF)return;const fr=flow.getBoundingClientRect();lensAt(e.clientX-fr.left,e.clientY-fr.top)});
+for(const pg of [pageEl,document.getElementById('ppage')])pg.addEventListener('mousemove',e=>{if(!lensOn||wRAF||pg!==LP)return;const fr=LF.getBoundingClientRect();lensAt(e.clientX-fr.left,e.clientY-fr.top)});
 setStops();
 document.getElementById('preset').addEventListener('change',e=>{const c=e.target.value.split(',');['c0','c1','c2'].forEach((id,i)=>document.getElementById(id).value=c[i]);setStops();paint()});
 ['c0','c1','c2'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{setStops();paint()}));
@@ -1443,7 +1448,11 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
     sync()});
   const mo=new MutationObserver(sync);
   ['write','play','pplay'].forEach(id=>mo.observe(document.getElementById(id),{childList:true,characterData:true,subtree:true,attributes:true}));
-  const ua=updateAnim;updateAnim=function(){ua();sync();document.getElementById('revSet').hidden=animSel!=='rev';
+  let cuAnim=animSel,cuView=st.view;
+  const placeCu=()=>{if(lensOn&&(animSel!==cuAnim||st.view!==cuView))lensOff();cuAnim=animSel;cuView=st.view;   // a new animation or view: the magnifier closes
+    const row=animSel==='rev'?document.querySelector('#pside .grow .items'):document.querySelector('#vwRow .items');
+    const arrows=row&&row.querySelector('span.mid');if(arrows&&cuBtn.previousElementSibling!==arrows)arrows.after(cuBtn);updateCuBtn()};
+  const ua=updateAnim;updateAnim=function(){ua();sync();placeCu();document.getElementById('revSet').hidden=animSel!=='rev';
     {const ps=document.getElementById('pside'),wait=animSel==='rev'&&st.view!=='player';ps.hidden=!(wait||st.view==='player');ps.classList.toggle('na',wait);ps.inert=wait}requestAnimationFrame(()=>{if(st.view==='one')fit()})};   // rows may have changed: fit the page to the space again   // Revisions chosen, player not open yet: its Player row shows, faded; rows may have changed: fit the page again
 }
 // ---- Hide / Show controls (phones start with the controls hidden) ----
