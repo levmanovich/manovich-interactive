@@ -1,5 +1,7 @@
 # Text Time-lapse
 
+### ▶ [Open the tool in your browser](https://levmanovich.github.io/manovich-interactive/text-time-lapse/)
+
 # Guide
 
 Nov 7, 2026 · @Lev Manovich
