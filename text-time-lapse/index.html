@@ -153,7 +153,7 @@ body.rbold .flow span[data-x],body.rbold #pflow span[data-ed]{font-weight:700}
 .zbtns{flex-wrap:nowrap;gap:5px}
 .zbtns .play{margin-right:0}
 #palCtl label.mid{flex-wrap:nowrap;white-space:nowrap}
-#ctlToggle{margin-right:8px;letter-spacing:0;text-transform:none;padding:1px 7px;min-width:8.6em;text-align:center}
+#ctlToggle{margin-right:0;letter-spacing:0;text-transform:none;padding:1px 7px;min-width:8.6em;text-align:center}
 /* wide screens held sideways (laptop, iPad in landscape): controls in a column on the left, the page on the right */
 @media (min-width:1000px) and (orientation:landscape){
   .wrap{max-width:1700px}   /* the same width with the controls shown or hidden, so the header does not move */
@@ -162,7 +162,7 @@ body.rbold .flow span[data-x],body.rbold #pflow span[data-ed]{font-weight:700}
   body:not(.compact) #main{flex:1 1 auto;padding-top:4px}
   body:not(.compact) .grow{grid-template-columns:72px minmax(0,1fr)}
   body:not(.compact) #animRow{min-height:0}
-  body:not(.compact) #side .seg{flex-wrap:wrap}
+  body:not(.compact) #side .seg{flex-wrap:nowrap}
   body:not(.compact) #side .seg button{white-space:nowrap}
 }
 /* Hide controls: one thin bar with Play/Pause and Start, the page gets the screen */
@@ -199,11 +199,92 @@ input[type=range]::-moz-range-track{height:2px;background:var(--btn);border-radi
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:9px;border-radius:50%;background:var(--ink);border:0;margin-top:-3.5px}
 input[type=range]::-moz-range-thumb{width:9px;height:9px;border-radius:50%;background:var(--ink);border:0}
 input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
+/* ===== Text Time-lapse 2: quieter panel ===== */
+:root{--lab:#8b929c}
+.groups{border-bottom:0}
+.grow{border-top:0!important;padding:6px 0}
+.lab{font-size:9.5px;letter-spacing:.14em;font-weight:400;color:var(--lab)}
+.seg{border-radius:6px}
+.seg button{font-size:12px;padding:0 9px;height:26px}
+.play{font-size:12px;padding:0 10px;height:26px;border-radius:6px}
+.pal select{height:26px;font-size:12px}
+.mid{font-size:12px}
+#aplay,#aplay[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:500}
+#animHint,#pside>.note{display:none!important}
+.tip{margin:-2px 0 4px;padding-left:calc(var(--labw,78px) + 8px);font-size:11.5px;font-weight:400;line-height:1.45;color:#5f6670;height:2.9em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.grow.na .items,#pside.na .items{opacity:.35}
+.advsub{margin:8px 0 0;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--lab);font-weight:600}
+#adv{display:flex;flex-direction:column;gap:6px;margin-top:2px;padding-top:12px;border-top:1px solid var(--line)}   /* separator: main controls above, Advanced below */
+#advBtn{align-self:flex-start;margin-left:0}
+#loadmsg:empty{display:none}
+body.compact #adv,body.compact #tip{display:none!important}
+@media (min-width:1000px) and (orientation:landscape){body:not(.compact){--labw:66px}}
+.top .eyebrow{align-items:center}
+/* Paragraphs: Line between = no indent, an empty line between paragraphs */
+body.pspace .flow p{text-indent:0;margin-bottom:1.1em}
+body.pspace #pflow i.ind{width:0}
+body.pspace #pflow i.pb{height:1.1em}
+#colorSel{font:inherit;font-size:12px;font-weight:400;height:26px;color:var(--ink);background:var(--bg);border:1px solid var(--btn);border-radius:6px;padding:0 6px}
+#palCtl>*:not(#preset){display:none}
+#palCtl.custom>*:not(#preset){display:inline-flex}
+#palCtl.custom input[type=color]{display:inline-block}
+.mid.pair{flex-wrap:nowrap;gap:5px}
+#advRows .grow{min-height:38px}
+#plh{width:200px}
+/* joined buttons stay on one line; with little room they get a bit narrower */
+@media (min-width:430px){
+#side .seg{flex-wrap:nowrap;max-width:100%}
+#side .seg button{white-space:nowrap;flex:0 1 auto;min-width:0;padding:0 clamp(5px,1.2vw,9px)}
+}
+@media (max-width:429px){#side .seg{flex-wrap:wrap}}   /* small phones: joined buttons may take two lines */   /* as long as the Zoom slider */   /* slider rows as tall as button rows: even spacing */
+/* on/off settings: toggle buttons like Close-up (black when on), no checkboxes */
+.tog[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#advRows label:has(> input[type=checkbox]){display:none}
+.mid.pair>.mid{font-size:12px;min-width:0}
+.mid.pair>.mid>label{font-size:12px}
+
+/* Example line and a thin strip of version colors, in the control column (the page gets the right side) */
+#legend{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+#legend .info{margin-top:0;align-items:flex-start}
+#legend .info .note{font-size:11px;line-height:1.4}
+#legend .rounds{grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;margin-top:0}
+#legend .rb{padding:3px 4px 2px;gap:1px;min-height:0;height:27px;box-sizing:border-box;justify-content:flex-start;overflow:hidden}
+#legend .rb .sw{flex:none}
+#legend .rb .sw{height:6px}
+#legend .rb .v{font-size:10px}
+#legend .rb .cnt2{display:none}
+#legend .rhint{min-height:0}
+#legend #rhint:has(#rclear[hidden]){display:none}   /* the line shows only with its 'Show all rounds' link */
+#rtext,#prtext{display:none!important}
+#rclear:not([hidden]){display:inline}
+#tip{display:none!important}
+#helpBtn{min-width:26px;padding:0;margin-right:6px;font-weight:600;letter-spacing:0;text-transform:none}
+#helpBtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+/* help mode: a bubble next to the control under the pointer (or tapped) */
+body.helpmode #side [data-tip],body.helpmode #main [data-tip],body.helpmode .top [data-tip]{cursor:help}
+body.helpmode [data-tip]:hover,body.helpmode [data-anim]:hover{outline:1px solid #8b929c;outline-offset:2px}
+#bubble{position:fixed;z-index:50;max-width:280px;background:#11141b;color:#fff;font:400 12px/1.45 var(--f-ui);padding:8px 10px;border-radius:6px;box-shadow:0 6px 20px -8px rgba(0,0,0,.5);pointer-events:none}
+#bubble[hidden]{display:none}
+#bubble b{font-weight:600}
+#helpBar{position:fixed;z-index:49;left:50%;bottom:14px;transform:translateX(-50%);background:#11141b;color:#fff;font:500 12px var(--f-ui);padding:6px 12px;border-radius:16px;pointer-events:none}
+#helpBar[hidden]{display:none}
+#olderSeg.idle{opacity:1}   /* always black, like the other controls */
+/* the Player row has the same height for Revisions, Versions and Write, so nothing below it moves */
+@media (min-width:1000px) and (orientation:landscape){
+  body:not(.compact) #vwRow,body:not(.compact) #pside .groups>.grow:first-child{min-height:72px;align-items:start}
+  body:not(.compact) #vwRow>.lab,body:not(.compact) #pside .groups>.grow:first-child>.lab{padding-top:7px}
+}
+.byname{text-transform:none;letter-spacing:.02em;font-size:12px}
+.sep{color:var(--lab);margin:0 2px}
+@media (min-width:1000px) and (orientation:landscape){
+  body:not(.compact) #side{flex-basis:520px}
+  body:not(.compact) .grow{grid-template-columns:66px minmax(0,1fr)}
+}
 </style>
 
 <div class="wrap">
   <div class="top">
-    <p class="eyebrow"><span><b>Text Time-lapse</b> · see how a text changed across its saved versions</span><span class="credit"><button type="button" class="play" id="ctlToggle" aria-pressed="false">Hide controls</button> Lev Manovich</span></p>
+    <p class="eyebrow"><span><b>Text Time-lapse</b> · visualize your writing process <span class="sep">|</span> <span class="byname">Lev Manovich</span></span><span class="credit"><button type="button" class="play" id="helpBtn" aria-pressed="false" aria-label="Help">?</button><button type="button" class="play" id="ctlToggle" aria-pressed="false">Hide controls</button></span></p>
   </div>
   <div class="cols">
   <div id="side">
@@ -211,7 +292,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
     <div class="grow" id="drop"><span class="lab">Files</span><div class="items">
       <label class="play" for="folder">Choose a folder…<input type="file" id="folder" webkitdirectory multiple></label>
       <label class="play" for="files">Choose files…<input type="file" id="files" multiple accept=".txt,.md,.markdown,.docx"></label>
-      <span id="loadmsg">Load two or more versions of one text (.txt, .md or .docx), or drop them on the page. They are ordered by file name. Nothing leaves your computer.</span>
+      <span id="loadmsg"></span>
     </div></div>
     <div class="grow" id="textViewRow"><span class="lab">Text view</span><div class="items">
       <div class="seg" role="group" aria-label="Text view" id="modeSeg"><button type="button" data-k="mode" data-v="final" aria-pressed="true">Final text</button><button type="button" data-k="mode" data-v="written" aria-pressed="false">All written text</button><button type="button" data-k="mode" data-v="deleted" aria-pressed="false">Deleted</button><button type="button" data-k="mode" data-v="edited" aria-pressed="false">Edited</button></div>
@@ -222,33 +303,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
     <div class="grow" id="zoomRow"><span class="lab">Zoom</span><div class="items">
       <span class="mid"><input type="range" id="mzoom" min="0.2" max="8" step="0.05" value="1" autocomplete="off" aria-label="Type size"> <span id="mzoomv">1.0×</span></span>
       <span class="mid zbtns"><button type="button" class="play" id="mzcol" title="Set the type so about 10 lines fit on screen">Large type</button><button type="button" class="play" id="mzfit">Whole page</button></span>
-      <span class="note">Large type: one column of readable text; scroll to read.</span>
     </div></div>
-    <div class="grow"><span class="lab">Color</span><div class="items">
-      <div class="seg" role="group" aria-label="Palette: color ramp"><button type="button" data-k="pal" data-v="hue" aria-pressed="true">Palette</button></div>
-      <div class="pal" id="palCtl">
-        <select id="preset" aria-label="Color set">
-          <option value="#0c2c84,#d0157a,#f59a1b">Navy–magenta–orange</option>
-          <option value="#1e88c7,#7a3fb5,#e2462f">Sky–violet–vermilion</option>
-        </select>
-        <input type="color" id="c0" value="#0c2c84" aria-label="Oldest color">
-        <input type="color" id="c1" value="#d0157a" aria-label="Middle color">
-        <input type="color" id="c2" value="#f59a1b" aria-label="Newest color">
-        <label class="mid" for="mid" title="Midpoint: where the middle color sits">Mid <input type="range" id="mid" min="0.1" max="0.9" step="0.01" value="0.5"> <span id="midv">v2.5</span></label>
-      </div>
-      <div class="seg" role="group" aria-label="Palette: other"><button type="button" data-k="pal" data-v="soft" aria-pressed="false">Soft hues</button><button type="button" data-k="pal" data-v="distinct" aria-pressed="false">Bright hues</button><button type="button" data-k="pal" data-v="gray" aria-pressed="false">Grays</button></div>
-    </div></div>
-      <div class="grow" id="pageRow"><span class="lab">Page</span><div class="items">
-        <div class="seg" role="group" aria-label="Alignment"><button type="button" data-pk="align" data-v="justify">Justified</button><button type="button" data-pk="align" data-v="left">Left aligned</button></div>
-        <div class="seg" role="group" aria-label="Proportions"><button type="button" data-pk="shape" data-v="a4">A4</button><button type="button" data-pk="shape" data-v="45">4:5</button><button type="button" data-pk="shape" data-v="11">Square</button><button type="button" data-pk="shape" data-v="916">9:16</button><button type="button" data-pk="shape" data-v="169">16:9</button></div>
-        <span class="mid"><label for="plh">Line spacing</label> <input type="range" id="plh" min="1" max="2.4" step="0.02" value="1.32"> <span id="plhv"></span></span>
-      </div></div>
-      <div class="grow" id="coloringRow"><span class="lab">Coloring</span><div class="items">
-        <span class="mid"><label title="Rewritten words in bold, in a darker shade of their version's color; new words a little lighter"><input type="checkbox" id="cbSplit">Rewrites bold</label></span>
-        <div class="seg" role="group" aria-label="Edits" hidden><button type="button" data-pk="split" data-v="same">Edits same color</button><button type="button" data-pk="split" data-v="darker">Edits darker</button></div>
-        <span class="mid" id="olderSeg"><label title="During animations, or when you pick a version: earlier versions in gray"><input type="checkbox" id="cbOlder">Earlier versions in gray</label></span>
-        <div class="seg" role="group" aria-label="Earlier versions" hidden><button type="button" data-pk="older" data-v="color">Earlier in color</button><button type="button" data-pk="older" data-v="gray">Earlier in gray</button></div>
-      </div></div>
     <div class="grow" id="animRow"><span class="lab">Animate</span><div class="items">
       <span class="mid" id="animCtl"><button type="button" class="play" id="aplay" disabled>Play</button><button type="button" class="play" id="astart" disabled title="Back to the beginning">⏮ Start</button></span>
       <div class="seg" role="group" aria-label="Animation" id="animSeg"><button type="button" data-anim="rev" aria-pressed="false">Revisions</button><button type="button" data-anim="ver" aria-pressed="false">Versions</button><button type="button" data-anim="write" aria-pressed="false">Write</button></div>
@@ -257,7 +312,7 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
     </div></div>
     <div class="grow" id="vwRow" hidden><span class="lab">Player</span><div class="items">
       <span class="mid" style="flex-wrap:nowrap"><button type="button" class="play" id="vwprev" aria-label="Previous version" title="Previous version">◀</button><button type="button" class="play" id="vwnext" aria-label="Next version" title="Next version">▶</button></span>
-      <span class="mid" id="writeCtl"><button type="button" class="play" id="write" hidden>Play</button><button type="button" class="play" id="closeup" disabled title="Pause and look closer: a magnifier follows the mouse">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
+      <span class="mid" id="writeCtl"><button type="button" class="play" id="write" hidden>Play</button><button type="button" class="play" id="closeup" disabled title="A magnifier over the page. In Write it follows the word being written; otherwise, or when paused, move the mouse to read any part.">Close-up</button><label for="wps">Words/s</label> <input type="range" id="wps" min="10" max="800" step="10" value="150"> <span id="wpsv">150</span></span>
       <span class="mid" id="playCtl"><button type="button" class="play" id="play" hidden>Play</button><label for="speed">Time per version</label> <input type="range" id="speed" min="0.2" max="10" step="0.1" value="2"> <span id="speedv">2 s</span></span>
     </div></div>
   </div>
@@ -269,9 +324,53 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
         <input type="range" id="pscrub" min="0" max="1000" value="0" aria-label="Position in the animation">
         <span class="mid"><label for="pspeed">Time per version</label> <input type="range" id="pspeed" min="0.2" max="10" step="0.1" value="2" style="width:80px" title="Time per version"> <span id="pspeedv"></span></span>
         <span class="mid" hidden><label for="pzoom">Zoom</label> <input type="range" id="pzoom" min="1" max="8" step="0.1" value="1"> <span id="pzoomv">1.0×</span></span>
-        <button type="button" class="play" id="pmore" aria-expanded="false" aria-controls="pmoreRows">More options…</button>
+        <button type="button" class="play" id="pmore" hidden aria-expanded="false" aria-controls="pmoreRows">More options…</button>
       </div></div>
       <div id="pmoreRows" hidden>
+      </div>
+    </div>
+    <p class="note">Click a version bar to play just that version. Gray shows the final text still to come. Zoom in and scroll inside the page to read a passage.</p>
+  </div>
+  <p class="tip" id="tip" hidden></p>
+  <div id="legend">
+  <div class="info" id="info"><button type="button" class="play" id="example" aria-pressed="false" title="Show the example: 16 versions of an essay">Example</button><p class="note" id="note"></p></div>
+  <div class="rounds" id="rounds"></div>
+  <div class="rhint" id="rhint"><span id="rtext"></span><button type="button" id="rclear" hidden>Show all rounds</button></div>
+    <div class="rounds" id="prounds" hidden></div>
+    <div class="rhint" id="prtext" hidden></div>
+  </div>
+  <div id="adv">
+    <button type="button" class="play" id="advBtn" aria-expanded="false">Advanced ⌄</button>
+    <div class="groups" id="advRows" hidden>
+    <div class="grow"><span class="lab">Color</span><div class="items">
+      <select id="colorSel" aria-label="Colors"></select>
+      <div class="seg" role="group" aria-label="Palette: color ramp" hidden><button type="button" data-k="pal" data-v="hue" aria-pressed="true">Palette</button></div>
+      <div class="pal" id="palCtl">
+        <select id="preset" aria-label="Color set" hidden>
+          <option value="#0c2c84,#d0157a,#f59a1b">Navy–magenta–orange</option>
+          <option value="#1e88c7,#7a3fb5,#e2462f">Sky–violet–vermilion</option>
+        </select>
+        <input type="color" id="c0" value="#0c2c84" aria-label="Oldest color">
+        <input type="color" id="c1" value="#d0157a" aria-label="Middle color">
+        <input type="color" id="c2" value="#f59a1b" aria-label="Newest color">
+        <label class="mid" for="mid" title="Midpoint: where the middle color sits">Mid <input type="range" id="mid" min="0.1" max="0.9" step="0.01" value="0.5"> <span id="midv">v2.5</span></label>
+      </div>
+      <div class="seg" role="group" aria-label="Palette: other" hidden><button type="button" data-k="pal" data-v="soft" aria-pressed="false">Soft hues</button><button type="button" data-k="pal" data-v="distinct" aria-pressed="false">Bright hues</button><button type="button" data-k="pal" data-v="gray" aria-pressed="false">Grays</button></div>
+    </div></div>
+      <div class="grow" id="pageRow"><span class="lab">Page</span><div class="items">
+        <div class="seg" role="group" aria-label="Alignment" hidden><button type="button" data-pk="align" data-v="justify">Justified</button><button type="button" data-pk="align" data-v="left">Left aligned</button></div>
+        <div class="seg" role="group" aria-label="Paragraphs" id="paraSeg"><button type="button" data-pk="para" data-v="indent">Indent</button><button type="button" data-pk="para" data-v="space">Line between</button></div>
+        <div class="seg" role="group" aria-label="Proportions"><button type="button" data-pk="shape" data-v="a4">A4</button><button type="button" data-pk="shape" data-v="45">4:5</button><button type="button" data-pk="shape" data-v="11">Square</button><button type="button" data-pk="shape" data-v="916">9:16</button><button type="button" data-pk="shape" data-v="169">16:9</button></div>
+        <span class="mid"><label><input type="checkbox" id="cbLeft">Left aligned</label></span>
+        <span class="mid"><label for="plh">Line spacing</label> <input type="range" id="plh" min="1" max="2.4" step="0.02" value="1.32"> <span id="plhv"></span></span>
+      </div></div>
+      <div class="grow" id="coloringRow"><span class="lab">Coloring</span><div class="items">
+        <span class="mid"><label title="Rewritten words in bold, in a darker shade of their version's color; new words a little lighter"><input type="checkbox" id="cbSplit">Rewrites bold</label></span>
+        <div class="seg" role="group" aria-label="Edits" hidden><button type="button" data-pk="split" data-v="same">Edits same color</button><button type="button" data-pk="split" data-v="darker">Edits darker</button></div>
+        <span class="mid" id="olderSeg"><label title="During animations, or when you pick a version: earlier versions in gray"><input type="checkbox" id="cbOlder">Earlier versions in gray</label></span>
+        <div class="seg" role="group" aria-label="Earlier versions" hidden><button type="button" data-pk="older" data-v="color">Earlier in color</button><button type="button" data-pk="older" data-v="gray">Earlier in gray</button></div>
+      </div></div>
+      <div id="revSet" hidden>
       <div class="grow"><span class="lab">Timing</span><div class="items">
         <span class="mid"><label for="phold">Crossed out</label> <input type="range" id="phold" min="0" max="3" step="0.1" value="0.6"> <span id="pholdv"></span></span>
         <span class="mid"><label for="ppause">Pause</label> <input type="range" id="ppause" min="0" max="4" step="0.1" value="1"> <span id="ppausev"></span></span>
@@ -279,8 +378,9 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
       </div></div>
       <div class="grow"><span class="lab">Changes</span><div class="items">
         <div class="seg" role="group" aria-label="Order of changes"><button type="button" data-pk="order" data-v="all">All at once</button><button type="button" data-pk="order" data-v="reading">Reading order</button><button type="button" data-pk="order" data-v="scattered">Scattered</button></div>
-        <div class="seg" role="group" aria-label="Text shape"><button type="button" data-pk="layout" data-v="fixed">Final text in gray</button><button type="button" data-pk="layout" data-v="grow">Text grows</button></div>
-        <div class="seg" role="group" aria-label="Removed words"><button type="button" data-pk="removed" data-v="vanish">Cuts disappear</button><button type="button" data-pk="removed" data-v="stay">Cuts stay</button></div>
+        <span class="mid pair"><label><input type="checkbox" id="cbGrow">Text grows</label><label><input type="checkbox" id="cbStay">Keep cuts</label></span>
+        <div class="seg" role="group" aria-label="Text shape" hidden><button type="button" data-pk="layout" data-v="fixed">Final text in gray</button><button type="button" data-pk="layout" data-v="grow">Text grows</button></div>
+        <div class="seg" role="group" aria-label="Removed words" hidden><button type="button" data-pk="removed" data-v="vanish">Cuts disappear</button><button type="button" data-pk="removed" data-v="stay">Cuts stay</button></div>
       </div></div>
       <div class="grow" hidden><span class="lab">Show as</span><div class="items">
         <div class="seg" role="group" aria-label="Words as"><button type="button" data-pk="view" data-v="text">Text</button><button type="button" data-pk="view" data-v="blocks">Blocks</button></div>
@@ -293,20 +393,14 @@ input[type=range]:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
       </div></div>
       </div>
     </div>
-    <p class="note">Click a version bar to play just that version. Gray shows the final text still to come. Zoom in and scroll inside the page to read a passage.</p>
   </div>
   </div>
   <div id="main">
-  <div class="info" id="info"><button type="button" class="play" id="example" aria-pressed="false" title="Show the example: 16 versions of an essay">Example</button><p class="note" id="note"></p></div>
-  <div class="rounds" id="rounds"></div>
-  <div class="rhint" id="rhint"><span id="rtext"></span><button type="button" id="rclear" hidden>Show all rounds</button></div>
   <div class="page" id="page"><div class="flow" id="flow"></div><div id="wlabel" hidden></div><div id="lens" hidden><div id="lensIn"></div></div></div>
   <div class="multi" id="multi" hidden></div>
   <div class="stackwrap" id="stackwrap" hidden><canvas id="stack" aria-label="The versions as stacked pages, first version at the bottom"></canvas></div>
 
   <div id="pview" hidden>
-    <div class="rounds" id="prounds"></div>
-    <div class="rhint" id="prtext"></div>
     <div class="page" id="ppage"><div class="flow" id="pflow"></div></div>
   </div>
   </div>
@@ -464,7 +558,7 @@ const DIST=['#4269d0','#efb118','#ff725c','#6cc5b0','#3ca951','#ff8ab7','#a463f2
 // Soft hues: same lightness and strength, the hue turning step by step from blue around the color wheel
 function softHue(k){const h=(265+(NR>1?(k-1)/(NR-1):0)*325)*Math.PI/180;return `rgb(${fromLab([68,38*Math.cos(h),38*Math.sin(h)])})`}
 // lighter version of a color for Blocks (same hue): lighter and a little less saturated
-function lighten(c){const m=c.match(/\d+(\.\d+)?/g).slice(0,3).map(Number);const [L,C,h]=toLch(toLab(m));const r=h*Math.PI/180,L2=L+(96-L)*0.42,C2=C*0.72;return `rgb(${fromLab([L2,C2*Math.cos(r),C2*Math.sin(r)])})`}
+function lighten(c){const m=c.match(/\d+(\.\d+)?/g).slice(0,3).map(Number);const [L,C,h]=toLch(toLab(m));const o=(typeof Player!=='undefined'&&Player.opt)||{bl:0.42,bs:0.72};const r=h*Math.PI/180,L2=L+(96-L)*o.bl,C2=C*o.bs;return `rgb(${fromLab([L2,C2*Math.cos(r),C2*Math.sin(r)])})`}
 function colorK(k){if(st.pal==='soft')return softHue(k);if(st.pal==='distinct'){const c=hex2rgb(DIST[(k-1)%DIST.length]);return `rgb(${c})`}return color(pos(k))}
 const esc=s=>s.replace(/[\u0000-\u001f\u007f\ufffc\ufffd]/g,'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const flow=document.getElementById('flow');
@@ -519,17 +613,18 @@ const roundsEl=document.getElementById('rounds');
 const fmt=n=>n.toLocaleString('en-US');
 function drawRounds(){
   if(writing){roundsEl.innerHTML=counts.map((n,i)=>{const r=i+1,cl=r<wRound?'past':r===wRound?'now':'future';
-    return `<button type="button" class="rb ${cl}" data-r="${r}" aria-pressed="false" title="Version ${r} · ${dates[i]} ${years[i]}"><span class="sw" style="background:${colorK(r)}"></span><span class="v">v${r} · ${fmt(n)}</span></button>`}).join('');return}
+    return `<button type="button" class="rb ${cl}" data-r="${r}" aria-pressed="false" title="Version ${r} · ${dates[i]} ${years[i]}"><span class="sw" style="background:${colorK(r)}"></span><span class="v">v${r}<span class="cnt2"> · ${fmt(n)}</span></span></button>`}).join('');return}
   roundsEl.innerHTML=counts.map((n,i)=>`<button type="button" class="rb" data-r="${i+1}" aria-pressed="${sel.has(i+1)}" title="Version ${i+1} · ${dates[i]} ${years[i]} · ${fmt(n)} words">
-   <span class="sw" style="background:${colorK(i+1)}"></span><span class="v">v${i+1} · ${fmt(n)}</span></button>`).join('');
+   <span class="sw" style="background:${colorK(i+1)}"></span><span class="v">v${i+1}<span class="cnt2"> · ${fmt(n)}</span></span></button>`).join('');
   const t=document.getElementById('rtext');const M=MODES[st.mode];
   if(st.view==='stack'){
-    roundsEl.querySelectorAll('.rb').forEach(b=>b.setAttribute('aria-pressed',!!st.upto&&+b.dataset.r<=st.upto));
+    // like Write: the current version outlined, later ones faded (not all of them 'selected')
+    if(st.upto)roundsEl.querySelectorAll('.rb').forEach(b=>{b.classList.toggle('now',+b.dataset.r===st.upto);b.classList.toggle('future',+b.dataset.r>st.upto)});
     document.getElementById('rclear').hidden=true;
     t.textContent=st.upto?`3D view built up to version ${st.upto} (${dates[st.upto-1]}). Click it again to show all ${NR}.`:'Click a version to build the 3D view up to it, or choose Versions under Animate to build it step by step.';
     return}
   if(st.view==='one'&&st.upto){
-    roundsEl.querySelectorAll('.rb').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.r<=st.upto));
+    roundsEl.querySelectorAll('.rb').forEach(b=>{b.classList.toggle('now',+b.dataset.r===st.upto);b.classList.toggle('future',+b.dataset.r>st.upto)});
     document.getElementById('rclear').hidden=true;
     t.textContent=st.mode==='written'?`Version ${st.upto} (${dates[st.upto-1]}): the text as it stood after this version. Crossed-out words were removed by then.`:`Up to version ${st.upto} (${dates[st.upto-1]}).`;
     return}
@@ -547,7 +642,7 @@ document.getElementById('rclear').addEventListener('click',()=>{sel.clear();pain
 let totals={all:0,kept:0,first:0,cut:0};
 function computeTotals(){let all=0,kept=0,first=0,ed=0;for(const w of D){if(w[0]==='¶')continue;all++;if(!w[2]){kept++;if(w[1]===1)first++}if(w[3][0]==='e'||w[3][1]==='e')ed++}totals={all,kept,first,cut:all-kept,ed};
   // word counts on the Text view buttons
-  const n={final:kept,written:all,deleted:all-kept,edited:ed},L={final:'Final text',written:'All written text',deleted:'Deleted',edited:'Edited'};
+  const n={final:kept,written:all,deleted:all-kept,edited:ed},L={final:'Final text',written:'All written',deleted:'Deleted',edited:'Edited'};
   document.querySelectorAll('#modeSeg button').forEach(b=>{b.innerHTML=`${L[b.dataset.v]} <span class="cnt">${fmt(n[b.dataset.v])}</span>`})}
 const dyn=document.createElement('style');document.head.appendChild(dyn);
 function paint(){
@@ -557,7 +652,7 @@ function paint(){
   if(typeof midLabel==='function')midLabel();
   flow.classList.toggle('blocks',st.mark==='blocks');
   drawRounds();
-  let css=`#flow span{color:${FADE}}#flow.blocks span{background:${FADE}}`;
+  let css=`#flow span{color:${FADE}}#flow.blocks span{background:linear-gradient(${FADE},${FADE}) no-repeat 0 55%/calc(100% - var(--wg,0em)) var(--bh,56%);color:transparent!important}`;
   // Coloring row: edits darker (new words a little lighter), and earlier versions in gray while Versions or Write runs
   const po=PO(),darker=po.split==='darker'&&typeof Player!=='undefined';
   const cur=po.older==='gray'?(writing?wRound:(st.view==='one'&&st.upto?st.upto:0)):0;
@@ -568,15 +663,15 @@ function paint(){
   for(let k=1;k<=NR;k++){
     const faded=sel.size&&!sel.has(k)&&!(grayEarlier&&k<selMax), old=(cur>1&&k<cur)||(grayEarlier&&!sel.has(k)&&k<selMax), c=faded?FADE:old?'#c9ced6':darker?Player.newCol(k):colorK(k), q=`span[data-e="${k}"]`;
     const bc=faded||old?c:lighten(c);
-    css+=`#flow ${q}{color:${c}}#flow.blocks ${q}{background:${bc}}`;
-    if(darker&&!faded&&!old){const e=Player.darkCol(k);css+=`#flow ${q}[data-x]{color:${e}}#flow.blocks ${q}[data-x]{background:${lighten(e)}}`}
-    if(!faded)css+=`#flow ${q}[data-h]{text-decoration:line-through}#flow.blocks ${q}[data-h]{background:transparent;color:transparent;text-decoration:none;box-shadow:inset 0 0 0 1px ${bc}}`;
+    css+=`#flow ${q}{color:${c}}#flow.blocks ${q}{background:linear-gradient(${bc},${bc}) no-repeat 0 55%/calc(100% - var(--wg,0em)) var(--bh,56%)}`;
+    if(darker&&!faded&&!old){const e=Player.darkCol(k);css+=`#flow ${q}[data-x]{color:${e}}#flow.blocks ${q}[data-x]{background:linear-gradient(${lighten(e)},${lighten(e)}) no-repeat 0 55%/calc(100% - var(--wg,0em)) var(--bh,56%)}`}
+    if(!faded)css+=`#flow ${q}[data-h]{text-decoration:line-through}#flow.blocks ${q}[data-h]{text-decoration:none;background:linear-gradient(color-mix(in srgb,${bc} 32%,#fff),color-mix(in srgb,${bc} 32%,#fff)) no-repeat 0 55%/calc(100% - var(--wg,0em)) var(--bh,56%)}`;
   }
   if(st.view==='one'&&st.upto){
     const k=st.upto, hide='{color:transparent!important;background:transparent!important;box-shadow:none!important;text-decoration:none!important}';
     for(let j=k+1;j<=NR;j++)css+=`#flow span[data-e="${j}"]${hide}`;
     if(st.mode==='written')for(let e=1;e<=k;e++){const c=(sel.size&&!sel.has(e))?FADE:colorK(e);
-      for(let d=k+1;d<=NR;d++)css+=`#flow span[data-e="${e}"][data-d="${d}"]{text-decoration:none!important}#flow.blocks span[data-e="${e}"][data-d="${d}"]{background:${c}!important;color:${c}!important;box-shadow:none!important}`}
+      for(let d=k+1;d<=NR;d++)css+=`#flow span[data-e="${e}"][data-d="${d}"]{text-decoration:none!important}#flow.blocks span[data-e="${e}"][data-d="${d}"]{background:linear-gradient(${c},${c}) no-repeat 0 55%/calc(100% - var(--wg,0em)) var(--bh,56%)!important;color:transparent!important;box-shadow:none!important}`}
   }
   css+=css.replace(/#flow(?![A-Za-z])/g,'#flowLens');
   dyn.textContent=css;
@@ -647,10 +742,10 @@ function solve(mode){
 }
 // page settings shared with the player (Page row): proportions, alignment, line spacing
 const SHAPES={a4:[1,1.414,900],'45':[4,5,900],'11':[1,1,900],'916':[9,16,560],'169':[16,9,900]};
-const PO=()=>(typeof Player!=='undefined'&&Player.opt)||{shape:'a4',align:'justify',lh:1.32,split:'same',older:'color'};
+const PO=()=>(typeof Player!=='undefined'&&Player.opt)||{shape:'a4',align:'justify',lh:1.32,split:'same',older:'color',para:'indent'};
 const shp=()=>SHAPES[PO().shape]||SHAPES.a4;
 const PR=()=>shp()[1]/shp()[0];           // page height / width
-const pkey=()=>{const o=PO();return o.shape+'|'+o.align+'|'+o.lh+'|'+o.split};
+const pkey=()=>{const o=PO();return o.shape+'|'+o.align+'|'+o.lh+'|'+o.split+'|'+o.para};
 // page width: as wide as the column allows, but short enough that the whole page fits on the screen
 function pageFitW(el){
   const s=shp(),r=s[1]/s[0],cw=el.parentElement.clientWidth||900,vh=innerHeight;
@@ -699,7 +794,7 @@ function drawMulti(){
     for(let i=0;i<R.length;i+=6)if(R[i+4]!==k)g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.86);
     const c=colorK(k);g.fillStyle=c;g.strokeStyle=c;g.lineWidth=0.7/w;
     for(let i=0;i<R.length;i+=6)if(R[i+4]===k){
-      if(R[i+5])g.strokeRect(R[i],R[i+1],R[i+2],R[i+3]*0.86);else g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.86);
+      g.globalAlpha=R[i+5]?0.32:1;g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.86);g.globalAlpha=1;   // removed words: a pale bar
     }
   });
 }
@@ -707,14 +802,13 @@ multi.addEventListener('click',e=>{const b=e.target.closest('.mp');if(!b)return;
   sel.clear();sel.add(+b.dataset.k);st.mark='blocks';setView('one');paint();});
 let lastView='one';
 // ---- Animate row: three animations; choosing one starts it and explains it ----
-let animSel=null;
+let animSel='rev';   // chosen at the start: Play opens the Revisions player
 const MODE_NAME={final:'Final text',written:'All written text',deleted:'Deleted',edited:'Edited'};
 const ANIM_HINT={rev:()=>'Each version\'s changes in turn: new words are written in, cuts are crossed out, rewrites replace old words.',
   ver:()=>`Shows the chosen text view (now ${MODE_NAME[st.mode]}) one whole version at a time: v1, then v2, and so on.`,
   write:()=>'Shows all text ever written, word by word, version after version; cut words are crossed out.'};
 function updateAnim(){
   const pv=st.view==='player';
-  if(!pv&&animSel==='rev')animSel=null;
   document.querySelectorAll('#animSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.anim===animSel)));
   document.getElementById('writeCtl').hidden=animSel!=='write'||st.view!=='one';
   document.getElementById('playCtl').hidden=animSel!=='ver'||pv||st.view==='ten';
@@ -731,12 +825,16 @@ document.querySelectorAll('#animSeg button').forEach(b=>b.addEventListener('clic
 document.getElementById('pclose').addEventListener('click',()=>setView(lastView));
 function setView(v){
   if(v==='player'&&typeof writing!=='undefined'&&writing)stopWrite(true);
-  st.view=v;
+  const prevView=st.view;st.view=v;
   document.querySelectorAll('.seg button[data-k="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===(v==='one'||v==='player'?st.mark:v)));
   pageEl.hidden=v!=='one';multi.hidden=v!=='ten';stackWrap.hidden=v!=='stack';
-  const pv=v==='player';document.getElementById('pview').hidden=!pv;document.getElementById('pside').hidden=!pv;
+  const pv=v==='player';
+  // the player always opens at the whole page (no left-over close-up from an earlier visit)
+  if(pv!==(prevView==='player')){const pz=document.getElementById('pzoom');if(pz&&+pz.value!==1){pz.value=1;pz.dispatchEvent(new Event('input'))}}
+  document.getElementById('pview').hidden=!pv;document.getElementById('pside').hidden=!pv;
   {const n=document.getElementById('info'),r=document.getElementById(pv?'prounds':'rounds');r.parentNode.insertBefore(n,r)}
   ['rounds','rhint'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=pv});
+  ['prounds','prtext'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=!pv});
   // rows that do not apply stay in place, faded, so the controls do not jump
   {const tv=document.getElementById('textViewRow');tv.classList.toggle('na',pv);tv.inert=pv}
   if(!pv)lastView=v;
@@ -788,10 +886,9 @@ function playerZoom(z){
   document.getElementById('mzoom').value=z;document.getElementById('mzoomv').textContent=z.toFixed(1)+'×';
 }
 function playerMark(quiet){
-  const v=st.mark==='blocks'?'blocks':'text',b=document.querySelector(`#pside [data-pk="view"][data-v="${v}"]`);
+  const v=st.mark==='blocks'?'blocks':'text',b=document.querySelector(`button[data-pk="view"][data-v="${v}"]`);
   if(Player.opt.view!==v&&b)b.click();
   if(!quiet)document.querySelectorAll('.seg button[data-k="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===st.mark));
-  playerZoom(+document.getElementById('pzoom').value||1);
 }
 // ---- stack: the ten pages in axonometry, v1 at the bottom ----
 const stackCv=document.getElementById('stack'), stackWrap=document.getElementById('stackwrap');
@@ -803,13 +900,13 @@ function drawStack(){
   const gap=+document.getElementById('gap').value, PH=PR();
   const W=stackWrap.clientWidth||900;
   const xs=[0,AX[0],BY[0]*PH,AX[0]+BY[0]*PH], minX=Math.min(...xs), spanX=Math.max(...xs)-minX;
-  const labelW=0;
-  const sc=(W*0.7-8)/spanX;
+  const labelW=38;   // room on the left for the version numbers
+  const sc=Math.min((W*0.7-8)/spanX,(W-labelW-12)/spanX);
   const pageH=(AX[1]+BY[1]*PH)*sc, step=gap*sc, topPad=14, H=Math.round(pageH+(NR-1)*step+topPad+12);
   const dpr=Math.min(2,window.devicePixelRatio||1);
   stackCv.style.height=H+'px';stackCv.width=Math.round(W*dpr);stackCv.height=Math.round(H*dpr);
   const g=stackCv.getContext('2d');
-  const ox=-minX*sc+4+(W-spanX*sc-8)/2;
+  const ox=Math.max(labelW+6,(W-spanX*sc)/2)-minX*sc;
   stackGeom={sc,ox,step,topPad,PH};
   g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
   const cn=countCache;
@@ -825,12 +922,22 @@ function drawStack(){
     for(let i=0;i<R.length;i+=6)if(R[i+4]!==k)g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.8);
     g.globalAlpha=1;
     if(on){const c=colorK(k);g.fillStyle=c;g.strokeStyle=c;g.lineWidth=1.2/sc;
-      for(let i=0;i<R.length;i+=6)if(R[i+4]===k){if(R[i+5])g.strokeRect(R[i],R[i+1],R[i+2],R[i+3]*0.8);else g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.8)}}
+      for(let i=0;i<R.length;i+=6)if(R[i+4]===k){g.globalAlpha=R[i+5]?0.32:1;g.fillRect(R[i],R[i+1],R[i+2],R[i+3]*0.8)}g.globalAlpha=1}   // removed words: a pale bar
     // outline drawn in screen space so every edge is an even 1px
     g.setTransform(dpr,0,0,dpr,0,0);
     const P=(u,v)=>[ox+(AX[0]*u+BY[0]*v)*sc, oy+(AX[1]*u+BY[1]*v)*sc];
     const c4=[P(0,0),P(1,0),P(1,PH),P(0,PH)];
     g.beginPath();g.moveTo(...c4[0]);for(let i=1;i<4;i++)g.lineTo(...c4[i]);g.closePath();
+  }
+  // version numbers on the left, next to each page's left corner (every 2nd or 3rd one when the pages are close)
+  g.setTransform(dpr,0,0,dpr,0,0);
+  const every=Math.max(1,Math.ceil(13/Math.max(1,step)));
+  g.font='500 11px "IBM Plex Sans",system-ui,sans-serif';g.textAlign='right';g.textBaseline='middle';
+  for(let k=1;k<=last;k++){
+    if((k-1)%every&&k!==last)continue;
+    const oy=topPad+(NR-k)*step, x=ox+(minX)*sc, y=oy+(AX[1]*0+BY[1]*PH)*sc;
+    g.fillStyle=(!sel.size||sel.has(k))?colorK(k):'#b8bec7';
+    g.fillText('v'+k,x-8,y);
   }
 }
 stackCv.addEventListener('click',e=>{
@@ -903,7 +1010,7 @@ function startWrite(){
     writing=true;wPos=0;paint();
   }
   writeBtn.textContent='Pause';writeBtn.setAttribute('aria-pressed','true');
-  if(lensOn)lensOff();updateCuBtn();
+  updateCuBtn();   // the close-up stays open while writing goes on
   wAcc=0;wLast=performance.now();wRAF=requestAnimationFrame(frame);
 }
 function frame(t){
@@ -912,9 +1019,11 @@ function frame(t){
   while(n-->0&&wPos<events.length){
     const [r,k,cut]=events[wPos++], sp=wSpans[k];
     if(cut)sp.setAttribute('data-h','1');else sp.classList.remove('w0');
+    if(lensSpans){const ls=lensSpans[k];if(ls){if(cut)ls.setAttribute('data-h','1');else ls.classList.remove('w0')}}
     if(wCur)wCur.classList.remove('cur');wCur=sp;sp.classList.add('cur');
     if(r!==wRound){wRound=r;writeHint()}
   }
+  if(lensOn&&wCur&&wCur.getClientRects().length){const fr=flow.getBoundingClientRect(),r=wCur.getBoundingClientRect();lensAt(r.left-fr.left+r.width/2,r.top-fr.top+r.height/2)}
   if(wRound){const sw=roundsEl.querySelector('.rb.now .sw');if(sw){const c=colorK(wRound),q=Math.min(100,Math.round((wPos-rStart[wRound])/Math.max(1,rEnd[wRound]-rStart[wRound])*100));
     sw.style.background=`linear-gradient(90deg,${c} ${q}%,${FADE} ${q}%)`}}
   if(wPos>=events.length){if(wCur)wCur.classList.remove('cur');wCur=null;writeBtn.textContent='Play';writeBtn.setAttribute('aria-pressed','false');wRAF=null;
@@ -931,40 +1040,46 @@ function writeHint(){
 writeBtn.addEventListener('click',()=>{if(wRAF){stopWrite(false)}else{if(!writing){wRound=0}startWrite()}});
 // ---- close-up lens: magnifies the paused page as readable text ----
 const lens=document.getElementById('lens'), lensIn=document.getElementById('lensIn'), cuBtn=document.getElementById('closeup');
-let lensOn=false, lensCopy=null, lensZ=3;
-function canCloseup(){return writing&&st.view==='one'}
+let lensOn=false, lensCopy=null, lensSpans=null, lensZ=3, LP=pageEl, LF=flow, lensT=null;
+function canCloseup(){return (animSel==='write'&&writing&&st.view==='one')||(animSel==='ver'&&st.view==='one')||(animSel==='rev'&&st.view==='player')}
 function updateCuBtn(){cuBtn.disabled=!canCloseup();if(cuBtn.disabled&&lensOn)lensOff()}
-function lensOff(){lensOn=false;lens.hidden=true;pageEl.classList.remove('lensing');cuBtn.setAttribute('aria-pressed','false');lensIn.innerHTML=''}
+function lensOff(){lensOn=false;lensSpans=null;clearInterval(lensT);lensT=null;lens.hidden=true;LP.classList.remove('lensing');cuBtn.setAttribute('aria-pressed','false');lensIn.innerHTML=''}
 let colW=100, colGap=10, nCols=1;
 function lensAt(x,y){ // x,y: point inside the flow, in CSS pixels
   const ci=Math.max(0,Math.min(nCols-1,Math.floor(x/(colW+colGap))));
-  x=ci*(colW+colGap)+colW/2;
-  const lw=lens.clientWidth, lh=lens.clientHeight, fr=flow.getBoundingClientRect(), pr=pageEl.getBoundingClientRect();
+  // the whole column fits in the magnifier: center on the column; otherwise follow the word across
+  if(colW*lensZ<=lens.clientWidth)x=ci*(colW+colGap)+colW/2;
+  const lw=lens.clientWidth, lh=lens.clientHeight, fr=LF.getBoundingClientRect(), pr=LP.getBoundingClientRect();
   let lx=(fr.left-pr.left)+x-lw/2, ly=(fr.top-pr.top)+y-lh/2;
   lx=Math.max(4,Math.min(pr.width-lw-4,lx)); ly=Math.max(4,Math.min(pr.height-lh-4,ly));
   lens.style.left=lx+'px';lens.style.top=ly+'px';
   lensIn.style.transform=`translate(${lw/2-x*lensZ}px,${lh/2-y*lensZ}px) scale(${lensZ})`;
 }
 function lensStart(){
-  lensCopy=flow.cloneNode(true);lensCopy.id='flowLens';lensCopy.classList.remove('blocks');
-  lensCopy.style.width=flow.clientWidth+'px';lensCopy.style.height=flow.clientHeight+'px';
-  lensIn.innerHTML='';lensIn.appendChild(lensCopy);
-  const fs=parseFloat(getComputedStyle(flow).fontSize)/kOf(flow);
-  nCols=+flow.style.columnCount||1;colGap=2.2*fs;colW=(flow.clientWidth/kOf(flow)-colGap*(nCols-1))/nCols;
-  const pw=pageEl.clientWidth;
-  lensZ=Math.min(16/fs,(pw-24)/(colW+2*fs));
-  lens.style.width=Math.round((colW+2*fs)*lensZ)+'px';   // one full column plus a small margin
+  const pv=st.view==='player';LP=pv?document.getElementById('ppage'):pageEl;LF=pv?document.getElementById('pflow'):flow;
+  if(lens.parentElement!==LP)LP.appendChild(lens);
+  // the player's colors are styled by its id: the copy keeps it (the real page comes first, so lookups still find it)
+  lensCopy=LF.cloneNode(true);lensCopy.id=pv?'pflow':'flowLens';lensCopy.classList.remove('blocks');lensCopy.style.transform='';
+  lensCopy.style.width=LF.clientWidth+'px';lensCopy.style.height=LF.clientHeight+'px';
+  lensIn.innerHTML='';lensIn.appendChild(lensCopy);lensSpans=pv?null:[...lensCopy.querySelectorAll('span')];
+  // Revisions changes many words at once: refresh the magnified copy a few times a second
+  if(pv)lensT=setInterval(()=>{if(lensOn&&lensCopy)lensCopy.innerHTML=LF.innerHTML},250);
+  const fs=parseFloat(getComputedStyle(LF).fontSize)/kOf(LF);
+  nCols=+LF.style.columnCount||1;colGap=2.2*fs;colW=(LF.clientWidth/kOf(LF)-colGap*(nCols-1))/nCols;
+  const pw=LP.clientWidth;
+  lensZ=Math.max(2,Math.min(16/fs,(pw-24)/(colW+2*fs)));   // always at least 2x larger than the page
+  lens.style.width=Math.round(Math.min((colW+2*fs)*lensZ,pw-24))+'px';   // one full column plus a small margin, or the page width
   lens.style.height=Math.round(fs*1.32*lensZ*6.5)+'px';  // about six lines
-  lensOn=true;lens.hidden=false;pageEl.classList.add('lensing');cuBtn.setAttribute('aria-pressed','true');
+  lensOn=true;lens.hidden=false;LP.classList.add('lensing');cuBtn.setAttribute('aria-pressed','true');
   // open on the last word written; without one, on the middle of the part of the page that is on screen
-  const fr=flow.getBoundingClientRect(),w=wCur||wHeld;
+  const fr=LF.getBoundingClientRect(),w=pv?null:(wCur||wHeld);
   let x=fr.width/2,y=Math.max(0,Math.min(fr.height,innerHeight/2-fr.top));
   if(w&&w.getClientRects().length){const r=w.getBoundingClientRect();x=r.left-fr.left+r.width/2;y=r.top-fr.top+r.height/2}
   lensAt(x,y);
   lens.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
-cuBtn.addEventListener('click',()=>{if(!canCloseup())return;if(lensOn){lensOff();return}if(wRAF)stopWrite(false);lensStart()});   // while writing: pause, then look closer
-pageEl.addEventListener('mousemove',e=>{if(!lensOn)return;const fr=flow.getBoundingClientRect();lensAt(e.clientX-fr.left,e.clientY-fr.top)});
+cuBtn.addEventListener('click',()=>{if(!canCloseup())return;lensOn?lensOff():lensStart()});   // the magnifier follows the writing; when paused, the mouse moves it
+for(const pg of [pageEl,document.getElementById('ppage')])pg.addEventListener('mousemove',e=>{if(!lensOn||wRAF||pg!==LP)return;const fr=LF.getBoundingClientRect();lensAt(e.clientX-fr.left,e.clientY-fr.top)});
 setStops();
 document.getElementById('preset').addEventListener('change',e=>{const c=e.target.value.split(',');['c0','c1','c2'].forEach((id,i)=>document.getElementById(id).value=c[i]);setStops();paint()});
 ['c0','c1','c2'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{setStops();paint()}));
@@ -1000,14 +1115,15 @@ document.fonts&&document.fonts.ready.then(()=>{for(const k in fitCache)delete fi
 // ---- Page and Coloring rows (shared with the player) changed ----
 window.onPageOpt=function(k){
   document.body.classList.toggle('rbold',PO().split==='darker');
-  if(k==='shape'||k==='align'||k==='lh'||k==='split'){if(st.view==='one'){fit();if(Math.abs(MZ-1)>0.001)mainZoom(MZ)}}
+  document.body.classList.toggle('pspace',PO().para==='space');
+  if(k==='shape'||k==='align'||k==='lh'||k==='split'||k==='para'){if(st.view==='one'){fit();if(Math.abs(MZ-1)>0.001)mainZoom(MZ)}}
   paint();
 };
 
 // ===================== Versions player: plays the versions one after another =====================
 const Player=(function(){
 const $=id=>document.getElementById(id);
-const opt={speed:2,bySize:true,hold:0.6,pause:1,order:'all',removed:'vanish',view:'text',align:'justify',bl:0.42,bs:0.72,bh:0.56,wg:0,lh:1.32,layout:'fixed',shape:'a4',split:'same',older:'color'};
+const opt={para:'indent',speed:2,bySize:true,hold:0.6,pause:1,order:'all',removed:'vanish',view:'text',align:'justify',bl:0.42,bs:0.72,bh:0.56,wg:0,lh:1.32,layout:'fixed',shape:'a4',split:'same',older:'color'};
 try{const s=JSON.parse(localStorage.getItem('poa-player')||'null');if(s)Object.assign(opt,s)}catch(e){}
 const save=()=>{try{localStorage.setItem('poa-player',JSON.stringify(opt))}catch(e){}};
 const flow=$('pflow'),pageEl=$('ppage');
@@ -1114,7 +1230,7 @@ function paint(){
   pageEl.style.aspectRatio=SH[0]+'/'+SH[1];if(!pageEl.closest('[hidden]'))pageEl.style.width=pageFitW(pageEl)+'px';
   $('prounds').innerHTML=[...Array(NR)].map((_,i)=>{const r=i+1,c=CNT[r],tot=c.add+c.ed||1;
     const sw=opt.split==='darker'?`<i style="width:${c.add/tot*100}%;background:${newCol(r)}"></i><i style="width:${c.ed/tot*100}%;background:${darkCol(r)}"></i>`:`<i style="width:100%;background:${baseCol(r)}"></i>`;
-    return `<button type="button" class="rb" data-r="${r}" title="Version ${r} · ${dates[i]} ${years[i]} · ${fmt(c.add)} added, ${fmt(c.ed)} edited, ${fmt(c.rem)} removed"><span class="sw">${sw}</span><span class="v">v${r} · ${fmt(c.add+c.ed)}</span></button>`}).join('');
+    return `<button type="button" class="rb" data-r="${r}" title="Version ${r} · ${dates[i]} ${years[i]} · ${fmt(c.add)} added, ${fmt(c.ed)} edited, ${fmt(c.rem)} removed"><span class="sw">${sw}</span><span class="v">v${r}<span class="cnt2"> · ${fmt(c.add+c.ed)}</span></span></button>`}).join('');
   $('prounds').querySelectorAll('.rb').forEach(b=>b.onclick=()=>{const s=TL[+b.dataset.r-1];stop();T=s.t0+0.02;apply(false);follow(true);stopAt=s.t0+s.w+s.hold+s.pause;play(true)});
   lastR=0;
 }
@@ -1125,7 +1241,7 @@ function fit(){
   if(!N)return;
   pageEl.style.width=pageFitW(pageEl)+'px';
   {const pw=pageEl.offsetWidth;pageEl.style.padding=`${0.07*pw}px ${0.08*pw}px`}   // the same margins as the other viewspx ${Math.round(m*0.065)}px`}
-  const Wp=flow.clientWidth/kOf(flow),Hp=flow.clientHeight/kOf(flow),key=[Math.round(Wp),Math.round(Hp),opt.removed,opt.layout,opt.lh,opt.align,opt.shape,opt.split,N].join('|');
+  const Wp=flow.clientWidth/kOf(flow),Hp=flow.clientHeight/kOf(flow),key=[Math.round(Wp),Math.round(Hp),opt.removed,opt.layout,opt.lh,opt.align,opt.shape,opt.split,opt.para,N].join('|');
   if(key===fitKey||!Wp)return;fitKey=key;
   let peak=1,best=-1;
   for(let r=1;r<=NR;r++){let n=0;for(let k=0;k<N;k++)if(born[k]<=r&&(opt.removed==='stay'||!died[k]||died[k]>=r))n++;if(n>best){best=n;peak=r}}
@@ -1171,20 +1287,21 @@ function syncUI(){
   ['bl','bs','bh'].forEach(id=>{$('p'+id).value=opt[id];$('p'+id+'v').textContent=Math.round(opt[id]*100)+'%'});
   $('pwg').value=opt.wg;$('pwgv').textContent=opt.wg.toFixed(2)+' em';$('plh').value=opt.lh;$('plhv').textContent=(+opt.lh).toFixed(2);
   flow.style.setProperty('--bh',Math.round(opt.bh*100)+'%');flow.style.setProperty('--wg',opt.wg+'em');flow.style.lineHeight=opt.lh;
+  for(const id of ['flow','flowLens']){const f=document.getElementById(id);if(f){f.style.setProperty('--bh',Math.round(opt.bh*100)+'%');f.style.setProperty('--wg',opt.wg+'em')}}
   $('pbySize').checked=opt.bySize;
-  $('pblocksRow').hidden=opt.view!=='blocks';
+  $('pblocksRow').hidden=!(typeof st!=='undefined'&&st.mark==='blocks');
   document.querySelectorAll('.seg button[data-pk]').forEach(b=>b.setAttribute('aria-pressed',String(opt[b.dataset.pk]===b.dataset.v)));
 }
 ['speed','hold','pause'].forEach(id=>$('p'+id).addEventListener('input',e=>{opt[id]=+e.target.value;retime();syncUI();save();apply(false)}));
-['bl','bs'].forEach(id=>$('p'+id).addEventListener('input',e=>{opt[id]=+e.target.value;syncUI();save();paint()}));
+['bl','bs'].forEach(id=>$('p'+id).addEventListener('input',e=>{opt[id]=+e.target.value;syncUI();save();paint();if(window.onPageOpt)onPageOpt('blocks')}));
 ['bh','wg'].forEach(id=>$('p'+id).addEventListener('input',e=>{opt[id]=+e.target.value;syncUI();save()}));
 let lt=null;$('plh').addEventListener('input',e=>{opt.lh=+e.target.value;syncUI();save();clearTimeout(lt);lt=setTimeout(()=>{fit();if(window.onPageOpt)onPageOpt('lh')},120)});
 $('pbySize').addEventListener('change',e=>{opt.bySize=e.target.checked;retime();save();apply(false)});
 document.querySelectorAll('.seg button[data-pk]').forEach(b=>b.addEventListener('click',()=>{
   const k=b.dataset.pk;opt[k]=b.dataset.v;syncUI();save();
-  if(window.onPageOpt&&['align','shape','split','older'].includes(k))onPageOpt(k);
+  if(window.onPageOpt&&['align','shape','split','older','para'].includes(k))onPageOpt(k);
   if(k==='order')retime();
-  paint();if(k==='removed'||k==='shape'||k==='layout'||k==='align'||k==='split'){fitKey='';fit()}
+  paint();if(k==='removed'||k==='shape'||k==='layout'||k==='align'||k==='split'||k==='para'){fitKey='';fit()}
   state.fill(-1);apply(false)}));
 let rt=null;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!$('pview').hidden)fit()},150)});
 
@@ -1282,7 +1399,7 @@ function showExample(){
   // the saved times of the 16 versions (1 Aug - 3 Sep 2026)
   const ds=[1785625137000,1785634098000,1785640635000,1785676287000,1785764968000,1785765503000,1785905358090,1785911536614,1785929714310,1785981856000,1785984440000,1785989327000,1786154964907,1786156434717,1788154053036,1788417639278].map(t=>new Date(t));
   setData(EX_D,ds,EX_NAME,[]);
-  loadMsg.textContent='Load two or more versions of one text (.txt, .md or .docx), or drop them on the page. They are ordered by file name. Nothing leaves your computer.';
+  loadMsg.textContent='';
 }
 // start from the default settings (browsers may restore slider positions from an earlier visit)
 document.querySelectorAll('input[type=range]').forEach(i=>i.value=i.defaultValue);
@@ -1319,10 +1436,11 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
 {
   const aplay=document.getElementById('aplay'),astart=document.getElementById('astart');
   const src=()=>animSel==='write'?writeBtn:animSel==='ver'?playBtn:animSel==='rev'?document.getElementById('pplay'):null;
-  const sync=()=>{const b=src();aplay.disabled=astart.disabled=!b;aplay.textContent=b?b.textContent:'Play';
-    aplay.setAttribute('aria-pressed',b?b.getAttribute('aria-pressed')||'false':'false');
-    if(b)document.getElementById('olderSeg').classList.remove('idle')};   // Earlier in gray applies to every animation
-  aplay.addEventListener('click',()=>{const b=src();if(b)b.click();sync()});
+  const sync=()=>{const b=src(),w=animSel==='rev'&&st.view!=='player';aplay.disabled=!b;astart.disabled=!b||w;
+    aplay.textContent=w?'Play':b?b.textContent:'Play';aplay.setAttribute('aria-pressed',!w&&b?b.getAttribute('aria-pressed')||'false':'false');
+    if(b&&!w)document.getElementById('olderSeg').classList.remove('idle')};   // Earlier in gray applies to every animation
+  const revWaiting=()=>animSel==='rev'&&st.view!=='player';
+  aplay.addEventListener('click',()=>{if(revWaiting()){document.querySelector('[data-anim=rev]').click();sync();return}const b=src();if(b)b.click();sync()});
   astart.addEventListener('click',()=>{
     if(animSel==='write'){stopWrite(true);wRound=0;startWrite();stopWrite(false);writeBtn.textContent='Play';wHeld=null}
     else if(animSel==='ver'){stopPlay();st.upto=1;verAtStart=true;step()}
@@ -1330,7 +1448,12 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
     sync()});
   const mo=new MutationObserver(sync);
   ['write','play','pplay'].forEach(id=>mo.observe(document.getElementById(id),{childList:true,characterData:true,subtree:true,attributes:true}));
-  const ua=updateAnim;updateAnim=function(){ua();sync()};
+  let cuAnim=animSel,cuView=st.view;
+  const placeCu=()=>{if(lensOn&&(animSel!==cuAnim||st.view!==cuView))lensOff();cuAnim=animSel;cuView=st.view;   // a new animation or view: the magnifier closes
+    const row=animSel==='rev'?document.querySelector('#pside .grow .items'):document.querySelector('#vwRow .items');
+    const arrows=row&&row.querySelector('span.mid');if(arrows&&cuBtn.previousElementSibling!==arrows)arrows.after(cuBtn);updateCuBtn()};
+  const ua=updateAnim;updateAnim=function(){ua();sync();placeCu();document.getElementById('revSet').hidden=animSel!=='rev';
+    {const ps=document.getElementById('pside'),wait=animSel==='rev'&&st.view!=='player';ps.hidden=!(wait||st.view==='player');ps.classList.toggle('na',wait);ps.inert=wait}requestAnimationFrame(()=>{if(st.view==='one')fit()})};   // rows may have changed: fit the page to the space again   // Revisions chosen, player not open yet: its Player row shows, faded; rows may have changed: fit the page again
 }
 // ---- Hide / Show controls (phones start with the controls hidden) ----
 {
@@ -1343,12 +1466,143 @@ document.getElementById('vwnext').addEventListener('click',()=>vwStep(1));
   tb.addEventListener('click',()=>set(!document.body.classList.contains('compact')));
 }
 document.body.classList.toggle('rbold',PO().split==='darker');
+document.body.classList.toggle('pspace',PO().para==='space');
 // ---- Coloring checkboxes: each one drives a pair of the old buttons ----
-for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','older','gray','color']]){
+// ---- one Colors menu: the color sets, Soft / Bright / Grays, and Custom (your own three colors and Mid) ----
+{
+  const cs=document.getElementById('colorSel'),pre=document.getElementById('preset'),palCtl=document.getElementById('palCtl');
+  cs.innerHTML=[...pre.options].map(o=>`<option value="set:${o.value}">${o.text}</option>`).join('')+
+    '<option value="soft">Soft hues</option><option value="distinct">Bright hues</option><option value="gray">Grays</option><option value="custom">Custom…</option>';
+  const pal=v=>document.querySelector(`button[data-k="pal"][data-v="${v}"]`);
+  const cur=()=>['c0','c1','c2'].map(id=>document.getElementById(id).value.toLowerCase()).join(',');
+  const showCustom=on=>palCtl.classList.toggle('custom',on);
+  let custom=false;
+  const syncSel=()=>{if(st.pal!=='hue'){cs.value=st.pal;showCustom(false);return}
+    const m=!custom&&[...pre.options].find(o=>o.value.toLowerCase()===cur());cs.value=m?'set:'+m.value:'custom';showCustom(!m)};
+  cs.addEventListener('change',()=>{const v=cs.value;custom=v==='custom';
+    if(v.startsWith('set:')){if(st.pal!=='hue')pal('hue').click();pre.value=v.slice(4);pre.dispatchEvent(new Event('change'))}
+    else if(v==='custom'){if(st.pal!=='hue')pal('hue').click()}
+    else pal(v).click();
+    syncSel()});
+  ['c0','c1','c2'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{custom=true;syncSel()}));
+  syncSel();
+}
+for(const [cb,k,on,off] of [['cbSplit','split','darker','same'],['cbOlder','older','gray','color'],['cbLeft','align','left','justify'],['cbGrow','layout','grow','fixed'],['cbStay','removed','stay','vanish']]){
   const box=document.getElementById(cb),btn=v=>document.querySelector(`button[data-pk="${k}"][data-v="${v}"]`);
   box.addEventListener('change',()=>btn(box.checked?on:off).click());
-  const syncBox=()=>{box.checked=btn(on).getAttribute('aria-pressed')==='true'};
+  const syncBox=()=>{box.checked=btn(on).getAttribute('aria-pressed')==='true';if(window.syncToggles)syncToggles()};
   new MutationObserver(syncBox).observe(btn(on),{attributes:true,attributeFilter:['aria-pressed']});syncBox();
+}
+// ---- tooltips (hover) and the hint line (click): the explanations that used to sit in the panel ----
+{
+  const T={
+    'label[for=folder]':'Load a folder with two or more versions of one text (.txt, .md or .docx). They are ordered by file name. Nothing leaves your computer.',
+    'label[for=files]':'Choose two or more versions of one text (.txt, .md or .docx), or drop them on the page. Nothing leaves your computer.',
+    '[data-k=mode][data-v=final]':'The final text. Each word has the color of the version in which it was written.',
+    '[data-k=mode][data-v=written]':'Everything ever written. Words that were later cut are crossed out.',
+    '[data-k=mode][data-v=deleted]':'Only the words that were removed.',
+    '[data-k=mode][data-v=edited]':'Only the rewrites: words that replaced earlier ones.',
+    '[data-k=view][data-v=text]':'Show the words as text.',
+    '[data-k=view][data-v=blocks]':'Show each word as a colored bar, to see the pattern of versions at a glance.',
+    '[data-k=view][data-v=ten]':'One small page per version. Click a page to open it.',
+    '[data-k=view][data-v=stack]':'The versions as a 3D stack of pages, the first version at the bottom.',
+    '#mzoom':'Type size. Below 1×: smaller. Above 1×: one long column to scroll.',
+    '#mzcol':'Large type: one column of readable text; scroll to read.',
+    '#mzfit':'Whole page: the entire text on one page.',
+    '#aplay':'Play or pause the chosen animation.',
+    '#astart':'Back to the beginning.',
+    '#speed':'Time per version (shared with Revisions).',
+    '#wps':'Writing speed, in words per second.',
+    '#pscrub':'Position in the animation: drag to move.',
+    '#pspeed':'Time per version (shared with Versions).',
+    '#pmore':'Timing, order of changes and other settings for Revisions.',
+    '#advBtn':'All settings: color, page and coloring, and the Revisions settings when Revisions is chosen.',
+    '#ctlToggle':'Hide or show the controls.',
+    '[data-k=pal][data-v=hue]':'Colors blend from the oldest version to the newest.',
+    '[data-k=pal][data-v=soft]':'A calm color for each version.',
+    '[data-k=pal][data-v=distinct]':'A bright, clearly different color for each version.',
+    '[data-k=pal][data-v=gray]':'All versions in shades of gray.',
+    '#preset':'Color set: oldest, middle and newest version.','#colorSel':'Colors of the versions: a color set that blends from the oldest version to the newest, a calm or bright color for each version, grays, or your own three colors (Custom).','#cbLeft':'Text aligned on the left (otherwise on both sides).','[data-pk=para][data-v=indent]':'Paragraphs: the first line indented, a small gap between paragraphs.','[data-pk=para][data-v=space]':'Paragraphs: no indent, an empty line between paragraphs.','#cbGrow':'Revisions: the text has the real length of each version (otherwise the final text stays in place, in gray).','#cbStay':'Revisions: cut words stay, crossed out (otherwise they disappear).',
+    '#c0':'Color of the oldest version.','#c1':'Color of the middle version.','#c2':'Color of the newest version.',
+    '[data-pk=align][data-v=justify]':'Text aligned on both sides.',
+    '[data-pk=align][data-v=left]':'Text aligned on the left.',
+    '[data-pk=shape][data-v=a4]':'Page shape: A4.','[data-pk=shape][data-v="45"]':'Page shape: 4:5.','[data-pk=shape][data-v="11"]':'Page shape: square.',
+    '[data-pk=shape][data-v="916"]':'Page shape: 9:16 (tall, like a phone).','[data-pk=shape][data-v="169"]':'Page shape: 16:9 (wide, like a screen).',
+    '#plh':'Space between lines.',
+    '[data-pk=order][data-v=all]':'All changes of a version at once.','[data-pk=order][data-v=reading]':'Changes one by one, in reading order.','[data-pk=order][data-v=scattered]':'Changes one by one, in random order.',
+    '[data-pk=layout][data-v=fixed]':'The final text stays in place, in gray, and fills in.','[data-pk=layout][data-v=grow]':'The text has the real length of each version.',
+    '[data-pk=removed][data-v=vanish]':'Cut words disappear after being crossed out.','[data-pk=removed][data-v=stay]':'Cut words stay, crossed out.',
+    '#pbl':'Blocks: how light the colored bars are.','#pbs':'Blocks: how strong the colors are.','#pbh':'Blocks: height of the bars.','#pwg':'Blocks: space between words.','#phold':'How long cut words stay crossed out.','#ppause':'Pause after each version.','#pbySize':'Versions with more changes get more time.'
+  };
+  for(const [q,t] of Object.entries(T))document.querySelectorAll(q).forEach(el=>{el.title=t;const l=el.closest('label');if(l&&!l.title)l.title=t});
+
+  // ---- help mode: "?" in the header. Point at (or tap) a control to see what it does; nothing changes while it is on ----
+  const hb=document.getElementById('helpBtn');hb.title='Help: point at or tap any control to see what it does. Click ? again or press Esc to leave.';
+  const bub=document.createElement('div');bub.id='bubble';bub.hidden=true;bub.setAttribute('role','tooltip');document.body.appendChild(bub);
+  const bar=document.createElement('div');bar.id='helpBar';bar.hidden=true;bar.textContent='Help mode: point at or tap any control · Esc or ? to leave';document.body.appendChild(bar);
+  let help=false;
+  const tipOf=el=>el.dataset.anim?ANIM_HINT[el.dataset.anim]():el.dataset.tip;
+  const target=e=>{const el=e.target.closest('[data-tip],[data-anim]');return el&&el!==hb&&!el.closest('#bubble')?el:null};
+  const show=el=>{const t=tipOf(el);if(!t){bub.hidden=true;return}
+    bub.textContent=t;bub.hidden=false;const r=el.getBoundingClientRect(),bw=bub.offsetWidth,bh=bub.offsetHeight;
+    let top=r.bottom+8;if(top+bh>innerHeight-8)top=r.top-bh-8;
+    bub.style.top=Math.max(8,top)+'px';bub.style.left=Math.max(8,Math.min(innerWidth-bw-8,r.left))+'px'};
+  const setHelp=on=>{help=on;document.body.classList.toggle('helpmode',on);hb.setAttribute('aria-pressed',String(on));bar.hidden=!on;bub.hidden=true;
+    // the explanation moves from the browser's own tooltip to the bubble, and back
+    document.querySelectorAll(on?'[title]':'[data-tip]').forEach(el=>{if(el===hb)return;
+      if(on){el.dataset.tip=el.title;el.removeAttribute('title')}else{el.title=el.dataset.tip;delete el.dataset.tip}})};
+  hb.addEventListener('click',()=>setHelp(!help));
+  addEventListener('keydown',e=>{if(help&&e.key==='Escape')setHelp(false)});
+  document.addEventListener('pointerover',e=>{if(!help||e.pointerType==='touch')return;const el=target(e);if(el)show(el)});
+  document.addEventListener('pointerout',e=>{if(!help||e.pointerType==='touch')return;const el=target(e);if(el&&!el.contains(e.relatedTarget))bub.hidden=true});
+  // while help is on, taps and clicks on controls only explain them
+  for(const ev of ['pointerdown','mousedown','click'])document.addEventListener(ev,e=>{if(!help)return;const el=target(e);if(!el)return;
+    e.preventDefault();e.stopPropagation();if(ev==='click')show(el)},true);
+  // version buttons are redrawn often: keep their explanation in the bubble too
+  new MutationObserver(()=>{if(help)document.querySelectorAll('#rounds [title],#prounds [title]').forEach(el=>{el.dataset.tip=el.title;el.removeAttribute('title')})}).observe(document.getElementById('main'),{childList:true,subtree:true});
+  {const br=document.getElementById('pblocksRow');document.getElementById('advRows').insertBefore(br,document.getElementById('revSet'));
+   document.querySelectorAll('[data-k=view]').forEach(x=>x.addEventListener('click',()=>{br.hidden=st.mark!=='blocks'}));br.hidden=st.mark!=='blocks'}
+  // Advanced: Color, Page and Coloring (remembered)
+  const ab=document.getElementById('advBtn'),ar=document.getElementById('advRows');
+  const setA=o=>{ar.hidden=!o;ab.setAttribute('aria-expanded',String(o));ab.textContent=o?'Advanced ⌃':'Advanced ⌄';try{localStorage.setItem('ttl-adv',o?'1':'0')}catch(e){}};
+  let sa=null;try{sa=localStorage.getItem('ttl-adv')}catch(e){}
+  setA(sa==='1');ab.addEventListener('click',()=>{setA(ar.hidden);requestAnimationFrame(()=>dispatchEvent(new Event('resize')))});
+}
+// ---- Advanced: on/off settings as toggle buttons (same look as the upper controls) ----
+{
+  const syncs=[];
+  for(const box of document.querySelectorAll('#advRows input[type=checkbox]')){
+    const lab=box.closest('label');const t=document.createElement('button');t.type='button';t.className='play tog';
+    t.textContent=lab.textContent.trim();t.title=lab.title||box.title||'';lab.after(t);
+    const sync=()=>t.setAttribute('aria-pressed',String(box.checked));
+    t.addEventListener('click',()=>{box.click();sync()});box.addEventListener('change',sync);sync();syncs.push(sync);
+  }
+  window.syncToggles=()=>syncs.forEach(f=>f());
+}
+// ---- Advanced: one kind of control per row, like the upper controls ----
+{
+  const mk=(label,id)=>{const g=document.createElement('div');g.className='grow';if(id)g.id=id;g.innerHTML=`<span class="lab">${label}</span><div class="items"></div>`;return g};
+  const rowOf=el=>el.closest('.grow');
+  const move=(els,g)=>{const it=g.querySelector('.items');els.forEach(e=>e&&it.appendChild(e));return g};
+  const lab=(g,t)=>{g.querySelector('.lab').textContent=t};
+  const span=id=>document.getElementById(id).closest('span.mid');
+  // Page -> Shape / Text / Spacing
+  const page=document.getElementById('pageRow');lab(page,'Shape');
+  const tText=move([span('cbLeft')],mk('Text','textRow'));
+  const sp=span('plh');sp.querySelector('label').hidden=true;document.getElementById('plh').setAttribute('aria-label','Line spacing');
+  const tSp=move([sp],mk('Spacing','spacingRow'));
+  const tPara=move([document.getElementById('paraSeg')],mk('Paragraphs','paraRow'));
+  page.after(tText);tText.after(tPara);tPara.after(tSp);
+  // Blocks -> Blocks (Lightness, Saturation) / Bars (Bar height, Word gap); both show only with Blocks
+  const bl=document.getElementById('pblocksRow');
+  const bars=move([span('pbh'),span('pwg')],mk('Bars','pbarsRow'));bl.after(bars);
+  const mirror=()=>{bars.hidden=bl.hidden};new MutationObserver(mirror).observe(bl,{attributes:true,attributeFilter:['hidden']});mirror();
+  // Timing -> Timing (Crossed out, Pause) / Pacing (Big versions longer)
+  const tim=rowOf(document.getElementById('phold'));
+  const pac=move([span('pbySize')],mk('Pacing','pacingRow'));tim.after(pac);
+  // Changes -> Order / Changes (Text grows, Keep cuts)
+  const ch=rowOf(document.querySelector('button[data-pk="order"]'));lab(ch,'Order');
+  const chg=move([span('cbGrow')],mk('Changes','changesRow'));ch.after(chg);
 }
 updateAnim();
 showExample();
